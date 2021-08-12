@@ -6,7 +6,7 @@ function base64toJSON(string) {
   return JSON.parse(Buffer.from(string.replace('data:application/json;base64,',''), 'base64').toString())
 }
 
-describe("Greeter", function() {
+describe("Packs Test", function() {
   const baseURI = 'https://arweave.net/';
   const tokenPrice = ethers.utils.parseEther("0.0777");
   const bulkBuyLimit = 30;

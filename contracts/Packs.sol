@@ -60,7 +60,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
   bool public editioned; // Display edition # in token name
   uint256 public licenseVersion; // Tracker of latest license
 
-  uint256[] public shuffleIDs;
+  uint32[] public shuffleIDs;
 
   constructor(
     string memory name,
@@ -70,7 +70,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
     uint256[] memory _initParams,
     string memory _licenseURI
   ) ERC721PresetMinterPauserAutoId(name, symbol, baseURI) public {
-    require(_initParams[1] <= 30, "There cannot be bulk mints above 100");
+    require(_initParams[1] <= 50, "There cannot be bulk mints above 50");
 
     daoAddress = msg.sender;
     daoInitialized = false;
@@ -163,11 +163,11 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
    */
   function createTokenIDs(uint256 collectibleCount, uint256 editions) private {
     for (uint256 i = 0; i < editions; i++) {
-      shuffleIDs.push((collectibleCount + 1) * 100000 + (i + 1));
+      shuffleIDs.push(uint32((collectibleCount + 1) * 100000 + (i + 1)));
     }
   }
 
-  function getTokens() public view returns (uint256[] memory) {
+  function getTokens() public view returns (uint32[] memory) {
     return shuffleIDs;
   }
 
@@ -183,8 +183,9 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
       require(returnExcessStatus, "Failed to return excess.");
     }
 
-    uint256 randomTokenID = random() % (shuffleIDs.length - 1);
+    uint256 randomTokenID = random() % shuffleIDs.length;
     uint256 tokenID = shuffleIDs[randomTokenID];
+
     shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
     shuffleIDs.pop();
 
