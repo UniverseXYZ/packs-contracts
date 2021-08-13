@@ -6,14 +6,11 @@
 pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
-/* TODO: ADD SECONDARY SALE FEES */
-
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import 'base64-sol/base64.sol';
-import "./ERC721PresetMinterPauserAutoId.sol";
-import "./IPacks.sol";
 import "./HasSecondarySaleFees.sol";
 import "hardhat/console.sol";
 
@@ -26,18 +23,10 @@ contract UnopenedPacks is ERC1155, ReentrancyGuard, HasSecondarySaleFees {
 
 
   constructor(
-    string memory name,
-    string memory symbol,
-    string memory baseURI,
-    bool _editioned,
-    uint256[] memory _initParams,
-    string memory _licenseURI
-  ) ERC721PresetMinterPauserAutoId(name, symbol, baseURI) public {
-    require(_initParams[1] <= 50, "There cannot be bulk mints above 50");
-
+    string memory uri
+  ) ERC1155(uri) public {
     daoAddress = msg.sender;
     daoInitialized = false;
-
   }
 
   modifier onlyDAO() {
@@ -48,5 +37,9 @@ contract UnopenedPacks is ERC1155, ReentrancyGuard, HasSecondarySaleFees {
   function transferDAOownership(address payable _daoAddress) public onlyDAO {
     daoAddress = _daoAddress;
     daoInitialized = true;
+  }
+
+  function mint() public payable nonReentrant {
+    _mint(msg.sender, 0, 1, bytes('hi'));
   }
 }
