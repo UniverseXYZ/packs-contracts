@@ -6,11 +6,17 @@
 pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
-/* TODO: ADD SECONDARY SALE FEES */
+/* 
+ * TODO: ADD SECONDARY SALE FEES
+ * Event Emitters
+ * Sale start time & read-only function that checks if sale started
+ * Mint Pass presale
+ */
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "./ConversionLibrary.sol";
 import 'base64-sol/base64.sol';
 import "./ERC721PresetMinterPauserAutoId.sol";
 import "./IPacks.sol";
@@ -19,6 +25,7 @@ import "hardhat/console.sol";
 
 contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSecondarySaleFees {
   using SafeMath for uint256;
+  using ConversionLibrary for *;
   using Counters for Counters.Counter;
 
   address payable public daoAddress;
@@ -119,7 +126,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
     collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
       description: _coreData[1],
-      count: safeParseInt(_coreData[2]),
+      count: _coreData[2].safeParseInt(),
       assets: _assets,
       currentVersion: 1,
       totalVersionCount: _assets.length,
@@ -144,7 +151,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
       propertyCount: _metadataValues.length
     });
 
-    uint256 editions = safeParseInt(_coreData[2]);
+    uint256 editions = _coreData[2].safeParseInt();
     createTokenIDs(collectibleCount, editions);
 
     collectibleCount++;
@@ -261,7 +268,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
   }
 
   function getFeeRecipients(uint256 tokenId) external view returns (address payable[] memory) {
-    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
+    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
     uint256 collectibleId = (tokenId - edition) / 100000 - 1;
     Fee[] memory _fees = secondaryFees[collectibleId];
     address payable[] memory result = new address payable[](_fees.length);
@@ -272,7 +279,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
   }
 
   function getFeeBps(uint256 tokenId) external view returns (uint[] memory) {
-    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
+    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
     uint256 collectibleId = (tokenId - edition) / 100000 - 1;
     Fee[] memory _fees = secondaryFees[collectibleId];
     uint[] memory result = new uint[](_fees.length);
@@ -285,8 +292,8 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
 
   // Dynamic base64 encoded metadata generation using on-chain metadata and edition numbers
   function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-    string memory stringId = toString(tokenId);
-    uint256 edition = safeParseInt(substring(stringId, bytes(stringId).length - 5, bytes(stringId).length)) - 1;
+    string memory stringId = tokenId.toString();
+    uint256 edition = stringId.substring(bytes(stringId).length - 5, bytes(stringId).length).safeParseInt() - 1;
     uint256 collectibleId = (tokenId - edition) / 100000 - 1;
     string memory encodedMetadata = '';
 
@@ -311,7 +318,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
                 '{"name":"',
                 collectibles[collectibleId].title,
                 editioned ? ' #' : '',
-                editioned ? toString(edition + 1) : '',
+                editioned ? (edition + 1).toString() : '',
                 '", "description":"',
                 collectibles[collectibleId].description,
                 '", "image": "',
@@ -330,66 +337,5 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
       );
     
     return encoded;
-  }
-
-  /* HELPER FUNCTIONS
-   * Functions from https://github.com/provable-things/ethereum-api/blob/master/provableAPI_0.6.sol
-   */
-  function toString(uint256 value) internal pure returns (string memory) {
-    if (value == 0) {
-        return "0";
-    }
-    uint256 temp = value;
-    uint256 digits;
-    while (temp != 0) {
-        digits++;
-        temp /= 10;
-    }
-    bytes memory buffer = new bytes(digits);
-    uint256 index = digits - 1;
-    temp = value;
-    while (temp != 0) {
-        buffer[index--] = bytes1(uint8(48 + temp % 10));
-        temp /= 10;
-    }
-    return string(buffer);
-  }
-
-  function safeParseInt(string memory _a) internal pure returns (uint _parsedInt) {
-    return safeParseInt(_a, 0);
-  }
-
-  function safeParseInt(string memory _a, uint _b) internal pure returns (uint _parsedInt) {
-    bytes memory bresult = bytes(_a);
-    uint mint = 0;
-    bool decimals = false;
-    for (uint i = 0; i < bresult.length; i++) {
-      if ((uint(uint8(bresult[i])) >= 48) && (uint(uint8(bresult[i])) <= 57)) {
-        if (decimals) {
-            if (_b == 0) break;
-            else _b--;
-        }
-        mint *= 10;
-        mint += uint(uint8(bresult[i])) - 48;
-      } else if (uint(uint8(bresult[i])) == 46) {
-        require(!decimals, 'More than one decimal encountered in string!');
-        decimals = true;
-      } else {
-        revert("Non-numeral character encountered in string!");
-      }
-    }
-    if (_b > 0) {
-      mint *= 10 ** _b;
-    }
-    return mint;
-  }
-
-  function substring(string memory str, uint startIndex, uint endIndex) internal pure returns (string memory) {
-    bytes memory strBytes = bytes(str);
-    bytes memory result = new bytes(endIndex-startIndex);
-    for(uint i = startIndex; i < endIndex; i++) {
-        result[i-startIndex] = strBytes[i];
-    }
-    return string(result);
   }
 }

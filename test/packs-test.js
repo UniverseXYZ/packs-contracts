@@ -1,10 +1,12 @@
 const { expect } = require("chai");
-const { utils } = require('ethers')
+const { utils } = require('ethers');
 const mock = require('./mock-metadata.json');
 
 function base64toJSON(string) {
   return JSON.parse(Buffer.from(string.replace('data:application/json;base64,',''), 'base64').toString())
 }
+
+/* TODO: Sale Start Time */
 
 describe("Packs Test", function() {
   const baseURI = 'https://arweave.net/';
