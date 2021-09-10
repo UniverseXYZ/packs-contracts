@@ -17,7 +17,6 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./ConversionLibrary.sol";
 import 'base64-sol/base64.sol';
-// import "./ERC721PresetMinterPauserAutoId.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IPacks.sol";
 import "./HasSecondarySaleFees.sol";
@@ -188,11 +187,10 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
 
   function mintPostcomplete() private {
     uint256 randomTokenID = shuffleIDs.length == 1 ? 0 : random() % (shuffleIDs.length - 1);
-    uint256 tokenID = shuffleIDs[randomTokenID];
     shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
     shuffleIDs.pop();
 
-    _mint(_msgSender(), tokenID);
+    _mint(_msgSender(), shuffleIDs[randomTokenID]);
   }
 
   function mint() public override payable nonReentrant {
@@ -251,29 +249,26 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
     return licenseURI[licenseVersion - 1];
   }
 
-  // Returns license version count
-  function getLicenseVersion(uint256 versionNumber) public view returns (string memory) {
-    return licenseURI[versionNumber - 1];
-  }
+  // // Returns license version count
+  // function getLicenseVersion(uint256 versionNumber) public view returns (string memory) {
+  //   return licenseURI[versionNumber - 1];
+  // }
 
   function getFeeRecipients(uint256 tokenId) external view returns (address payable[] memory) {
-    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
-    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
+    uint256 collectibleId = (tokenId - tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1) / 100000 - 1;
     Fee[] memory _fees = secondaryFees[collectibleId];
-    address payable[] memory result = new address payable[](_fees.length);
-    for (uint i = 0; i < _fees.length; i++) {
-      result[i] = _fees[i].recipient;
+    address payable[] memory result = new address payable[](secondaryFees[collectibleId].length);
+    for (uint i = 0; i < secondaryFees[collectibleId].length; i++) {
+      result[i] = secondaryFees[collectibleId][i].recipient;
     }
     return result;
   }
 
   function getFeeBps(uint256 tokenId) external view returns (uint[] memory) {
-    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
-    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
-    Fee[] memory _fees = secondaryFees[collectibleId];
-    uint[] memory result = new uint[](_fees.length);
-    for (uint i = 0; i < _fees.length; i++) {
-      result[i] = _fees[i].value;
+    uint256 collectibleId = (tokenId - tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1) / 100000 - 1;
+    uint[] memory result = new uint[](secondaryFees[collectibleId].length);
+    for (uint i = 0; i < secondaryFees[collectibleId].length; i++) {
+      result[i] = secondaryFees[collectibleId][i].value;
     }
 
     return result;
