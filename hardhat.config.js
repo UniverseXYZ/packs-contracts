@@ -30,7 +30,7 @@ module.exports = {
   },
   networks: {
     hardhat: {
-      // allowUnlimitedContractSize: true
+      allowUnlimitedContractSize: true
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${ process.env.INFURA_KEY }`,

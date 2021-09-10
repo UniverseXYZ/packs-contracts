@@ -20,6 +20,7 @@ import 'base64-sol/base64.sol';
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IPacks.sol";
 import "./HasSecondarySaleFees.sol";
+import "hardhat/console.sol";
 
 contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
   using SafeMath for uint256;
@@ -81,6 +82,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
 
     _name = name;
     _symbol = symbol;
+    _baseURI = baseURI;
 
     editioned = _editioned;
     tokenPrice = _initParams[0];
@@ -172,44 +174,52 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
     }
   }
 
-  function mintPrecheck(uint256 amount) private {
+  function mint() public override payable nonReentrant {
+    if (daoInitialized) {
+      (bool transferToDaoStatus, ) = daoAddress.call{value:tokenPrice}("");
+      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
+    }
+
+    uint256 excessAmount = msg.value.sub(tokenPrice);
+    if (excessAmount > 0) {
+      (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
+      require(returnExcessStatus, "Failed to return excess.");
+    }
+
+    uint256 randomTokenID = random() % shuffleIDs.length;
+    uint256 tokenID = shuffleIDs[randomTokenID];
+
+    shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
+    shuffleIDs.pop();
+
+    _mint(_msgSender(), tokenID);
+  }
+
+  function bulkMint(uint256 amount) public override payable nonReentrant {
+    require(amount <= bulkBuyLimit, "Cannot bulk buy more than the preset limit");
+    require(amount <= shuffleIDs.length, "Total supply reached");
+
     if (daoInitialized) {
       (bool transferToDaoStatus, ) = daoAddress.call{value:tokenPrice.mul(amount)}("");
-      require(transferToDaoStatus, "Unable to send");
+      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
     }
 
     uint256 excessAmount = msg.value.sub(tokenPrice.mul(amount));
     if (excessAmount > 0) {
       (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
-      require(returnExcessStatus, "Excess ERR");
+      require(returnExcessStatus, "Failed to return excess.");
     }
-  }
 
-  function mintPostcomplete() private {
-    uint256 randomTokenID = shuffleIDs.length == 1 ? 0 : random() % (shuffleIDs.length - 1);
-    shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
-    shuffleIDs.pop();
-
-    _mint(_msgSender(), shuffleIDs[randomTokenID]);
-  }
-
-  function mint() public override payable nonReentrant {
-    mintPrecheck(1);
-    mintPostcomplete();
-  }
-
-  modifier isSoldOut(uint256 amount) {
-    require(amount <= bulkBuyLimit, "Over limit");
-    require(amount <= shuffleIDs.length, "Sold out");
-    _;
-  }
-
-  function bulkMint(uint256 amount) public override isSoldOut(amount) payable nonReentrant {
-    mintPrecheck(amount);
     for (uint256 i = 0; i < amount; i++) {
-      mintPostcomplete();
+      uint256 randomTokenID = shuffleIDs.length == 1 ? 0 : random() % (shuffleIDs.length - 1);
+      uint256 tokenID = shuffleIDs[randomTokenID];
+      shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
+      shuffleIDs.pop();
+
+      _mint(_msgSender(), tokenID);
     }
   }
+
 
   // Modify property field only if marked as updateable
   function updateMetadata(uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
@@ -249,26 +259,29 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
     return licenseURI[licenseVersion - 1];
   }
 
-  // // Returns license version count
-  // function getLicenseVersion(uint256 versionNumber) public view returns (string memory) {
-  //   return licenseURI[versionNumber - 1];
-  // }
+  // Returns license version count
+  function getLicenseVersion(uint256 versionNumber) public view returns (string memory) {
+    return licenseURI[versionNumber - 1];
+  }
 
   function getFeeRecipients(uint256 tokenId) external view returns (address payable[] memory) {
-    uint256 collectibleId = (tokenId - tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1) / 100000 - 1;
+    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
+    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
     Fee[] memory _fees = secondaryFees[collectibleId];
-    address payable[] memory result = new address payable[](secondaryFees[collectibleId].length);
-    for (uint i = 0; i < secondaryFees[collectibleId].length; i++) {
-      result[i] = secondaryFees[collectibleId][i].recipient;
+    address payable[] memory result = new address payable[](_fees.length);
+    for (uint i = 0; i < _fees.length; i++) {
+      result[i] = _fees[i].recipient;
     }
     return result;
   }
 
   function getFeeBps(uint256 tokenId) external view returns (uint[] memory) {
-    uint256 collectibleId = (tokenId - tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1) / 100000 - 1;
-    uint[] memory result = new uint[](secondaryFees[collectibleId].length);
-    for (uint i = 0; i < secondaryFees[collectibleId].length; i++) {
-      result[i] = secondaryFees[collectibleId][i].value;
+    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
+    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
+    Fee[] memory _fees = secondaryFees[collectibleId];
+    uint[] memory result = new uint[](_fees.length);
+    for (uint i = 0; i < _fees.length; i++) {
+      result[i] = _fees[i].value;
     }
 
     return result;
