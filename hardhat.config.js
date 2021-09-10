@@ -1,5 +1,6 @@
 require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
+require('hardhat-contract-sizer');
 require('dotenv').config();
 
 
@@ -29,12 +30,17 @@ module.exports = {
   },
   networks: {
     hardhat: {
-      allowUnlimitedContractSize: true
+      // allowUnlimitedContractSize: true
     },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${ process.env.INFURA_KEY }`,
       accounts: [`0x${ process.env.MM_PRIVATE_KEY }`],
     },
+  },
+  contractSizer: {
+    alphaSort: true,
+    runOnCompile: true,
+    disambiguatePaths: false,
   },
   gasReporter: {
     enabled: true

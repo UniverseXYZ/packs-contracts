@@ -14,19 +14,17 @@ pragma experimental ABIEncoderV2;
  */
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "./ConversionLibrary.sol";
 import 'base64-sol/base64.sol';
-import "./ERC721PresetMinterPauserAutoId.sol";
+// import "./ERC721PresetMinterPauserAutoId.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IPacks.sol";
 import "./HasSecondarySaleFees.sol";
-import "hardhat/console.sol";
 
-contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSecondarySaleFees {
+contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
   using SafeMath for uint256;
   using ConversionLibrary for *;
-  using Counters for Counters.Counter;
 
   address payable public daoAddress;
   bool public daoInitialized;
@@ -76,15 +74,14 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
     bool _editioned,
     uint256[] memory _initParams,
     string memory _licenseURI
-  ) ERC721PresetMinterPauserAutoId(name, symbol, baseURI) public {
-    require(_initParams[1] <= 50, "There cannot be bulk mints above 50");
+  ) ERC721(name, symbol) public {
+    require(_initParams[1] <= 50, "Limit of 50");
 
     daoAddress = msg.sender;
     daoInitialized = false;
 
     _name = name;
     _symbol = symbol;
-    _baseURI  = baseURI;
 
     editioned = _editioned;
     tokenPrice = _initParams[0];
@@ -92,10 +89,12 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
     saleStartTime = _initParams[2];
     licenseURI[0] = _licenseURI;
     licenseVersion = 1;
+
+    _setBaseURI(baseURI);
   }
 
   modifier onlyDAO() {
-    require(msg.sender == daoAddress, "Not called from the dao");
+    require(msg.sender == daoAddress, "Wrong address");
     _;
   }
 
@@ -112,8 +111,8 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
   function addCollectible(string[] memory _coreData, string[] memory _assets, string[] memory _secondaryAssets, string[][] memory _metadataValues, Fee[] memory _fees) public onlyDAO {
     uint256 sum = 0;
     for (uint256 i = 0; i < _fees.length; i++) {
-      require(_fees[i].recipient != address(0x0), "Recipient should be present");
-      require(_fees[i].value != 0, "Fee value should be positive");
+      require(_fees[i].recipient != address(0x0), "No recipient");
+      require(_fees[i].value != 0, "Fee negative");
       secondaryFees[collectibleCount].push(Fee({
         recipient: _fees[i].recipient,
         value: _fees[i].value
@@ -121,7 +120,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
       sum += _fees[i].value;
     }
 
-    require(sum < 10000, "Fee should be less than 100%");
+    require(sum < 10000, "Fee over 100%");
 
     collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
@@ -181,13 +180,13 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
   function mint() public override payable nonReentrant {
     if (daoInitialized) {
       (bool transferToDaoStatus, ) = daoAddress.call{value:tokenPrice}("");
-      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
+      require(transferToDaoStatus, "Unable to send");
     }
 
     uint256 excessAmount = msg.value.sub(tokenPrice);
     if (excessAmount > 0) {
       (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
-      require(returnExcessStatus, "Failed to return excess.");
+      require(returnExcessStatus, "Excess ERR");
     }
 
     uint256 randomTokenID = random() % shuffleIDs.length;
@@ -199,19 +198,23 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
     _mint(_msgSender(), tokenID);
   }
 
-  function bulkMint(uint256 amount) public override payable nonReentrant {
-    require(amount <= bulkBuyLimit, "Cannot bulk buy more than the preset limit");
-    require(amount <= shuffleIDs.length, "Total supply reached");
+  modifier isSoldOut(uint256 amount) {
+    require(amount <= bulkBuyLimit, "Over limit");
+    require(amount <= shuffleIDs.length, "Sold out");
+    _;
+  }
+
+  function bulkMint(uint256 amount) public override isSoldOut(amount) payable nonReentrant {
 
     if (daoInitialized) {
       (bool transferToDaoStatus, ) = daoAddress.call{value:tokenPrice.mul(amount)}("");
-      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
+      require(transferToDaoStatus, "Unable to send");
     }
 
     uint256 excessAmount = msg.value.sub(tokenPrice.mul(amount));
     if (excessAmount > 0) {
       (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
-      require(returnExcessStatus, "Failed to return excess.");
+      require(returnExcessStatus, "Excess ERR");
     }
 
     for (uint256 i = 0; i < amount; i++) {
@@ -226,7 +229,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
 
   // Modify property field only if marked as updateable
   function updateMetadata(uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
-    require(metadata[collectibleId - 1].modifiable[propertyIndex], 'Metadata field not updateable');
+    require(metadata[collectibleId - 1].modifiable[propertyIndex], 'Not allowed');
     metadata[collectibleId - 1].value[propertyIndex] = value;
   }
 
@@ -292,8 +295,7 @@ contract Packs is IPacks, ERC721PresetMinterPauserAutoId, ReentrancyGuard, HasSe
 
   // Dynamic base64 encoded metadata generation using on-chain metadata and edition numbers
   function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-    string memory stringId = tokenId.toString();
-    uint256 edition = stringId.substring(bytes(stringId).length - 5, bytes(stringId).length).safeParseInt() - 1;
+    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
     uint256 collectibleId = (tokenId - edition) / 100000 - 1;
     string memory encodedMetadata = '';
 

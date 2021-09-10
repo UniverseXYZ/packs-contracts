@@ -4,7 +4,7 @@ library ConversionLibrary {
   /* HELPER FUNCTIONS
    * Functions from https://github.com/provable-things/ethereum-api/blob/master/provableAPI_0.6.sol
    */
-  function toString(uint256 value) internal pure returns (string memory) {
+  function toString(uint256 value) public pure returns (string memory) {
     if (value == 0) {
         return "0";
     }
@@ -24,11 +24,11 @@ library ConversionLibrary {
     return string(buffer);
   }
 
-  function safeParseInt(string memory _a) internal pure returns (uint _parsedInt) {
+  function safeParseInt(string memory _a) public pure returns (uint _parsedInt) {
     return safeParseInt(_a, 0);
   }
 
-  function safeParseInt(string memory _a, uint _b) internal pure returns (uint _parsedInt) {
+  function safeParseInt(string memory _a, uint _b) public pure returns (uint _parsedInt) {
     bytes memory bresult = bytes(_a);
     uint mint = 0;
     bool decimals = false;
@@ -53,7 +53,7 @@ library ConversionLibrary {
     return mint;
   }
 
-  function substring(string memory str, uint startIndex, uint endIndex) internal pure returns (string memory) {
+  function substring(string memory str, uint startIndex, uint endIndex) public pure returns (string memory) {
     bytes memory strBytes = bytes(str);
     bytes memory result = new bytes(endIndex-startIndex);
     for(uint i = startIndex; i < endIndex; i++) {

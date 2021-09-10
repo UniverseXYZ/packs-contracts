@@ -32,15 +32,24 @@ async function main() {
   const feeSplit1 = 1000;
   const feeSplit2 = 500;
 
+  const Conversion = await hre.ethers.getContractFactory("ConversionLibrary");
+  const libraryInstance = await Conversion.deploy();
+  await libraryInstance.deployed();
+
   const Packs = await hre.ethers.getContractFactory("Packs");
-  packsInstance = await Packs.deploy(
-    'Relics',
-    'MONSTERCAT',
-    baseURI,
-    true,
-    [tokenPrice, bulkBuyLimit, saleStartTime],
-    'https://arweave.net/license',
-  );
+  packsInstance = await Packs.deploy({
+    libraries: {
+      ConversionLibrary: libraryInstance.address
+    },
+    args: [
+      'Relics',
+      'MONSTERCAT',
+      baseURI,
+      true,
+      [tokenPrice, bulkBuyLimit, saleStartTime],
+      'https://arweave.net/license'
+    ]
+  });
   await packsInstance.deployed();
 
   console.log("Packs deployed to:", greeter.address);
