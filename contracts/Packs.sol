@@ -27,7 +27,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
   using ConversionLibrary for *;
 
   address payable public daoAddress;
-  bool public daoInitialized;
+  bool private daoInitialized;
 
   string private _name; // Contract name
   string private _symbol; // Contract symbol
@@ -52,20 +52,20 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
     uint256 propertyCount; // Tracker of total attributes
   }
 
-  mapping (uint256 => SingleCollectible) collectibles; // Unique assets
-  mapping (uint256 => Metadata) metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
-  mapping (uint256 => Fee[]) secondaryFees; // Trait & property attributes, indexes should be coupled with 'collectibles'
-  mapping (uint256 => string) public licenseURI; // URL to external license or file
+  mapping (uint256 => SingleCollectible) private collectibles; // Unique assets
+  mapping (uint256 => Metadata) private metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
+  mapping (uint256 => Fee[]) private secondaryFees; // Trait & property attributes, indexes should be coupled with 'collectibles'
+  mapping (uint256 => string) private licenseURI; // URL to external license or file
 
-  uint256 public collectibleCount = 0; // Total unique assets count
-  uint256 public totalTokenCount = 0; // Total NFT count to be minted
-  uint256 public tokenPrice;
-  uint256 public bulkBuyLimit;
-  uint256 public saleStartTime;
-  bool public editioned; // Display edition # in token name
-  uint256 public licenseVersion; // Tracker of latest license
+  uint256 private collectibleCount = 0; // Total unique assets count
+  uint256 private totalTokenCount = 0; // Total NFT count to be minted
+  uint256 private tokenPrice;
+  uint256 private bulkBuyLimit;
+  uint256 private saleStartTime;
+  bool private editioned; // Display edition # in token name
+  uint256 private licenseVersion; // Tracker of latest license
 
-  uint32[] public shuffleIDs;
+  uint32[] private shuffleIDs;
 
   constructor(
     string memory name,
@@ -173,39 +173,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
     }
   }
 
-  function getTokens() public view returns (uint32[] memory) {
-    return shuffleIDs;
-  }
-
-  function mint() public override payable nonReentrant {
-    if (daoInitialized) {
-      (bool transferToDaoStatus, ) = daoAddress.call{value:tokenPrice}("");
-      require(transferToDaoStatus, "Unable to send");
-    }
-
-    uint256 excessAmount = msg.value.sub(tokenPrice);
-    if (excessAmount > 0) {
-      (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
-      require(returnExcessStatus, "Excess ERR");
-    }
-
-    uint256 randomTokenID = random() % shuffleIDs.length;
-    uint256 tokenID = shuffleIDs[randomTokenID];
-
-    shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
-    shuffleIDs.pop();
-
-    _mint(_msgSender(), tokenID);
-  }
-
-  modifier isSoldOut(uint256 amount) {
-    require(amount <= bulkBuyLimit, "Over limit");
-    require(amount <= shuffleIDs.length, "Sold out");
-    _;
-  }
-
-  function bulkMint(uint256 amount) public override isSoldOut(amount) payable nonReentrant {
-
+  function mintPrecheck(uint256 amount) private {
     if (daoInitialized) {
       (bool transferToDaoStatus, ) = daoAddress.call{value:tokenPrice.mul(amount)}("");
       require(transferToDaoStatus, "Unable to send");
@@ -216,14 +184,32 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
       (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
       require(returnExcessStatus, "Excess ERR");
     }
+  }
 
+  function mintPostcomplete() private {
+    uint256 randomTokenID = shuffleIDs.length == 1 ? 0 : random() % (shuffleIDs.length - 1);
+    uint256 tokenID = shuffleIDs[randomTokenID];
+    shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
+    shuffleIDs.pop();
+
+    _mint(_msgSender(), tokenID);
+  }
+
+  function mint() public override payable nonReentrant {
+    mintPrecheck(1);
+    mintPostcomplete();
+  }
+
+  modifier isSoldOut(uint256 amount) {
+    require(amount <= bulkBuyLimit, "Over limit");
+    require(amount <= shuffleIDs.length, "Sold out");
+    _;
+  }
+
+  function bulkMint(uint256 amount) public override isSoldOut(amount) payable nonReentrant {
+    mintPrecheck(amount);
     for (uint256 i = 0; i < amount; i++) {
-      uint256 randomTokenID = shuffleIDs.length == 1 ? 0 : random() % (shuffleIDs.length - 1);
-      uint256 tokenID = shuffleIDs[randomTokenID];
-      shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
-      shuffleIDs.pop();
-
-      _mint(_msgSender(), tokenID);
+      mintPostcomplete();
     }
   }
 
