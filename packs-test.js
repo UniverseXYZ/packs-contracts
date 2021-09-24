@@ -1,5 +1,7 @@
 const { expect } = require("chai");
 const { utils } = require('ethers');
+const { deploy } = require('./helpers/deploy.ts');
+
 const mock = require('./mock-metadata.json');
 
 function base64toJSON(string) {
@@ -26,8 +28,13 @@ describe("Packs Test", function() {
   const feeSplit2 = 500;
 
   before(async () => {
-    const Packs = await ethers.getContractFactory("Packs");
-    packsInstance = await Packs.deploy(
+    const [owner] = await ethers.getSigners();
+
+    const cutFacet = await deploy.deployContract('DiamondCutFacet');
+    const loupeFacet = await deploy.deployContract('DiamondLoupeFacet');
+    const ownershipFacet = await deploy.deployContract('OwnershipFacet');
+    const packsFacet = await deploy.deployContract('PacksFacet');
+    packsInstance = await packsFacet.deploy(
       'Relics',
       'MONSTERCAT',
       baseURI,
@@ -36,6 +43,11 @@ describe("Packs Test", function() {
       'https://arweave.net/license',
     );
     await packsInstance.deployed();
+
+    const diamond = await deploy.deployDiamond('Packs',
+      [cutFacet, loupeFacet, ownershipFacet, barnFacet, changeRewardsFacet],
+      owner.address,
+    );
   });
 
   it("should create collectible", async function() {
