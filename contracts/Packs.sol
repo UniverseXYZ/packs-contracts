@@ -195,32 +195,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
     _mint(_msgSender(), tokenID);
   }
 
-  function bulkMint(uint256 amount) public override payable nonReentrant {
-    require(amount <= bulkBuyLimit, "Cannot bulk buy more than the preset limit");
-    require(amount <= shuffleIDs.length, "Total supply reached");
-
-    if (daoInitialized) {
-      (bool transferToDaoStatus, ) = daoAddress.call{value:tokenPrice.mul(amount)}("");
-      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
-    }
-
-    uint256 excessAmount = msg.value.sub(tokenPrice.mul(amount));
-    if (excessAmount > 0) {
-      (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
-      require(returnExcessStatus, "Failed to return excess.");
-    }
-
-    for (uint256 i = 0; i < amount; i++) {
-      uint256 randomTokenID = shuffleIDs.length == 1 ? 0 : random() % (shuffleIDs.length - 1);
-      uint256 tokenID = shuffleIDs[randomTokenID];
-      shuffleIDs[randomTokenID] = shuffleIDs[shuffleIDs.length - 1];
-      shuffleIDs.pop();
-
-      _mint(_msgSender(), tokenID);
-    }
-  }
-
-
   // Modify property field only if marked as updateable
   function updateMetadata(uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
     require(metadata[collectibleId - 1].modifiable[propertyIndex], 'Not allowed');
@@ -231,37 +205,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
   function addVersion(uint256 collectibleNumber, string memory asset) public onlyDAO {
     collectibles[collectibleNumber - 1].assets[collectibles[collectibleNumber - 1].totalVersionCount - 1] = asset;
     collectibles[collectibleNumber - 1].totalVersionCount++;
-  }
-
-  // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
-  function updateVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
-    collectibles[collectibleNumber - 1].currentVersion = versionNumber - 1;
-  }
-
-  // Secondary asset versioning
-  function updateSecondaryVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
-    collectibles[collectibleNumber - 1].secondaryCurrentVersion = versionNumber - 1;
-  }
-
-  function addSecondaryVersion(uint256 collectibleNumber, string memory asset) public onlyDAO {
-    collectibles[collectibleNumber - 1].secondaryAssets[collectibles[collectibleNumber - 1].secondaryTotalVersionCount - 1] = asset;
-    collectibles[collectibleNumber - 1].secondaryTotalVersionCount++;
-  }
-
-  // Adds new license and updates version to latest
-  function addNewLicense(string memory _license) public onlyDAO {
-    licenseURI[licenseVersion] = _license;
-    licenseVersion++;
-  }
-
-  // Returns license URI
-  function getLicense() public view returns (string memory) {
-    return licenseURI[licenseVersion - 1];
-  }
-
-  // Returns license version count
-  function getLicenseVersion(uint256 versionNumber) public view returns (string memory) {
-    return licenseURI[versionNumber - 1];
   }
 
   function getFeeRecipients(uint256 tokenId) external view returns (address payable[] memory) {
