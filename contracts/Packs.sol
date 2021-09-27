@@ -7,7 +7,7 @@ pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
 /* 
- * TODO: ADD SECONDARY SALE FEES
+ * TODO:
  * Event Emitters
  * Sale start time & read-only function that checks if sale started
  * Mint Pass presale
@@ -19,10 +19,9 @@ import "./ConversionLibrary.sol";
 import 'base64-sol/base64.sol';
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IPacks.sol";
-import "./HasSecondarySaleFees.sol";
 import "hardhat/console.sol";
 
-contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
+contract Packs is IPacks, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
   using ConversionLibrary for *;
 
@@ -54,7 +53,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
 
   mapping (uint256 => SingleCollectible) private collectibles; // Unique assets
   mapping (uint256 => Metadata) private metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
-  mapping (uint256 => Fee[]) private secondaryFees; // Trait & property attributes, indexes should be coupled with 'collectibles'
   mapping (uint256 => string) private licenseURI; // URL to external license or file
 
   uint256 private collectibleCount = 0; // Total unique assets count
@@ -66,6 +64,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
   uint256 private licenseVersion; // Tracker of latest license
 
   uint32[] private shuffleIDs;
+
+  bytes4 private constant _INTERFACE_ID_ROYALTIES_EIP2981 = 0x2a55205a;
+  bytes4 private constant _INTERFACE_ID_ROYALTIES_RARIBLE = 0xb7799584;
 
   constructor(
     string memory name,
@@ -109,20 +110,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
   }
 
   // Add single collectible asset with main info and metadata properties
-  function addCollectible(string[] memory _coreData, string[] memory _assets, string[] memory _secondaryAssets, string[][] memory _metadataValues, Fee[] memory _fees) public onlyDAO {
-    uint256 sum = 0;
-    for (uint256 i = 0; i < _fees.length; i++) {
-      require(_fees[i].recipient != address(0x0), "No recipient");
-      require(_fees[i].value != 0, "Fee negative");
-      secondaryFees[collectibleCount].push(Fee({
-        recipient: _fees[i].recipient,
-        value: _fees[i].value
-      }));
-      sum += _fees[i].value;
-    }
-
-    require(sum < 10000, "Fee over 100%");
-
+  function addCollectible(string[] memory _coreData, string[] memory _assets, string[] memory _secondaryAssets, string[][] memory _metadataValues) public onlyDAO {
     collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
       description: _coreData[1],
@@ -158,9 +146,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
     totalTokenCount += editions;
   }
 
-  function bulkAddCollectible(string[][] memory _coreData, string[][] memory _assets, string[][] memory _secondaryAssets, string[][][] memory _metadataValues, Fee[][] memory _fees) public onlyDAO {
+  function bulkAddCollectible(string[][] memory _coreData, string[][] memory _assets, string[][] memory _secondaryAssets, string[][][] memory _metadataValues) public onlyDAO {
     for (uint256 i = 0; i < _coreData.length; i++) {
-      addCollectible(_coreData[i], _assets[i], _secondaryAssets[i], _metadataValues[i], _fees[i]);
+      addCollectible(_coreData[i], _assets[i], _secondaryAssets[i], _metadataValues[i]);
     }
   }
 
@@ -207,27 +195,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard, HasSecondarySaleFees {
     collectibles[collectibleNumber - 1].totalVersionCount++;
   }
 
-  function getFeeRecipients(uint256 tokenId) external view returns (address payable[] memory) {
-    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
-    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
-    Fee[] memory _fees = secondaryFees[collectibleId];
-    address payable[] memory result = new address payable[](_fees.length);
-    for (uint i = 0; i < _fees.length; i++) {
-      result[i] = _fees[i].recipient;
-    }
-    return result;
-  }
-
-  function getFeeBps(uint256 tokenId) external view returns (uint[] memory) {
-    uint256 edition = tokenId.toString().substring(bytes(tokenId.toString()).length - 5, bytes(tokenId.toString()).length).safeParseInt() - 1;
-    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
-    Fee[] memory _fees = secondaryFees[collectibleId];
-    uint[] memory result = new uint[](_fees.length);
-    for (uint i = 0; i < _fees.length; i++) {
-      result[i] = _fees[i].value;
-    }
-
-    return result;
+  // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
+  function updateVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
+    collectibles[collectibleNumber - 1].currentVersion = versionNumber - 1;
   }
 
   // Dynamic base64 encoded metadata generation using on-chain metadata and edition numbers
