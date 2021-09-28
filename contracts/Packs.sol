@@ -39,9 +39,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     string[] assets; // Each asset in array is a version
     uint256 totalVersionCount; // Total number of existing states
     uint256 currentVersion; // Current existing state
-    string[] secondaryAssets; // Each asset in array is a version
-    uint256 secondaryTotalVersionCount; // Total number of existing states
-    uint256 secondaryCurrentVersion; // Current existing state
   }
 
   struct Metadata {
@@ -110,17 +107,14 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   }
 
   // Add single collectible asset with main info and metadata properties
-  function addCollectible(string[] memory _coreData, string[] memory _assets, string[] memory _secondaryAssets, string[][] memory _metadataValues) public onlyDAO {
+  function addCollectible(string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) public onlyDAO {
     collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
       description: _coreData[1],
       count: _coreData[2].safeParseInt(),
       assets: _assets,
       currentVersion: 1,
-      totalVersionCount: _assets.length,
-      secondaryAssets: _secondaryAssets,
-      secondaryCurrentVersion: 1,
-      secondaryTotalVersionCount: _secondaryAssets.length
+      totalVersionCount: _assets.length
     });
 
     string[] memory propertyNames = new string[](_metadataValues.length);
@@ -146,9 +140,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     totalTokenCount += editions;
   }
 
-  function bulkAddCollectible(string[][] memory _coreData, string[][] memory _assets, string[][] memory _secondaryAssets, string[][][] memory _metadataValues) public onlyDAO {
+  function bulkAddCollectible(string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues) public onlyDAO {
     for (uint256 i = 0; i < _coreData.length; i++) {
-      addCollectible(_coreData[i], _assets[i], _secondaryAssets[i], _metadataValues[i]);
+      addCollectible(_coreData[i], _assets[i], _metadataValues[i]);
     }
   }
 
@@ -233,9 +227,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
                 '", "image": "',
                 _baseURI,
                 collectibles[collectibleId].assets[collectibles[collectibleId].currentVersion - 1],
-                '", "secondaryAsset": "',
-                _baseURI,
-                collectibles[collectibleId].secondaryAssets[collectibles[collectibleId].secondaryCurrentVersion - 1],
                 '", "attributes": [',
                 encodedMetadata,
                 '] }'

@@ -39,15 +39,14 @@ describe("Packs Test", function() {
   });
 
   it("should create collectible", async function() {
-    await packsInstance.addCollectible(metadata[0].coreData, metadata[0].assets, metadata[0].secondaryAssets, metadata[0].metaData);
+    await packsInstance.addCollectible(metadata[0].coreData, metadata[0].assets, metadata[0].metaData);
   });
 
   it("should bulk add collectible", async function() {
     const coreData = [metadata[1].coreData, metadata[2].coreData];
     const assets = [metadata[1].assets, metadata[2].assets];
-    const secondaryAssets = [metadata[1].secondaryAssets, metadata[2].secondaryAssets];
     const metaData = [metadata[1].metaData, metadata[2].metaData];
-    await packsInstance.bulkAddCollectible(coreData, assets, secondaryAssets, metaData);
+    await packsInstance.bulkAddCollectible(coreData, assets, metaData);
   });
 
   // it("should match the total token count", async function() {
