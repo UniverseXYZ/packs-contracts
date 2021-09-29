@@ -62,9 +62,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
   uint32[] private shuffleIDs;
 
-  bytes4 private constant _INTERFACE_ID_ROYALTIES_EIP2981 = 0x2a55205a;
-  bytes4 private constant _INTERFACE_ID_ROYALTIES_RARIBLE = 0xb7799584;
-
   constructor(
     string memory name,
     string memory symbol,

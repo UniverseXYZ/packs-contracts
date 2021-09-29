@@ -1,6 +1,7 @@
 require("@nomiclabs/hardhat-waffle");
 require("hardhat-gas-reporter");
 require('hardhat-contract-sizer');
+require("@nomiclabs/hardhat-etherscan");
 require('dotenv').config();
 
 
@@ -36,6 +37,13 @@ module.exports = {
       url: `https://ropsten.infura.io/v3/${ process.env.INFURA_KEY }`,
       accounts: [`0x${ process.env.MM_PRIVATE_KEY }`],
     },
+    rinkeby: {
+      url: `https://rinkeby.infura.io/v3/${ process.env.INFURA_KEY }`,
+      accounts: [`0x${ process.env.MM_PRIVATE_KEY }`],
+    },
+  },
+  etherscan: {
+    apiKey: "AHJVIXHJ44QUE3ZM1MS1RCWG27TWU315GC"
   },
   contractSizer: {
     alphaSort: true,

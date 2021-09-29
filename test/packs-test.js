@@ -20,10 +20,6 @@ describe("Packs Test", function() {
   tokenCounts.forEach(e => totalTokenCount += e);
 
   let packsInstance;
-  const randomWallet1 = ethers.Wallet.createRandom();
-  const randomWallet2 = ethers.Wallet.createRandom();
-  const feeSplit1 = 1000;
-  const feeSplit2 = 500;
 
   before(async () => {
     const Packs = await ethers.getContractFactory("Packs");
@@ -49,13 +45,8 @@ describe("Packs Test", function() {
     await packsInstance.bulkAddCollectible(coreData, assets, metaData);
   });
 
-  // it("should match the total token count", async function() {
-  //   expect((await packsInstance.totalTokenCount())).to.equal(totalTokenCount);
-  // });
-
   it("should mint one token", async function() {
     await packsInstance.functions['mint()']({value: tokenPrice})
-    // expect((await packsInstance.getTokens()).length).to.equal(totalTokenCount - 1);
   });
 
   it("should reject mints with insufficient funds", async function() {
