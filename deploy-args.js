@@ -1,9 +1,9 @@
-const tokenPrice = ethers.utils.parseEther("0.0777");
+const tokenPrice = ethers.utils.parseEther("0.0007");
 const bulkBuyLimit = 30;
 const saleStartTime = 1948372;
 
 module.exports = [
-  'Relics',
+  'RELICS INSTINCT',
   'MONSTERCAT',
   'https://arweave.net/',
   true,

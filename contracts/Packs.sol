@@ -223,7 +223,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
                 collectibles[collectibleId].description,
                 '", "image": "',
                 _baseURI,
-                collectibles[collectibleId].assets[collectibles[collectibleId].currentVersion - 1],
+                collectibles[collectibleId].assets[collectibles[collectibleId].currentVersion],
                 '", "attributes": [',
                 encodedMetadata,
                 '] }'
