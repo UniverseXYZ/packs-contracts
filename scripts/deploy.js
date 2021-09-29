@@ -5,7 +5,7 @@
 // Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
 
-const mock = require('../test/mock-metadata.json');
+const mock = require('../test/mock-deploy.json');
 
 async function main() {
   // Hardhat always runs the compile task when running scripts with its command
@@ -17,7 +17,7 @@ async function main() {
 
   // We get the contract to deploy
   const baseURI = 'https://arweave.net/';
-  const tokenPrice = ethers.utils.parseEther("0.0777");
+  const tokenPrice = ethers.utils.parseEther("0.0007");
   const bulkBuyLimit = 30;
   const saleStartTime = 1948372;
   const metadata = mock.data;
@@ -27,32 +27,44 @@ async function main() {
   tokenCounts.forEach(e => totalTokenCount += e);
 
   let packsInstance;
-  const randomWallet1 = ethers.Wallet.createRandom();
-  const randomWallet2 = ethers.Wallet.createRandom();
-  const feeSplit1 = 1000;
-  const feeSplit2 = 500;
 
-  const Conversion = await hre.ethers.getContractFactory("ConversionLibrary");
-  const libraryInstance = await Conversion.deploy();
+  const LibPackStorage = await hre.ethers.getContractFactory("LibPackStorage");
+  const libraryInstance = await LibPackStorage.deploy();
   await libraryInstance.deployed();
 
-  const Packs = await hre.ethers.getContractFactory("Packs");
-  packsInstance = await Packs.deploy({
+  console.log("Library deployed");
+
+  const Packs = await ethers.getContractFactory("Packs", {
     libraries: {
-      ConversionLibrary: libraryInstance.address
+      LibPackStorage: libraryInstance.address
     },
-    args: [
-      'Relics',
-      'MONSTERCAT',
-      baseURI,
-      true,
-      [tokenPrice, bulkBuyLimit, saleStartTime],
-      'https://arweave.net/license'
-    ]
   });
+
+  packsInstance = await Packs.deploy(
+    'RELICS INSTINCT',
+    'MONSTERCAT',
+    baseURI,
+    true,
+    [tokenPrice, bulkBuyLimit, saleStartTime],
+    'https://arweave.net/license',
+  );
   await packsInstance.deployed();
 
-  console.log("Packs deployed to:", greeter.address);
+  console.log("Packs deployed to:", packsInstance.address);
+
+  let coreData = [metadata[0].coreData, metadata[1].coreData];
+  let assets = [metadata[0].assets, metadata[1].assets];
+  let metaData = [metadata[0].metaData, metadata[1].metaData];
+  await packsInstance.bulkAddCollectible(coreData, assets, metaData);
+
+  console.log('Metadata 1 and 2 deployed');
+
+  coreData = [metadata[2].coreData];
+  assets = [metadata[2].assets];
+  metaData = [metadata[2].metaData];
+  await packsInstance.bulkAddCollectible(coreData, assets, metaData);
+
+  console.log('Metadata 3 and 4 deployed');
 }
 
 // We recommend this pattern to be able to use async/await everywhere

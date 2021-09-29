@@ -1,0 +1,67 @@
+{
+  "data": [
+    {
+      "coreData": [
+        "Dreamstate",
+        "Music by Ephixa. Visuals by GameShrimp",
+        "30"
+      ],
+      "assets": ["zhKl1KoFG4RSZqCRjnBudTvF27-aGDpqNv5wRSZe5-w"],
+      "metaData": [
+ 	["Musician", "Ephixa", "0"],
+	["Designer", "GameShrimp", "0"],
+	["Rarity", "Quartz", "1"],
+        ["ISRC", "US-S1Z-92-00001", "1"],
+        ["Duration", "3:12", "0"],
+        ["Version", "Original", "0"],
+        ["Label", "Monstercat", "0"],
+        ["Brand", "Instinct", "0"],
+        ["Season", "1", "0"],
+	["License", "monstercat.com", "1"],
+	["Stream", "https://mcatdata.s3.ca-central-1.amazonaws.com/relics/Nft_Instinctseason1_Ephixa_Dreamstate-%7B720p_320kbps%7D.mp4", "1"]
+      ]
+    },
+    {
+      "coreData": [
+        "Left Behind",
+        "Music by Half an Orange & Outwild. Visuals by Kez",
+        "30"
+      ],
+      "assets": ["wd_tYp5ObgqqQKAZFpYrtSWfIGVZoW7XuCLg7lLpxtI"],
+      "metaData": [
+ 	["Musician", "Half an Orange", "0"],
+	["Designer", "Kez", "0"],
+	["Rarity", "Quartz", "1"],
+        ["ISRC", "US-S1Z-91-00001", "1"],
+        ["Duration", "3:34", "0"],
+        ["Version", "Original", "0"],
+        ["Label", "Monstercat", "0"],
+        ["Brand", "Instinct", "0"],
+        ["Season", "1", "0"],
+	["License", "monstercat.com", "1"],
+	["Stream", "https://mcatdata.s3.ca-central-1.amazonaws.com/relics/Nft_Instinctseason1_Ephixa_Dreamstate-%7B720p_320kbps%7D.mp4", "1"]
+      ]
+    },
+    {
+      "coreData": [
+        "Hang Up",
+        "Music by WRLD. Visuals by XXX",
+        "30"
+      ],
+      "assets": ["wd_tYp5ObgqqQKAZFpYrtSWfIGVZoW7XuCLg7lLpxtI", "nkQbgtoP6X1yPW9FOYLL31wPIuC22uiNRePu42WZlTU"],
+      "metaData": [
+ 	["Musician", "WRLD", "0"],
+	["Designer", "XXX", "0"],
+	["Rarity", "Emerald", "1"],
+        ["ISRC", "US-S1Z-93-00001", "1"],
+        ["Duration", "3:17", "0"],
+        ["Version", "Original", "0"],
+        ["Label", "Monstercat", "0"],
+        ["Brand", "Instinct", "0"],
+        ["Season", "1", "0"],
+	["License", "monstercat.com", "1"],
+	["Stream", "https://mcatdata.s3.ca-central-1.amazonaws.com/relics/Nft_Instinctseason1_Ephixa_Dreamstate-%7B720p_320kbps%7D.mp4", "1"]
+      ]
+    }
+  ]
+}

@@ -26,7 +26,16 @@ describe("Packs Test", function() {
   const feeSplit2 = 500;
 
   before(async () => {
-    const Packs = await ethers.getContractFactory("Packs");
+    const LibPackStorage = await hre.ethers.getContractFactory("LibPackStorage");
+    const libraryInstance = await LibPackStorage.deploy();
+    await libraryInstance.deployed();
+
+    const Packs = await ethers.getContractFactory("Packs", {
+      libraries: {
+        LibPackStorage: libraryInstance.address
+      },
+    });
+
     packsInstance = await Packs.deploy(
       'Relics',
       'MONSTERCAT',
@@ -40,7 +49,7 @@ describe("Packs Test", function() {
 
   it("should create collectible", async function() {
     const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
-    await packsInstance.addCollectible(metadata[0].coreData, metadata[0].assets, metadata[0].secondaryAssets, metadata[0].metaData, fees);
+    await packsInstance.addCollectible(metadata[0].coreData, metadata[0].assets, metadata[0].secondaryAssets, metadata[0].metaData);
   });
 
   it("should bulk add collectible", async function() {
@@ -52,7 +61,7 @@ describe("Packs Test", function() {
       [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
       [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
     ];
-    await packsInstance.bulkAddCollectible(coreData, assets, secondaryAssets, metaData, fees);
+    await packsInstance.bulkAddCollectible(coreData, assets, secondaryAssets, metaData);
   });
 
   // it("should match the total token count", async function() {
@@ -132,29 +141,6 @@ describe("Packs Test", function() {
     const license = await packsInstance.getLicenseVersion(1);
     expect(license).to.equal('https://arweave.net/license');
   })
-
-  it("should return correct secondary splits", async function() {
-    let recipients = await packsInstance.getFeeRecipients(100008);
-    let bps = await packsInstance.getFeeBps(100008);
-    expect(recipients[0]).to.equal(randomWallet1.address);
-    expect(recipients[1]).to.equal(randomWallet2.address);
-    expect(bps[0].toNumber()).to.equal(feeSplit1);
-    expect(bps[1].toNumber()).to.equal(feeSplit2);
-
-    recipients = await packsInstance.getFeeRecipients(200008);
-    bps = await packsInstance.getFeeBps(200008);
-    expect(recipients[0]).to.equal(randomWallet2.address);
-    expect(recipients[1]).to.equal(randomWallet1.address);
-    expect(bps[0].toNumber()).to.equal(feeSplit1);
-    expect(bps[1].toNumber()).to.equal(feeSplit2);
-
-    recipients = await packsInstance.getFeeRecipients(300008);
-    bps = await packsInstance.getFeeBps(300008);
-    expect(recipients[0]).to.equal(randomWallet1.address);
-    expect(recipients[1]).to.equal(randomWallet2.address);
-    expect(bps[0].toNumber()).to.equal(feeSplit2);
-    expect(bps[1].toNumber()).to.equal(feeSplit1);
-  });
 
   /* TODO: Write test to check non-editioned names */
 });
