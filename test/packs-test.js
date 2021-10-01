@@ -108,7 +108,6 @@ describe("Packs Test", function() {
     const newMetadata = 'new new';
     await packsInstance.updateMetadata(1, 0, newMetadata);
     const tokenJSON = base64toJSON(await packsInstance.tokenURI(100008));
-    console.log('wtf', tokenJSON);
     expect(tokenJSON.attributes[0].trait_type).to.equal(metadata[0].metaData[0][0]);
     expect(tokenJSON.attributes[0].value).to.equal(newMetadata);
   });

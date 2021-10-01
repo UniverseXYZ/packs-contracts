@@ -40,6 +40,7 @@ library LibPackStorage {
     mapping (uint256 => SingleCollectible) collectibles; // Unique assets
     mapping (uint256 => Metadata) metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
     mapping (uint256 => string) licenseURI; // URL to external license or file
+    mapping (address => bool) freeClaims;
 
     uint256 collectibleCount; // Total unique assets count
     uint256 totalTokenCount; // Total NFT count to be minted

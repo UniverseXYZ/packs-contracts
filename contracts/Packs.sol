@@ -22,7 +22,7 @@ import "./IPacks.sol";
 contract Packs is IPacks, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
 
-  address mintPass = 0xD47F7521792Cca93983E447a7Cc7f55794284f78;
+  Packs packs = Packs(0xD47F7521792Cca93983E447a7Cc7f55794284f78);
 
   constructor(
     string memory name,
@@ -76,23 +76,33 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     }
   }
 
-  // function checkMintPass() {
-  //   uint256 count = mintPass.call(bytes4(keccak256("balanceOf(address)")), msg.sender);
-  //   return count;
-  // }
+  function checkMintPass(address minter) public view returns (uint256) {
+    uint256 count = packs.balanceOf(minter);
+    return count;
+  }
 
   function mint() public override payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
+
+    bool freeClaim = false;
+    if (!ds.freeClaims[msg.sender]) {
+      if (packs.balanceOf(msg.sender) > 0) {
+        freeClaim = true;
+        ds.freeClaims[msg.sender] = true;
+      }
+    }
 
     if (ds.daoInitialized) {
       (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.tokenPrice}("");
       require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
     }
 
-    uint256 excessAmount = msg.value.sub(ds.tokenPrice);
-    if (excessAmount > 0) {
-      (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
-      require(returnExcessStatus, "Failed to return excess.");
+    if (!freeClaim) {
+      uint256 excessAmount = msg.value.sub(ds.tokenPrice);
+      if (excessAmount > 0) {
+        (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
+        require(returnExcessStatus, "Failed to return excess.");
+      }
     }
 
     uint256 randomTokenID = LibPackStorage.random() % ds.shuffleIDs.length;
