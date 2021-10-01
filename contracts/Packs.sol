@@ -9,8 +9,6 @@ pragma experimental ABIEncoderV2;
 /* 
  * TODO: ADD SECONDARY SALE FEES
  * Event Emitters
- * Sale start time & read-only function that checks if sale started
- * Mint Pass presale
  */
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
