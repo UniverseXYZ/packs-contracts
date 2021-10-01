@@ -2,9 +2,8 @@
 pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import 'base64-sol/base64.sol';
-import 'hardhat/console.sol';
 
 library LibPackStorage {
   bytes32 constant STORAGE_POSITION = keccak256("com.universe.packs.storage");
@@ -28,8 +27,6 @@ library LibPackStorage {
   struct Storage {
     bool initialized;
 
-    // IERC721 pack;
-
     address payable daoAddress;
     bool daoInitialized;
 
@@ -51,6 +48,10 @@ library LibPackStorage {
     uint256 licenseVersion; // Tracker of latest license
 
     uint32[] shuffleIDs;
+
+    bool mintPass;
+    ERC721 mintPassContract;
+    uint256 mintPassDuration;
   }
 
   function packStorage() internal pure returns (Storage storage ds) {
@@ -81,6 +82,7 @@ library LibPackStorage {
     }
   }
 
+  // Add single collectible asset with main info and metadata properties
   function addCollectible(string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) external onlyDAO {
     Storage storage ds = packStorage();
 
@@ -159,6 +161,53 @@ library LibPackStorage {
     return ds.licenseURI[versionNumber - 1];
   }
 
+  // Dynamic base64 encoded metadata generation using on-chain metadata and edition numbers
+  function tokenURI(uint256 tokenId) public view returns (string memory) {
+    Storage storage ds = packStorage();
+
+    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
+    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
+    string memory encodedMetadata = '';
+
+    for (uint i = 0; i < ds.metadata[collectibleId].propertyCount; i++) {
+      encodedMetadata = string(abi.encodePacked(
+        encodedMetadata,
+        '{"trait_type":"',
+        ds.metadata[collectibleId].name[i],
+        '", "value":"',
+        ds.metadata[collectibleId].value[i],
+        '"}',
+        i == ds.metadata[collectibleId].propertyCount - 1 ? '' : ',')
+      );
+    }
+
+    string memory encoded = string(
+        abi.encodePacked(
+          'data:application/json;base64,',
+          Base64.encode(
+            bytes(
+              abi.encodePacked(
+                '{"name":"',
+                ds.collectibles[collectibleId].title,
+                ds.editioned ? ' #' : '',
+                ds.editioned ? toString(edition + 1) : '',
+                '", "description":"',
+                ds.collectibles[collectibleId].description,
+                '", "image": "',
+                ds._baseURI,
+                ds.collectibles[collectibleId].assets[ds.collectibles[collectibleId].currentVersion - 1],
+                '", "attributes": [',
+                encodedMetadata,
+                '] }'
+              )
+            )
+          )
+        )
+      );
+
+    return encoded;
+  }
+
   function toString(uint256 value) internal pure returns (string memory) {
     if (value == 0) {
         return "0";
@@ -215,51 +264,5 @@ library LibPackStorage {
         result[i-startIndex] = strBytes[i];
     }
     return string(result);
-  }
-
-  function tokenURI(uint256 tokenId) public view returns (string memory) {
-    Storage storage ds = packStorage();
-
-    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
-    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
-    string memory encodedMetadata = '';
-
-    for (uint i = 0; i < ds.metadata[collectibleId].propertyCount; i++) {
-      encodedMetadata = string(abi.encodePacked(
-        encodedMetadata,
-        '{"trait_type":"',
-        ds.metadata[collectibleId].name[i],
-        '", "value":"',
-        ds.metadata[collectibleId].value[i],
-        '"}',
-        i == ds.metadata[collectibleId].propertyCount - 1 ? '' : ',')
-      );
-    }
-
-    string memory encoded = string(
-        abi.encodePacked(
-          'data:application/json;base64,',
-          Base64.encode(
-            bytes(
-              abi.encodePacked(
-                '{"name":"',
-                ds.collectibles[collectibleId].title,
-                ds.editioned ? ' #' : '',
-                ds.editioned ? toString(edition + 1) : '',
-                '", "description":"',
-                ds.collectibles[collectibleId].description,
-                '", "image": "',
-                ds._baseURI,
-                ds.collectibles[collectibleId].assets[ds.collectibles[collectibleId].currentVersion - 1],
-                '", "attributes": [',
-                encodedMetadata,
-                '] }'
-              )
-            )
-          )
-        )
-      );
-
-    return encoded;
   }
 }

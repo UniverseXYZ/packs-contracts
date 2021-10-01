@@ -18,11 +18,10 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./LibPackStorage.sol";
 import "./IPacks.sol";
+import 'hardhat/console.sol';
 
 contract Packs is IPacks, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
-
-  Packs packs = Packs(0xD47F7521792Cca93983E447a7Cc7f55794284f78);
 
   constructor(
     string memory name,
@@ -30,7 +29,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     string memory baseURI,
     bool _editioned,
     uint256[] memory _initParams,
-    string memory _licenseURI
+    string memory _licenseURI,
+    address _mintPass,
+    uint256 _mintPassDuration
   ) ERC721(name, symbol) public {
     require(_initParams[1] <= 50, "Limit of 50");
 
@@ -50,6 +51,12 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.licenseURI[0] = _licenseURI;
     ds.licenseVersion = 1;
 
+    if (_mintPass != address(0)) {
+      ds.mintPass = true;
+      ds.mintPassContract = ERC721(_mintPass);
+      ds.mintPassDuration = _mintPassDuration;
+    }
+
     _setBaseURI(baseURI);
   }
 
@@ -65,7 +72,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
   }
 
-  // Add single collectible asset with main info and metadata properties
   function addCollectible(string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) public onlyDAO {
     LibPackStorage.addCollectible(_coreData, _assets, _metadataValues);
   }
@@ -77,7 +83,8 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   }
 
   function checkMintPass(address minter) public view returns (uint256) {
-    uint256 count = packs.balanceOf(minter);
+    LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
+    uint256 count = ds.mintPassContract.balanceOf(minter);
     return count;
   }
 
@@ -85,12 +92,15 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
     bool freeClaim = false;
-    if (!ds.freeClaims[msg.sender]) {
-      if (packs.balanceOf(msg.sender) > 0) {
+    if (ds.mintPass && !ds.freeClaims[msg.sender]) {
+      if (checkMintPass(msg.sender) > 0) {
         freeClaim = true;
         ds.freeClaims[msg.sender] = true;
       }
     }
+
+    if (ds.mintPass) require((freeClaim && (block.timestamp > (ds.saleStartTime - ds.mintPassDuration))), "You cannot claim");
+    require((block.timestamp > ds.saleStartTime), "Sale has not yet started");
 
     if (ds.daoInitialized) {
       (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.tokenPrice}("");
@@ -119,6 +129,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
     require(amount <= ds.bulkBuyLimit, "Cannot bulk buy more than the preset limit");
     require(amount <= ds.shuffleIDs.length, "Total supply reached");
+    require((block.timestamp > ds.saleStartTime), "Sale has not yet started");
 
     if (ds.daoInitialized) {
       (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.tokenPrice.mul(amount)}("");
@@ -141,37 +152,30 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     }
   }
 
-  // Modify property field only if marked as updateable
   function updateMetadata(uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
     LibPackStorage.updateMetadata(collectibleId, propertyIndex, value);
   }
 
-  // Add new asset, does not automatically increase current version
   function addVersion(uint256 collectibleNumber, string memory asset) public onlyDAO {
     LibPackStorage.addVersion(collectibleNumber, asset);
   }
 
-  // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
   function updateVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
     LibPackStorage.updateVersion(collectibleNumber, versionNumber);
   }
 
-  // Adds new license and updates version to latest
   function addNewLicense(string memory _license) public onlyDAO {
     LibPackStorage.addNewLicense(_license);
   }
 
-  // Returns license URI
   function getLicense() public view returns (string memory) {
     return LibPackStorage.getLicense();
   }
 
-  // Returns license version count
   function getLicenseVersion(uint256 versionNumber) public view returns (string memory) {
     return LibPackStorage.getLicenseVersion(versionNumber);
   }
 
-  // Dynamic base64 encoded metadata generation using on-chain metadata and edition numbers
   function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
     return LibPackStorage.tokenURI(tokenId);
   }

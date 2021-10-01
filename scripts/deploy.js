@@ -1,30 +1,30 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional 
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// When running the script with `hardhat run <script>` you'll find the Hardhat
-// Runtime Environment's members available in the global scope.
 const hre = require("hardhat");
-
 const mock = require('../test/mock-deploy.json');
 
 async function main() {
-  // Hardhat always runs the compile task when running scripts with its command
-  // line interface.
-  //
-  // If this script is run directly using `node` you may want to call compile 
-  // manually to make sure everything is compiled
-  // await hre.run('compile');
-
-  // We get the contract to deploy
+  const collectionName = 'RELICS INSTINCT';
+  const collectionSymbol = 'MONSTERCAT';
   const baseURI = 'https://arweave.net/';
+  const licenseURI = 'https://arweave.net/license';
+  const editioned = true;
   const tokenPrice = ethers.utils.parseEther("0.0007");
-  const bulkBuyLimit = 30;
-  const saleStartTime = 1948372;
+  const bulkBuyLimit = 50;
+  const nullAddress = '0x0000000000000000000000000000000000000000';
+  const mintPassAddress = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
+  const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
+  const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
   const metadata = mock.data;
-  const tokenCounts = [Number(metadata[0].coreData[2]), Number(metadata[1].coreData[2]), Number(metadata[2].coreData[2])];
 
-  let totalTokenCount = 0;
-  tokenCounts.forEach(e => totalTokenCount += e);
+  const deployArgs = [
+    collectionName,
+    collectionSymbol,
+    baseURI,
+    editioned,
+    [tokenPrice, bulkBuyLimit, saleStartTime],
+    licenseURI,
+    mintPassAddress, // mintPassAddress or nullAddress for no mint pass
+    mintPassDuration
+  ];
 
   let packsInstance;
 
@@ -40,14 +40,7 @@ async function main() {
     },
   });
 
-  packsInstance = await Packs.deploy(
-    'RELICS INSTINCT',
-    'MONSTERCAT',
-    baseURI,
-    true,
-    [tokenPrice, bulkBuyLimit, saleStartTime],
-    'https://arweave.net/license',
-  );
+  packsInstance = await Packs.deploy(...deployArgs);
   await packsInstance.deployed();
 
   console.log("Packs deployed to:", packsInstance.address);
@@ -65,6 +58,21 @@ async function main() {
   await packsInstance.bulkAddCollectible(coreData, assets, metaData);
 
   console.log('Metadata 3 and 4 deployed');
+
+  await new Promise(resolve => setTimeout(resolve, 10000));
+
+  await hre.run("verify:verify", {
+    address: libraryInstance.address,
+  });
+
+  console.log('Library verified');
+
+  await hre.run("verify:verify", {
+    address: packsInstance.address,
+    constructorArguments: deployArgs,
+  });
+
+  console.log('Packs verified');
 }
 
 // We recommend this pattern to be able to use async/await everywhere

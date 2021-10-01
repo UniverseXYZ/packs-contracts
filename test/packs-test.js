@@ -6,13 +6,18 @@ function base64toJSON(string) {
   return JSON.parse(Buffer.from(string.replace('data:application/json;base64,',''), 'base64').toString())
 }
 
-/* TODO: Sale Start Time */
-
-describe("Packs Test", function() {
+describe("Packs Test", async function() {
+  const collectionName = 'RELICS INSTINCT';
+  const collectionSymbol = 'MONSTERCAT';
   const baseURI = 'https://arweave.net/';
-  const tokenPrice = ethers.utils.parseEther("0.0777");
-  const bulkBuyLimit = 30;
-  const saleStartTime = 1948372;
+  const licenseURI = 'https://arweave.net/license';
+  const editioned = true;
+  const tokenPrice = ethers.utils.parseEther("0.0007");
+  const bulkBuyLimit = 50;
+  const nullAddress = '0x0000000000000000000000000000000000000000';
+  const mintPassAddress = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
+  const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
+  const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
   const metadata = mock.data;
   const tokenCounts = [Number(metadata[0].coreData[2]), Number(metadata[1].coreData[2]), Number(metadata[2].coreData[2])];
 
@@ -37,18 +42,19 @@ describe("Packs Test", function() {
     });
 
     packsInstance = await Packs.deploy(
-      'Relics',
-      'MONSTERCAT',
+      collectionName,
+      collectionSymbol,
       baseURI,
-      true,
+      editioned,
       [tokenPrice, bulkBuyLimit, saleStartTime],
-      'https://arweave.net/license',
+      licenseURI,
+      nullAddress, // mintPassAddress or nullAddress for no mint pass
+      mintPassDuration
     );
     await packsInstance.deployed();
   });
 
   /* TODO: ONLY DAO CHECK */
-
   it("should create collectible", async function() {
     const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
     await packsInstance.addCollectible(metadata[0].coreData, metadata[0].assets, metadata[0].metaData);
@@ -57,7 +63,6 @@ describe("Packs Test", function() {
   it("should bulk add collectible", async function() {
     const coreData = [metadata[1].coreData, metadata[2].coreData];
     const assets = [metadata[1].assets, metadata[2].assets];
-    const secondaryAssets = [metadata[1].secondaryAssets, metadata[2].secondaryAssets];
     const metaData = [metadata[1].metaData, metadata[2].metaData];
     const fees = [
       [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
@@ -71,6 +76,8 @@ describe("Packs Test", function() {
   // });
 
   it("should mint one token", async function() {
+    await ethers.provider.send('evm_setNextBlockTimestamp', [saleStartTime]);
+    await ethers.provider.send('evm_mine');
     await packsInstance.functions['mint()']({value: tokenPrice})
     // expect((await packsInstance.getTokens()).length).to.equal(totalTokenCount - 1);
   });
