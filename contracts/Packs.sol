@@ -100,7 +100,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     }
 
     if (ds.mintPass) require((freeClaim && (block.timestamp > (ds.saleStartTime - ds.mintPassDuration))), "You cannot claim");
-    require((block.timestamp > ds.saleStartTime), "Sale has not yet started");
+    else require((block.timestamp > ds.saleStartTime), "Sale has not yet started");
 
     if (ds.daoInitialized) {
       (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.tokenPrice}("");
