@@ -15,16 +15,14 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "./ConversionLibrary.sol";
-import "./LibPackStorage.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "./LibPackStorage.sol";
 import "./IPacks.sol";
-import "./HasSecondarySaleFees.sol";
-import "hardhat/console.sol";
 
 contract Packs is IPacks, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
-  using ConversionLibrary for *;
+
+  address mintPass = 0xD47F7521792Cca93983E447a7Cc7f55794284f78;
 
   constructor(
     string memory name,
@@ -68,15 +66,20 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   }
 
   // Add single collectible asset with main info and metadata properties
-  function addCollectible(string[] memory _coreData, string[] memory _assets, string[] memory _secondaryAssets, string[][] memory _metadataValues) public onlyDAO {
-    LibPackStorage.addCollectible(_coreData, _assets, _secondaryAssets, _metadataValues);
+  function addCollectible(string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) public onlyDAO {
+    LibPackStorage.addCollectible(_coreData, _assets, _metadataValues);
   }
 
-  function bulkAddCollectible(string[][] memory _coreData, string[][] memory _assets, string[][] memory _secondaryAssets, string[][][] memory _metadataValues) public onlyDAO {
+  function bulkAddCollectible(string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues) public onlyDAO {
     for (uint256 i = 0; i < _coreData.length; i++) {
-      addCollectible(_coreData[i], _assets[i], _secondaryAssets[i], _metadataValues[i]);
+      addCollectible(_coreData[i], _assets[i], _metadataValues[i]);
     }
   }
+
+  // function checkMintPass() {
+  //   uint256 count = mintPass.call(bytes4(keccak256("balanceOf(address)")), msg.sender);
+  //   return count;
+  // }
 
   function mint() public override payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
@@ -141,15 +144,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
   function updateVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
     LibPackStorage.updateVersion(collectibleNumber, versionNumber);
-  }
-
-  // Secondary asset versioning
-  function updateSecondaryVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
-    LibPackStorage.updateSecondaryVersion(collectibleNumber, versionNumber);
-  }
-
-  function addSecondaryVersion(uint256 collectibleNumber, string memory asset) public onlyDAO {
-    LibPackStorage.addSecondaryVersion(collectibleNumber, asset);
   }
 
   // Adds new license and updates version to latest

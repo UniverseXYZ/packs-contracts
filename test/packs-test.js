@@ -47,9 +47,11 @@ describe("Packs Test", function() {
     await packsInstance.deployed();
   });
 
+  /* TODO: ONLY DAO CHECK */
+
   it("should create collectible", async function() {
     const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
-    await packsInstance.addCollectible(metadata[0].coreData, metadata[0].assets, metadata[0].secondaryAssets, metadata[0].metaData);
+    await packsInstance.addCollectible(metadata[0].coreData, metadata[0].assets, metadata[0].metaData);
   });
 
   it("should bulk add collectible", async function() {
@@ -61,7 +63,7 @@ describe("Packs Test", function() {
       [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
       [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
     ];
-    await packsInstance.bulkAddCollectible(coreData, assets, secondaryAssets, metaData);
+    await packsInstance.bulkAddCollectible(coreData, assets, metaData);
   });
 
   // it("should match the total token count", async function() {
@@ -106,6 +108,7 @@ describe("Packs Test", function() {
     const newMetadata = 'new new';
     await packsInstance.updateMetadata(1, 0, newMetadata);
     const tokenJSON = base64toJSON(await packsInstance.tokenURI(100008));
+    console.log('wtf', tokenJSON);
     expect(tokenJSON.attributes[0].trait_type).to.equal(metadata[0].metaData[0][0]);
     expect(tokenJSON.attributes[0].value).to.equal(newMetadata);
   });
@@ -116,16 +119,9 @@ describe("Packs Test", function() {
 
   it("should update image asset and version", async function() {
     await packsInstance.addVersion(1, 'fourrrrrrr');
-    await packsInstance.updateVersion(1, 4);
+    await packsInstance.updateVersion(1, 3);
     const tokenJSON = base64toJSON(await packsInstance.tokenURI(100008));
     expect(tokenJSON.image).to.equal(`${ baseURI }fourrrrrrr`);
-  });
-
-  it("should update secondary asset and version", async function() {
-    await packsInstance.addSecondaryVersion(3, 'secondaryAsset3Version3');
-    await packsInstance.updateSecondaryVersion(3, 3);
-    const tokenJSON = base64toJSON(await packsInstance.tokenURI(300777));
-    expect(tokenJSON.secondaryAsset).to.equal(`${ baseURI }secondaryAsset3Version3`);
   });
 
   it("should add new license version", async function() {

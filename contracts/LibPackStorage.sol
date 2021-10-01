@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import 'base64-sol/base64.sol';
+import 'hardhat/console.sol';
 
 library LibPackStorage {
   bytes32 constant STORAGE_POSITION = keccak256("com.universe.packs.storage");
@@ -15,9 +16,6 @@ library LibPackStorage {
     string[] assets; // Each asset in array is a version
     uint256 totalVersionCount; // Total number of existing states
     uint256 currentVersion; // Current existing state
-    string[] secondaryAssets; // Each asset in array is a version
-    uint256 secondaryTotalVersionCount; // Total number of existing states
-    uint256 secondaryCurrentVersion; // Current existing state
   }
 
   struct Metadata {
@@ -82,7 +80,7 @@ library LibPackStorage {
     }
   }
 
-  function addCollectible(string[] memory _coreData, string[] memory _assets, string[] memory _secondaryAssets, string[][] memory _metadataValues) external onlyDAO {
+  function addCollectible(string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) external onlyDAO {
     Storage storage ds = packStorage();
 
     ds.collectibles[ds.collectibleCount] = SingleCollectible({
@@ -91,10 +89,7 @@ library LibPackStorage {
       count: safeParseInt(_coreData[2]),
       assets: _assets,
       currentVersion: 1,
-      totalVersionCount: _assets.length,
-      secondaryAssets: _secondaryAssets,
-      secondaryCurrentVersion: 1,
-      secondaryTotalVersionCount: _secondaryAssets.length
+      totalVersionCount: _assets.length
     });
 
     string[] memory propertyNames = new string[](_metadataValues.length);
@@ -137,19 +132,11 @@ library LibPackStorage {
   // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
   function updateVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
     Storage storage ds = packStorage();
-    ds.collectibles[collectibleNumber - 1].currentVersion = versionNumber - 1;
-  }
 
-  // Secondary asset versioning
-  function updateSecondaryVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
-    Storage storage ds = packStorage();
-    ds.collectibles[collectibleNumber - 1].secondaryCurrentVersion = versionNumber - 1;
-  }
-
-  function addSecondaryVersion(uint256 collectibleNumber, string memory asset) public onlyDAO {
-    Storage storage ds = packStorage();
-    ds.collectibles[collectibleNumber - 1].secondaryAssets[ds.collectibles[collectibleNumber - 1].secondaryTotalVersionCount - 1] = asset;
-    ds.collectibles[collectibleNumber - 1].secondaryTotalVersionCount++;
+    require(versionNumber > 0, "Versions start at 1");
+    require(versionNumber <= ds.collectibles[collectibleNumber - 1].assets.length, "Versions must be less than asset count");
+    require(collectibleNumber > 0, "Collectible IDs start at 1");
+    ds.collectibles[collectibleNumber - 1].currentVersion = versionNumber;
   }
 
   // Adds new license and updates version to latest
@@ -263,9 +250,6 @@ library LibPackStorage {
                 '", "image": "',
                 ds._baseURI,
                 ds.collectibles[collectibleId].assets[ds.collectibles[collectibleId].currentVersion - 1],
-                '", "secondaryAsset": "',
-                ds._baseURI,
-                ds.collectibles[collectibleId].secondaryAssets[ds.collectibles[collectibleId].secondaryCurrentVersion - 1],
                 '", "attributes": [',
                 encodedMetadata,
                 '] }'

@@ -32,7 +32,7 @@ async function main() {
   const libraryInstance = await LibPackStorage.deploy();
   await libraryInstance.deployed();
 
-  console.log("Library deployed");
+  console.log("Library deployed to:", libraryInstance.address);
 
   const Packs = await ethers.getContractFactory("Packs", {
     libraries: {
