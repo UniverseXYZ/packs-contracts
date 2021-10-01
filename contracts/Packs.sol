@@ -30,7 +30,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration
-  ) ERC721(name, symbol) public {
+  ) ERC721(name, symbol) {
     require(_initParams[1] <= 50, "Limit of 50");
 
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
@@ -38,21 +38,21 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoAddress = msg.sender;
     ds.daoInitialized = false;
 
-    ds._name = name;
-    ds._symbol = symbol;
-    ds._baseURI = baseURI;
+    ds.collection[0]._name = name;
+    ds.collection[0]._symbol = symbol;
+    ds.collection[0]._baseURI = baseURI;
 
-    ds.editioned = _editioned;
-    ds.tokenPrice = _initParams[0];
-    ds.bulkBuyLimit = _initParams[1];
-    ds.saleStartTime = _initParams[2];
-    ds.licenseURI[0] = _licenseURI;
-    ds.licenseVersion = 1;
+    ds.collection[0].editioned = _editioned;
+    ds.collection[0].tokenPrice = _initParams[0];
+    ds.collection[0].bulkBuyLimit = _initParams[1];
+    ds.collection[0].saleStartTime = _initParams[2];
+    ds.collection[0].licenseURI[0] = _licenseURI;
+    ds.collection[0].licenseVersion = 1;
 
     if (_mintPass != address(0)) {
-      ds.mintPass = true;
-      ds.mintPassContract = ERC721(_mintPass);
-      ds.mintPassDuration = _mintPassDuration;
+      ds.collection[0].mintPass = true;
+      ds.collection[0].mintPassContract = ERC721(_mintPass);
+      ds.collection[0].mintPassDuration = _mintPassDuration;
     }
 
     _setBaseURI(baseURI);
@@ -70,108 +70,111 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
   }
 
-  function addCollectible(string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) public onlyDAO {
-    LibPackStorage.addCollectible(_coreData, _assets, _metadataValues);
+  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) public onlyDAO {
+    LibPackStorage.addCollectible(cID, _coreData, _assets, _metadataValues);
   }
 
-  function bulkAddCollectible(string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues) public onlyDAO {
+  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues) public onlyDAO {
     for (uint256 i = 0; i < _coreData.length; i++) {
-      addCollectible(_coreData[i], _assets[i], _metadataValues[i]);
+      addCollectible(cID, _coreData[i], _assets[i], _metadataValues[i]);
     }
   }
 
-  function checkMintPass(address minter) public view returns (uint256) {
+  function checkMintPass(uint256 cID, address minter) public view returns (uint256) {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-    uint256 count = ds.mintPassContract.balanceOf(minter);
+    uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
     return count;
   }
 
-  function mint() public override payable nonReentrant {
+  function mint() public payable override {}
+  function bulkMint(uint256 amount) public payable override {}
+
+  function mintPack(uint256 cID) public payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
     bool freeClaim = false;
-    if (ds.mintPass && !ds.freeClaims[msg.sender]) {
-      if (checkMintPass(msg.sender) > 0) {
+    if (ds.collection[cID].mintPass && !ds.collection[cID].freeClaims[msg.sender]) {
+      if (checkMintPass(cID, msg.sender) > 0) {
         freeClaim = true;
-        ds.freeClaims[msg.sender] = true;
+        ds.collection[cID].freeClaims[msg.sender] = true;
       }
     }
 
-    if (ds.mintPass) require((freeClaim && (block.timestamp > (ds.saleStartTime - ds.mintPassDuration))), "You cannot claim");
-    else require((block.timestamp > ds.saleStartTime), "Sale has not yet started");
+    if (ds.collection[cID].mintPass) require((freeClaim && (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration))), "You cannot claim");
+    else require((block.timestamp > ds.collection[cID].saleStartTime), "Sale has not yet started");
 
     if (ds.daoInitialized) {
-      (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.tokenPrice}("");
+      (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.collection[cID].tokenPrice}("");
       require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
     }
 
     if (!freeClaim) {
-      uint256 excessAmount = msg.value.sub(ds.tokenPrice);
+      uint256 excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
       if (excessAmount > 0) {
         (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
         require(returnExcessStatus, "Failed to return excess.");
       }
     }
 
-    uint256 randomTokenID = LibPackStorage.random() % ds.shuffleIDs.length;
-    uint256 tokenID = ds.shuffleIDs[randomTokenID];
+    uint256 randomTokenID = LibPackStorage.random(cID) % ds.collection[cID].shuffleIDs.length;
+    uint256 tokenID = ds.collection[cID].shuffleIDs[randomTokenID];
 
-    ds.shuffleIDs[randomTokenID] = ds.shuffleIDs[ds.shuffleIDs.length - 1];
-    ds.shuffleIDs.pop();
+    ds.collection[cID].shuffleIDs[randomTokenID] = ds.collection[cID].shuffleIDs[ds.collection[cID].shuffleIDs.length - 1];
+    ds.collection[cID].shuffleIDs.pop();
 
     _mint(_msgSender(), tokenID);
   }
 
-  function bulkMint(uint256 amount) public override payable nonReentrant {
+  function bulkMintPack(uint256 cID, uint256 amount) public payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
-    require(amount <= ds.bulkBuyLimit, "Cannot bulk buy more than the preset limit");
-    require(amount <= ds.shuffleIDs.length, "Total supply reached");
-    require((block.timestamp > ds.saleStartTime), "Sale has not yet started");
+    require(amount <= ds.collection[cID].bulkBuyLimit, "Cannot bulk buy more than the preset limit");
+    require(amount <= ds.collection[cID].shuffleIDs.length, "Total supply reached");
+    require((block.timestamp > ds.collection[cID].saleStartTime), "Sale has not yet started");
 
     if (ds.daoInitialized) {
-      (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.tokenPrice.mul(amount)}("");
+      (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.collection[cID].tokenPrice.mul(amount)}("");
       require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
     }
 
-    uint256 excessAmount = msg.value.sub(ds.tokenPrice.mul(amount));
+    uint256 excessAmount = msg.value.sub(ds.collection[cID].tokenPrice.mul(amount));
     if (excessAmount > 0) {
       (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
       require(returnExcessStatus, "Failed to return excess.");
     }
 
     for (uint256 i = 0; i < amount; i++) {
-      uint256 randomTokenID = ds.shuffleIDs.length == 1 ? 0 : LibPackStorage.random() % (ds.shuffleIDs.length - 1);
-      uint256 tokenID = ds.shuffleIDs[randomTokenID];
-      ds.shuffleIDs[randomTokenID] = ds.shuffleIDs[ds.shuffleIDs.length - 1];
-      ds.shuffleIDs.pop();
+      uint256 randomTokenID = ds.collection[cID].shuffleIDs.length == 1 ? 0 : LibPackStorage.random(cID) % (ds.collection[cID].shuffleIDs.length - 1);
+      uint256 tokenID = ds.collection[cID].shuffleIDs[randomTokenID];
+      ds.collection[cID].shuffleIDs[randomTokenID] = ds.collection[cID].shuffleIDs[ds.collection[cID].shuffleIDs.length - 1];
+      ds.collection[cID].shuffleIDs.pop();
 
       _mint(_msgSender(), tokenID);
     }
   }
 
-  function updateMetadata(uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
-    LibPackStorage.updateMetadata(collectibleId, propertyIndex, value);
+  function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
+    LibPackStorage.updateMetadata(cID, collectibleId, propertyIndex, value);
   }
 
-  function addVersion(uint256 collectibleNumber, string memory asset) public onlyDAO {
-    LibPackStorage.addVersion(collectibleNumber, asset);
+  function addVersion(uint256 cID, uint256 collectibleNumber, string memory asset) public onlyDAO {
+    LibPackStorage.addVersion(cID, collectibleNumber, asset);
   }
 
-  function updateVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
-    LibPackStorage.updateVersion(collectibleNumber, versionNumber);
+  function updateVersion(uint256 cID, uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
+    LibPackStorage.updateVersion(cID, collectibleNumber, versionNumber);
   }
 
-  function addNewLicense(string memory _license) public onlyDAO {
-    LibPackStorage.addNewLicense(_license);
+  function addNewLicense(uint256 cID, string memory _license) public onlyDAO {
+    LibPackStorage.addNewLicense(cID, _license);
   }
 
-  function getLicense() public view returns (string memory) {
-    return LibPackStorage.getLicense();
+  function getLicense(uint256 cID) public view returns (string memory) {
+    return LibPackStorage.getLicense(cID);
   }
 
-  function getLicenseVersion(uint256 versionNumber) public view returns (string memory) {
-    return LibPackStorage.getLicenseVersion(versionNumber);
+  function getLicenseVersion(uint256 cID, uint256 versionNumber) public view returns (string memory) {
+    return LibPackStorage.getLicenseVersion(cID, versionNumber);
   }
 
   function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {

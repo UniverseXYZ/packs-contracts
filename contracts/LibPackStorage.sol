@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import 'base64-sol/base64.sol';
+import 'hardhat/console.sol';
 
 library LibPackStorage {
   bytes32 constant STORAGE_POSITION = keccak256("com.universe.packs.storage");
@@ -24,11 +25,8 @@ library LibPackStorage {
     uint256 propertyCount; // Tracker of total attributes
   }
 
-  struct Storage {
+  struct Collection {
     bool initialized;
-
-    address payable daoAddress;
-    bool daoInitialized;
 
     string _name; // Contract name
     string _symbol; // Contract symbol
@@ -54,6 +52,13 @@ library LibPackStorage {
     uint256 mintPassDuration;
   }
 
+  struct Storage {
+    address payable daoAddress;
+    bool daoInitialized;
+
+    mapping (uint256 => Collection) collection;
+  }
+
   function packStorage() internal pure returns (Storage storage ds) {
     bytes32 position = STORAGE_POSITION;
     assembly {
@@ -61,8 +66,8 @@ library LibPackStorage {
     }
   }
 
-  function random() external view returns (uint) {
-    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, packStorage().totalTokenCount)));
+  function random(uint256 cID) external view returns (uint) {
+    return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, packStorage().collection[cID].totalTokenCount)));
   }
 
   modifier onlyDAO() {
@@ -74,19 +79,21 @@ library LibPackStorage {
    * Map token order w/ URI upon mints
    * Sample token ID (edition #77) with collection of 12 different assets: 1200077
    */
-  function createTokenIDs(uint256 collectibleCount, uint256 editions) private {
+  function createTokenIDs(uint256 cID, uint256 collectibleCount, uint256 editions) private {
     Storage storage ds = packStorage();
 
     for (uint256 i = 0; i < editions; i++) {
-      ds.shuffleIDs.push(uint32((collectibleCount + 1) * 100000 + (i + 1)));
+      uint32 tokenID = uint32((cID + 1) * 100000000) + uint32((collectibleCount + 1) * 100000) + uint32(i + 1);
+      console.log(tokenID);
+      ds.collection[cID].shuffleIDs.push(tokenID);
     }
   }
 
   // Add single collectible asset with main info and metadata properties
-  function addCollectible(string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) external onlyDAO {
+  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) external onlyDAO {
     Storage storage ds = packStorage();
 
-    ds.collectibles[ds.collectibleCount] = SingleCollectible({
+    ds.collection[cID].collectibles[ds.collection[cID].collectibleCount] = SingleCollectible({
       title: _coreData[0],
       description: _coreData[1],
       count: safeParseInt(_coreData[2]),
@@ -104,7 +111,7 @@ library LibPackStorage {
       modifiables[i] = (keccak256(abi.encodePacked((_metadataValues[i][2]))) == keccak256(abi.encodePacked(('1')))); // 1 is modifiable, 0 is permanent
     }
 
-    ds.metadata[ds.collectibleCount] = Metadata({
+    ds.collection[cID].metadata[ds.collection[cID].collectibleCount] = Metadata({
       name: propertyNames,
       value: propertyValues,
       modifiable: modifiables,
@@ -112,53 +119,53 @@ library LibPackStorage {
     });
 
     uint256 editions = safeParseInt(_coreData[2]);
-    createTokenIDs(ds.collectibleCount, editions);
+    createTokenIDs(cID, ds.collection[cID].collectibleCount, editions);
 
-    ds.collectibleCount++;
-    ds.totalTokenCount += editions;
+    ds.collection[cID].collectibleCount++;
+    ds.collection[cID].totalTokenCount += editions;
   }
 
   // Modify property field only if marked as updateable
-  function updateMetadata(uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
+  function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
     Storage storage ds = packStorage();
-    require(ds.metadata[collectibleId - 1].modifiable[propertyIndex], 'Not allowed');
-    ds.metadata[collectibleId - 1].value[propertyIndex] = value;
+    require(ds.collection[cID].metadata[collectibleId - 1].modifiable[propertyIndex], 'Not allowed');
+    ds.collection[cID].metadata[collectibleId - 1].value[propertyIndex] = value;
   }
 
   // Add new asset, does not automatically increase current version
-  function addVersion(uint256 collectibleNumber, string memory asset) public onlyDAO {
+  function addVersion(uint256 cID, uint256 collectibleNumber, string memory asset) public onlyDAO {
     Storage storage ds = packStorage();
-    ds.collectibles[collectibleNumber - 1].assets[ds.collectibles[collectibleNumber - 1].totalVersionCount - 1] = asset;
-    ds.collectibles[collectibleNumber - 1].totalVersionCount++;
+    ds.collection[cID].collectibles[collectibleNumber - 1].assets[ds.collection[cID].collectibles[collectibleNumber - 1].totalVersionCount - 1] = asset;
+    ds.collection[cID].collectibles[collectibleNumber - 1].totalVersionCount++;
   }
 
   // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
-  function updateVersion(uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
+  function updateVersion(uint256 cID, uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
     Storage storage ds = packStorage();
 
     require(versionNumber > 0, "Versions start at 1");
-    require(versionNumber <= ds.collectibles[collectibleNumber - 1].assets.length, "Versions must be less than asset count");
+    require(versionNumber <= ds.collection[cID].collectibles[collectibleNumber - 1].assets.length, "Versions must be less than asset count");
     require(collectibleNumber > 0, "Collectible IDs start at 1");
-    ds.collectibles[collectibleNumber - 1].currentVersion = versionNumber;
+    ds.collection[cID].collectibles[collectibleNumber - 1].currentVersion = versionNumber;
   }
 
   // Adds new license and updates version to latest
-  function addNewLicense(string memory _license) public onlyDAO {
+  function addNewLicense(uint256 cID, string memory _license) public onlyDAO {
     Storage storage ds = packStorage();
-    ds.licenseURI[ds.licenseVersion] = _license;
-    ds.licenseVersion++;
+    ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion] = _license;
+    ds.collection[cID].licenseVersion++;
   }
 
   // Returns license URI
-  function getLicense() public view returns (string memory) {
+  function getLicense(uint256 cID) public view returns (string memory) {
     Storage storage ds = packStorage();
-    return ds.licenseURI[ds.licenseVersion - 1];
+    return ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion - 1];
   }
 
   // Returns license version count
-  function getLicenseVersion(uint256 versionNumber) public view returns (string memory) {
+  function getLicenseVersion(uint256 cID, uint256 versionNumber) public view returns (string memory) {
     Storage storage ds = packStorage();
-    return ds.licenseURI[versionNumber - 1];
+    return ds.collection[cID].licenseURI[versionNumber - 1];
   }
 
   // Dynamic base64 encoded metadata generation using on-chain metadata and edition numbers
@@ -166,21 +173,27 @@ library LibPackStorage {
     Storage storage ds = packStorage();
 
     uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
-    uint256 collectibleId = (tokenId - edition) / 100000 - 1;
+    uint256 collectibleId = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 8, bytes(toString(tokenId)).length - 5)) - 1;
+    console.log(edition);
+    console.log(collectibleId);
+    uint256 cID = ((tokenId - ((collectibleId + 1) * 100000)) - (edition + 1)) / 100000000 - 1;
+    console.log(cID);
     string memory encodedMetadata = '';
 
-    for (uint i = 0; i < ds.metadata[collectibleId].propertyCount; i++) {
+    for (uint i = 0; i < ds.collection[cID].metadata[collectibleId].propertyCount; i++) {
       encodedMetadata = string(abi.encodePacked(
         encodedMetadata,
         '{"trait_type":"',
-        ds.metadata[collectibleId].name[i],
+        ds.collection[cID].metadata[collectibleId].name[i],
         '", "value":"',
-        ds.metadata[collectibleId].value[i],
+        ds.collection[cID].metadata[collectibleId].value[i],
         '"}',
-        i == ds.metadata[collectibleId].propertyCount - 1 ? '' : ',')
+        i == ds.collection[cID].metadata[collectibleId].propertyCount - 1 ? '' : ',')
       );
     }
 
+    Collection storage collection = ds.collection[cID];
+    uint256 asset = ds.collection[cID].collectibles[collectibleId].currentVersion - 1;
     string memory encoded = string(
         abi.encodePacked(
           'data:application/json;base64,',
@@ -188,14 +201,14 @@ library LibPackStorage {
             bytes(
               abi.encodePacked(
                 '{"name":"',
-                ds.collectibles[collectibleId].title,
-                ds.editioned ? ' #' : '',
-                ds.editioned ? toString(edition + 1) : '',
+                collection.collectibles[collectibleId].title,
+                collection.editioned ? ' #' : '',
+                collection.editioned ? toString(edition + 1) : '',
                 '", "description":"',
-                ds.collectibles[collectibleId].description,
+                collection.collectibles[collectibleId].description,
                 '", "image": "',
-                ds._baseURI,
-                ds.collectibles[collectibleId].assets[ds.collectibles[collectibleId].currentVersion - 1],
+                collection._baseURI,
+                collection.collectibles[collectibleId].assets[asset],
                 '", "attributes": [',
                 encodedMetadata,
                 '] }'
