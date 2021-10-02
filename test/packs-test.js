@@ -145,5 +145,70 @@ describe("Packs Test", async function() {
     expect(license).to.equal('https://arweave.net/license');
   })
 
+  // SECOND COLLECTION
+  const licenseURI2 = 'https://arweave.net/license';
+  const editioned2 = true;
+  const tokenPrice2 = ethers.utils.parseEther("0.0007");
+  const bulkBuyLimit2 = 50;
+  const nullAddress2 = '0x0000000000000000000000000000000000000000';
+  const mintPassAddress2 = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
+  const mintPassDuration2 = 600; // 600 = 10 minutes, 3600 = 1 hour
+  const saleStartTime2 = saleStartTime + mintPassDuration;
+
+  it("should create new collection", async function() {
+    const args = [
+      editioned2,
+      [tokenPrice2, bulkBuyLimit2, saleStartTime2],
+      licenseURI2,
+      nullAddress2, // mintPassAddress or nullAddress for no mint pass
+      mintPassDuration2
+    ]
+
+    packsInstance.createNewCollection(...args);
+  })
+
+  it("should create collectible", async function() {
+    const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
+    await packsInstance.addCollectible(1, metadata[0].coreData, metadata[0].assets, metadata[0].metaData);
+  });
+
+  it("should bulk add collectible", async function() {
+    const coreData = [metadata[1].coreData, metadata[2].coreData];
+    const assets = [metadata[1].assets, metadata[2].assets];
+    const metaData = [metadata[1].metaData, metadata[2].metaData];
+    const fees = [
+      [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
+      [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
+    ];
+    await packsInstance.bulkAddCollectible(1, coreData, assets, metaData);
+  });
+
+  it("should mint one token", async function() {
+    await ethers.provider.send('evm_setNextBlockTimestamp', [saleStartTime2]);
+    await ethers.provider.send('evm_mine');
+    await packsInstance.mintPack(1, {value: tokenPrice2 });
+    // await packsInstance.functions['mint()']({value: tokenPrice})
+    // expect((await packsInstance.getTokens()).length).to.equal(totalTokenCount - 1);
+  });
+
+  it("should reject mints with insufficient funds", async function() {
+    expect(packsInstance.mintPack(1, {value: tokenPrice.div(2) })).to.be.reverted;
+    expect(packsInstance.bulkMintPack(1, 50, {value: tokenPrice.mul(49) })).to.be.reverted;
+  });
+
+  it("should bulk mint all tokens", async function() {
+    const bulkCount = Number(metadata[2].coreData[2]);
+    expect(packsInstance.bulkMintPack(1, 10000, {value: tokenPrice.mul(10000) })).to.be.reverted;
+
+    await packsInstance.bulkMintPack(1, bulkCount, {value: tokenPrice.mul(bulkCount) });
+    // expect((await packsInstance.getTokens()).length).to.equal(totalTokenCount - 1 - bulkCount);
+
+    await packsInstance.bulkMintPack(1, totalTokenCount - 1 - bulkCount, {value: tokenPrice.mul(totalTokenCount - 1 - bulkCount) });
+    // expect((await packsInstance.getTokens()).length).to.equal(0);
+
+    const [owner] = await ethers.getSigners();
+    expect(await packsInstance.ownerOf(200100001)).to.equal(owner.address);
+  });
+
   /* TODO: Write test to check non-editioned names */
 });

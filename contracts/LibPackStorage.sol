@@ -56,6 +56,8 @@ library LibPackStorage {
     address payable daoAddress;
     bool daoInitialized;
 
+    uint256 collectionCount;
+
     mapping (uint256 => Collection) collection;
   }
 
@@ -84,7 +86,6 @@ library LibPackStorage {
 
     for (uint256 i = 0; i < editions; i++) {
       uint32 tokenID = uint32((cID + 1) * 100000000) + uint32((collectibleCount + 1) * 100000) + uint32(i + 1);
-      console.log(tokenID);
       ds.collection[cID].shuffleIDs.push(tokenID);
     }
   }
@@ -174,10 +175,7 @@ library LibPackStorage {
 
     uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
     uint256 collectibleId = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 8, bytes(toString(tokenId)).length - 5)) - 1;
-    console.log(edition);
-    console.log(collectibleId);
     uint256 cID = ((tokenId - ((collectibleId + 1) * 100000)) - (edition + 1)) / 100000000 - 1;
-    console.log(cID);
     string memory encodedMetadata = '';
 
     for (uint i = 0; i < ds.collection[cID].metadata[collectibleId].propertyCount; i++) {

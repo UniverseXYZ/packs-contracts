@@ -37,6 +37,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
     ds.daoAddress = msg.sender;
     ds.daoInitialized = false;
+    ds.collectionCount = 1;
 
     ds.collection[0]._name = name;
     ds.collection[0]._symbol = symbol;
@@ -68,6 +69,31 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
     ds.daoAddress = _daoAddress;
     ds.daoInitialized = true;
+  }
+
+  function createNewCollection(
+    bool _editioned,
+    uint256[] memory _initParams,
+    string memory _licenseURI,
+    address _mintPass,
+    uint256 _mintPassDuration
+  ) public onlyDAO {
+    LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
+
+    ds.collection[ds.collectionCount].editioned = _editioned;
+    ds.collection[ds.collectionCount].tokenPrice = _initParams[0];
+    ds.collection[ds.collectionCount].bulkBuyLimit = _initParams[1];
+    ds.collection[ds.collectionCount].saleStartTime = _initParams[2];
+    ds.collection[ds.collectionCount].licenseURI[0] = _licenseURI;
+    ds.collection[ds.collectionCount].licenseVersion = 1;
+
+    if (_mintPass != address(0)) {
+      ds.collection[ds.collectionCount].mintPass = true;
+      ds.collection[ds.collectionCount].mintPassContract = ERC721(_mintPass);
+      ds.collection[ds.collectionCount].mintPassDuration = _mintPassDuration;
+    }
+
+    ds.collectionCount++;
   }
 
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) public onlyDAO {
