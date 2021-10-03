@@ -1,10 +1,14 @@
 const { expect } = require("chai");
 const { utils } = require('ethers');
-const mock = require('./mock-metadata.json');
+const mock = require('./mock-instinct.json');
 
 function base64toJSON(string) {
   return JSON.parse(Buffer.from(string.replace('data:application/json;base64,',''), 'base64').toString())
 }
+
+/* TODO:
+ * ROYALTIES
+*/
 
 describe("Packs Test", async function() {
   const collectionName = 'RELICS INSTINCT';
@@ -54,21 +58,21 @@ describe("Packs Test", async function() {
     await packsInstance.deployed();
   });
 
-  /* TODO: ONLY DAO CHECK */
   it("should create collectible", async function() {
     const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
-    await packsInstance.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData);
+    await packsInstance.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData);
   });
 
   it("should bulk add collectible", async function() {
     const coreData = [metadata[1].coreData, metadata[2].coreData];
     const assets = [metadata[1].assets, metadata[2].assets];
     const metaData = [metadata[1].metaData, metadata[2].metaData];
+    const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
     const fees = [
       [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
       [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
     ];
-    await packsInstance.bulkAddCollectible(0, coreData, assets, metaData);
+    await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData);
   });
 
   // it("should match the total token count", async function() {
@@ -107,7 +111,7 @@ describe("Packs Test", async function() {
     const tokenJSON = base64toJSON(yo);
     expect(tokenJSON.name).to.equal(`${ metadata[0].coreData[0] } #8`);
     expect(tokenJSON.description).to.equal(metadata[0].coreData[1]);
-    expect(tokenJSON.image).to.equal(`${ baseURI }one`);
+    expect(tokenJSON.image).to.equal(`${ baseURI }zhKl1KoFG4RSZqCRjnBudTvF27-aGDpqNv5wRSZe5-w`);
     expect(tokenJSON.attributes[0].trait_type).to.equal(metadata[0].metaData[0][0]);
     expect(tokenJSON.attributes[0].value).to.equal(metadata[0].metaData[0][1]);
   });
@@ -126,7 +130,7 @@ describe("Packs Test", async function() {
 
   it("should update image asset and version", async function() {
     await packsInstance.addVersion(0, 1, 'fourrrrrrr');
-    await packsInstance.updateVersion(0, 1, 3);
+    await packsInstance.updateVersion(0, 1, 1);
     const tokenJSON = base64toJSON(await packsInstance.tokenURI(100100008));
     expect(tokenJSON.image).to.equal(`${ baseURI }fourrrrrrr`);
   });
@@ -157,6 +161,7 @@ describe("Packs Test", async function() {
 
   it("should create new collection", async function() {
     const args = [
+      baseURI,
       editioned2,
       [tokenPrice2, bulkBuyLimit2, saleStartTime2],
       licenseURI2,
@@ -164,23 +169,24 @@ describe("Packs Test", async function() {
       mintPassDuration2
     ]
 
-    packsInstance.createNewCollection(...args);
+    await packsInstance.createNewCollection(...args);
   })
 
   it("should create collectible", async function() {
     const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
-    await packsInstance.addCollectible(1, metadata[0].coreData, metadata[0].assets, metadata[0].metaData);
+    await packsInstance.addCollectible(1, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData);
   });
 
   it("should bulk add collectible", async function() {
     const coreData = [metadata[1].coreData, metadata[2].coreData];
     const assets = [metadata[1].assets, metadata[2].assets];
     const metaData = [metadata[1].metaData, metadata[2].metaData];
+    const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
     const fees = [
       [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
       [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
     ];
-    await packsInstance.bulkAddCollectible(1, coreData, assets, metaData);
+    await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData);
   });
 
   it("should mint one token", async function() {

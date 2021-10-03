@@ -6,32 +6,27 @@
 pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
-/* 
- * TODO: ADD SECONDARY SALE FEES
- * Event Emitters
- */
-
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./LibPackStorage.sol";
-import "./IPacks.sol";
 import 'hardhat/console.sol';
 
-contract Packs is IPacks, ERC721, ReentrancyGuard {
+contract Packs is IERC721, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
 
   constructor(
     string memory name,
     string memory symbol,
-    string memory baseURI,
+    string memory _baseURI,
     bool _editioned,
     uint256[] memory _initParams,
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration
   ) ERC721(name, symbol) {
-    require(_initParams[1] <= 50, "Limit of 50");
+    require(_initParams[1] <= 50, "Bulk buy limit of 50");
 
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
@@ -39,10 +34,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = false;
     ds.collectionCount = 1;
 
-    ds.collection[0]._name = name;
-    ds.collection[0]._symbol = symbol;
-    ds.collection[0]._baseURI = baseURI;
-
+    ds.collection[0].baseURI = _baseURI;
     ds.collection[0].editioned = _editioned;
     ds.collection[0].tokenPrice = _initParams[0];
     ds.collection[0].bulkBuyLimit = _initParams[1];
@@ -56,8 +48,46 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
       ds.collection[0].mintPassDuration = _mintPassDuration;
     }
 
-    _setBaseURI(baseURI);
+    _setBaseURI(_baseURI);
   }
+  
+  event LogCreateNewCollection(
+    uint256 index
+  );
+
+  event LogAddCollectible(
+    uint256 cID,
+    string title
+  );
+
+  event LogMintPack(
+    address minter,
+    uint256 tokenID
+  );
+  
+  event LogUpdateMetadata(
+    uint256 cID,
+    uint256 collectibleId,
+    uint256 propertyIndex,
+    string value
+  );
+
+  event LogAddVersion(
+    uint256 cID,
+    uint256 collectibleId,
+    string asset
+  );
+
+  event LogUpdateVersion(
+    uint256 cID,
+    uint256 collectibleId,
+    uint256 versionNumber
+  );
+
+  event LogAddNewLicense(
+    uint256 cID,
+    string license
+  );
 
   modifier onlyDAO() {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
@@ -71,38 +101,21 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
   }
 
-  function createNewCollection(
-    bool _editioned,
-    uint256[] memory _initParams,
-    string memory _licenseURI,
-    address _mintPass,
-    uint256 _mintPassDuration
-  ) public onlyDAO {
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration) public onlyDAO {
+    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration);
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-
-    ds.collection[ds.collectionCount].editioned = _editioned;
-    ds.collection[ds.collectionCount].tokenPrice = _initParams[0];
-    ds.collection[ds.collectionCount].bulkBuyLimit = _initParams[1];
-    ds.collection[ds.collectionCount].saleStartTime = _initParams[2];
-    ds.collection[ds.collectionCount].licenseURI[0] = _licenseURI;
-    ds.collection[ds.collectionCount].licenseVersion = 1;
-
-    if (_mintPass != address(0)) {
-      ds.collection[ds.collectionCount].mintPass = true;
-      ds.collection[ds.collectionCount].mintPassContract = ERC721(_mintPass);
-      ds.collection[ds.collectionCount].mintPassDuration = _mintPassDuration;
-    }
-
-    ds.collectionCount++;
+    emit LogCreateNewCollection(ds.collectionCount);
   }
 
-  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) public onlyDAO {
-    LibPackStorage.addCollectible(cID, _coreData, _assets, _metadataValues);
+  /**** cID refers to collection ID ****/
+  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata) public onlyDAO {
+    LibPackStorage.addCollectible(cID, _coreData, _assets, _metadataValues, _secondaryMetadata);
+    emit LogAddCollectible(cID, _coreData[0]);
   }
 
-  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues) public onlyDAO {
+  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues, string[][][] memory _secondaryMetadata) public onlyDAO {
     for (uint256 i = 0; i < _coreData.length; i++) {
-      addCollectible(cID, _coreData[i], _assets[i], _metadataValues[i]);
+      addCollectible(cID, _coreData[i], _assets[i], _metadataValues[i], _secondaryMetadata[i]);
     }
   }
 
@@ -112,10 +125,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     return count;
   }
 
-  function mint() public payable override {}
-  function bulkMint(uint256 amount) public payable override {}
-
-  function mintPack(uint256 cID) public payable nonReentrant {
+  function canFreeClaim(uint256 cID) private returns (bool)  {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
     bool freeClaim = false;
@@ -126,21 +136,11 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
       }
     }
 
-    if (ds.collection[cID].mintPass) require((freeClaim && (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration))), "You cannot claim");
-    else require((block.timestamp > ds.collection[cID].saleStartTime), "Sale has not yet started");
+    return freeClaim;
+  }
 
-    if (ds.daoInitialized) {
-      (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.collection[cID].tokenPrice}("");
-      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
-    }
-
-    if (!freeClaim) {
-      uint256 excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
-      if (excessAmount > 0) {
-        (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
-        require(returnExcessStatus, "Failed to return excess.");
-      }
-    }
+  function randomTokenID(uint256 cID) private returns (uint256) {
+    LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
     uint256 randomTokenID = LibPackStorage.random(cID) % ds.collection[cID].shuffleIDs.length;
     uint256 tokenID = ds.collection[cID].shuffleIDs[randomTokenID];
@@ -148,20 +148,31 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.collection[cID].shuffleIDs[randomTokenID] = ds.collection[cID].shuffleIDs[ds.collection[cID].shuffleIDs.length - 1];
     ds.collection[cID].shuffleIDs.pop();
 
+    return tokenID;
+  }
+
+  function mintPack(uint256 cID) public payable nonReentrant {
+    LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
+    bool freeClaim = canFreeClaim(cID);
+    LibPackStorage.mintChecks(cID, freeClaim);
+ 
+   if (!freeClaim) {
+      uint256 excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
+      if (excessAmount > 0) {
+        (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
+        require(returnExcessStatus, "Failed to return excess.");
+      }
+    }
+
+    uint256 tokenID = randomTokenID(cID);
     _mint(_msgSender(), tokenID);
+    emit LogMintPack(msg.sender, tokenID);
   }
 
   function bulkMintPack(uint256 cID, uint256 amount) public payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
-    require(amount <= ds.collection[cID].bulkBuyLimit, "Cannot bulk buy more than the preset limit");
-    require(amount <= ds.collection[cID].shuffleIDs.length, "Total supply reached");
-    require((block.timestamp > ds.collection[cID].saleStartTime), "Sale has not yet started");
-
-    if (ds.daoInitialized) {
-      (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.collection[cID].tokenPrice.mul(amount)}("");
-      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
-    }
+    LibPackStorage.bulkMintChecks(cID, amount);
 
     uint256 excessAmount = msg.value.sub(ds.collection[cID].tokenPrice.mul(amount));
     if (excessAmount > 0) {
@@ -170,29 +181,30 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     }
 
     for (uint256 i = 0; i < amount; i++) {
-      uint256 randomTokenID = ds.collection[cID].shuffleIDs.length == 1 ? 0 : LibPackStorage.random(cID) % (ds.collection[cID].shuffleIDs.length - 1);
-      uint256 tokenID = ds.collection[cID].shuffleIDs[randomTokenID];
-      ds.collection[cID].shuffleIDs[randomTokenID] = ds.collection[cID].shuffleIDs[ds.collection[cID].shuffleIDs.length - 1];
-      ds.collection[cID].shuffleIDs.pop();
-
+      uint256 tokenID = randomTokenID(cID);
       _mint(_msgSender(), tokenID);
+      emit LogMintPack(msg.sender, tokenID);
     }
   }
 
   function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
     LibPackStorage.updateMetadata(cID, collectibleId, propertyIndex, value);
+    emit LogUpdateMetadata(cID, collectibleId, propertyIndex, value);
   }
 
   function addVersion(uint256 cID, uint256 collectibleNumber, string memory asset) public onlyDAO {
     LibPackStorage.addVersion(cID, collectibleNumber, asset);
+    emit LogAddVersion(cID, collectibleNumber, asset);
   }
 
   function updateVersion(uint256 cID, uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
     LibPackStorage.updateVersion(cID, collectibleNumber, versionNumber);
+    emit LogUpdateVersion(cID, collectibleNumber, versionNumber);
   }
 
   function addNewLicense(uint256 cID, string memory _license) public onlyDAO {
     LibPackStorage.addNewLicense(cID, _license);
+    emit LogAddNewLicense(cID, _license);
   }
 
   function getLicense(uint256 cID) public view returns (string memory) {

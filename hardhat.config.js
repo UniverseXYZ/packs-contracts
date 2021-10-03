@@ -43,7 +43,7 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: "AHJVIXHJ44QUE3ZM1MS1RCWG27TWU315GC"
+    apiKey: `${ process.env.ETHERSCAN }`
   },
   contractSizer: {
     alphaSort: true,

@@ -1,0 +1,79 @@
+{
+  "data": [
+    {
+     "coreData": [
+        "This Time",
+        "Music by Kayzo. Visuals by XXX",
+        "30",
+        "1"
+      ],
+      "assets": ["Sqsr4nqbSwmqCVxdOq-uW_cYofCT9tjTAoVBej3BM4U"],
+      "metaData": [
+	      ["Rarity", "Sapphire", "1"],
+ 	      ["Musician", "Kayzo", "0"],
+	      ["Designer", "XXX", "0"],
+	      ["BPM", "150", "0"],
+	      ["Key", "D Major", "0"],
+ 	      ["Version", "Original", "0"],
+        ["Label", "Monstercat", "0"],
+        ["Brand", "Uncaged", "0"],
+        ["Season", "1", "0"]
+      ],
+      "secondaryMetaData": [
+        ["ISRC", "US-S1Z-94-00001", "1"],
+        ["Duration", "2:50", "0"],
+	      ["Stream", "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Wrld_Hangup-%7B720p_320kbps%7D.mp4", "1"]
+      ]
+    },
+    {
+     "coreData": [
+        "Us",
+        "Music by Snavs. Visuals by XXX",
+        "30",
+        "1"
+      ],
+      "assets": ["w8iBc2ZyZrGRCjb68zqjEnrqYMC56IL-9JSGntLliVU"],
+      "metaData": [
+	      ["Rarity", "Sapphire", "1"],
+ 	      ["Musician", "Snavs", "0"],
+	      ["Designer", "XXX", "0"],
+	      ["BPM", "150", "0"],
+	      ["Key", "E Minor", "0"],
+ 	      ["Version", "Original", "0"],
+        ["Label", "Monstercat", "0"],
+        ["Brand", "Uncaged", "0"],
+        ["Season", "1", "0"]
+      ],
+      "secondaryMetaData": [
+        ["ISRC", "US-S1Z-95-00001", "1"],
+        ["Duration", "3:03", "0"],
+	      ["Stream", "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Wrld_Hangup-%7B720p_320kbps%7D.mp4", "1"]
+      ]
+    },
+    {
+      "coreData": [
+        "SAIKOU",
+        "Music by Tokyo Machine. Visuals by GameShrimp",
+        "30",
+        "1"
+      ],
+      "assets": ["t4Fy2FAy1BQBUmm3NU2PpdyAnIe9GZHgI-Vr18dv-dA"],
+      "metaData": [
+        ["Rarity", "Emerald", "1"],
+        ["Musician", "Tokyo Machine", "0"],
+        ["Designer", "GameShrimp", "0"],
+        ["BPM", "128", "0"],
+        ["Key", "A Major", "0"],
+        ["Version", "Original", "0"],
+        ["Label", "Monstercat", "0"],
+        ["Brand", "Uncaged", "0"],
+        ["Season", "1", "0"]
+      ],
+      "secondaryMetaData": [
+        ["ISRC", "US-S1Z-96-00001", "1"],
+        ["Duration", "2:56", "0"],
+        ["Stream", "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Wrld_Hangup-%7B720p_320kbps%7D.mp4", "1"]
+      ]
+    }
+  ]
+}

@@ -2,11 +2,14 @@
 pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import 'base64-sol/base64.sol';
 import 'hardhat/console.sol';
 
 library LibPackStorage {
+  using SafeMath for uint256;
+
   bytes32 constant STORAGE_POSITION = keccak256("com.universe.packs.storage");
 
   struct SingleCollectible {
@@ -28,12 +31,11 @@ library LibPackStorage {
   struct Collection {
     bool initialized;
 
-    string _name; // Contract name
-    string _symbol; // Contract symbol
-    string _baseURI; // Token ID base URL (recommended as of 7/27/2021: https://arweave.net/)
+    string baseURI; // Token ID base URL
 
     mapping (uint256 => SingleCollectible) collectibles; // Unique assets
     mapping (uint256 => Metadata) metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
+    mapping (uint256 => Metadata) secondaryMetadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
     mapping (uint256 => string) licenseURI; // URL to external license or file
     mapping (address => bool) freeClaims;
 
@@ -68,7 +70,7 @@ library LibPackStorage {
     }
   }
 
-  function random(uint256 cID) external view returns (uint) {
+  function random(uint256 cID) internal view returns (uint) {
     return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, packStorage().collection[cID].totalTokenCount)));
   }
 
@@ -90,8 +92,35 @@ library LibPackStorage {
     }
   }
 
+  function createNewCollection(
+    string memory _baseURI,
+    bool _editioned,
+    uint256[] memory _initParams,
+    string memory _licenseURI,
+    address _mintPass,
+    uint256 _mintPassDuration
+  ) external onlyDAO {
+    Storage storage ds = packStorage();
+
+    ds.collection[ds.collectionCount].baseURI = _baseURI;
+    ds.collection[ds.collectionCount].editioned = _editioned;
+    ds.collection[ds.collectionCount].tokenPrice = _initParams[0];
+    ds.collection[ds.collectionCount].bulkBuyLimit = _initParams[1];
+    ds.collection[ds.collectionCount].saleStartTime = _initParams[2];
+    ds.collection[ds.collectionCount].licenseURI[0] = _licenseURI;
+    ds.collection[ds.collectionCount].licenseVersion = 1;
+
+    if (_mintPass != address(0)) {
+      ds.collection[ds.collectionCount].mintPass = true;
+      ds.collection[ds.collectionCount].mintPassContract = ERC721(_mintPass);
+      ds.collection[ds.collectionCount].mintPassDuration = _mintPassDuration;
+    }
+
+    ds.collectionCount++;
+  }
+
   // Add single collectible asset with main info and metadata properties
-  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues) external onlyDAO {
+  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata) external onlyDAO {
     Storage storage ds = packStorage();
 
     ds.collection[cID].collectibles[ds.collection[cID].collectibleCount] = SingleCollectible({
@@ -99,7 +128,7 @@ library LibPackStorage {
       description: _coreData[1],
       count: safeParseInt(_coreData[2]),
       assets: _assets,
-      currentVersion: 1,
+      currentVersion: safeParseInt(_coreData[3]),
       totalVersionCount: _assets.length
     });
 
@@ -112,18 +141,55 @@ library LibPackStorage {
       modifiables[i] = (keccak256(abi.encodePacked((_metadataValues[i][2]))) == keccak256(abi.encodePacked(('1')))); // 1 is modifiable, 0 is permanent
     }
 
-    ds.collection[cID].metadata[ds.collection[cID].collectibleCount] = Metadata({
+    Collection storage collection = ds.collection[cID];
+    uint256 collectibleCount = collection.collectibleCount;
+
+    collection.metadata[collectibleCount] = Metadata({
       name: propertyNames,
       value: propertyValues,
       modifiable: modifiables,
       propertyCount: _metadataValues.length
     });
 
-    uint256 editions = safeParseInt(_coreData[2]);
-    createTokenIDs(cID, ds.collection[cID].collectibleCount, editions);
+    string[] memory secondaryPropertyNames = new string[](_secondaryMetadata.length);
+    string[] memory secondaryPropertyValues = new string[](_secondaryMetadata.length);
+    bool[] memory secondaryModifiables = new bool[](_secondaryMetadata.length);
+    for (uint256 i = 0; i < _secondaryMetadata.length; i++) {
+      secondaryPropertyNames[i] = _secondaryMetadata[i][0];
+      secondaryPropertyValues[i] = _secondaryMetadata[i][1];
+      secondaryModifiables[i] = (keccak256(abi.encodePacked((_secondaryMetadata[i][2]))) == keccak256(abi.encodePacked(('1')))); // 1 is modifiable, 0 is permanent
+    }
 
-    ds.collection[cID].collectibleCount++;
-    ds.collection[cID].totalTokenCount += editions;
+    collection.secondaryMetadata[collectibleCount] = Metadata({
+      name: secondaryPropertyNames,
+      value: secondaryPropertyValues,
+      modifiable: secondaryModifiables,
+      propertyCount: _secondaryMetadata.length
+    });
+
+    uint256 editions = safeParseInt(_coreData[2]);
+    createTokenIDs(cID, collectibleCount, editions);
+
+    collection.collectibleCount++;
+    collection.totalTokenCount += editions;
+  }
+
+  function mintChecks(uint256 cID, bool freeClaim) external {
+    Storage storage ds = packStorage();
+    require((freeClaim && (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration)) || (block.timestamp > ds.collection[cID].saleStartTime)), "Sale has not yet started");
+  }
+
+  function bulkMintChecks(uint256 cID, uint256 amount) external {
+    Storage storage ds = packStorage();
+
+    require(amount <= ds.collection[cID].bulkBuyLimit, "Cannot bulk buy more than the preset limit");
+    require(amount <= ds.collection[cID].shuffleIDs.length, "Total supply reached");
+    require((block.timestamp > ds.collection[cID].saleStartTime), "Sale has not yet started");
+
+    if (ds.daoInitialized) {
+      (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.collection[cID].tokenPrice.mul(amount)}("");
+      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
+    }
   }
 
   // Modify property field only if marked as updateable
@@ -178,20 +244,35 @@ library LibPackStorage {
     uint256 cID = ((tokenId - ((collectibleId + 1) * 100000)) - (edition + 1)) / 100000000 - 1;
     string memory encodedMetadata = '';
 
-    for (uint i = 0; i < ds.collection[cID].metadata[collectibleId].propertyCount; i++) {
+    Collection storage collection = ds.collection[cID];
+
+    for (uint i = 0; i < collection.metadata[collectibleId].propertyCount; i++) {
       encodedMetadata = string(abi.encodePacked(
         encodedMetadata,
         '{"trait_type":"',
-        ds.collection[cID].metadata[collectibleId].name[i],
+        collection.metadata[collectibleId].name[i],
         '", "value":"',
-        ds.collection[cID].metadata[collectibleId].value[i],
+        collection.metadata[collectibleId].value[i],
         '"}',
-        i == ds.collection[cID].metadata[collectibleId].propertyCount - 1 ? '' : ',')
+        i == collection.metadata[collectibleId].propertyCount - 1 ? '' : ',')
       );
     }
 
-    Collection storage collection = ds.collection[cID];
-    uint256 asset = ds.collection[cID].collectibles[collectibleId].currentVersion - 1;
+    string memory encodedSecondaryMetadata = '';
+    for (uint i = 0; i < collection.secondaryMetadata[collectibleId].propertyCount; i++) {
+      encodedSecondaryMetadata = string(abi.encodePacked(
+        encodedSecondaryMetadata,
+        '{"trait_type":"',
+        collection.secondaryMetadata[collectibleId].name[i],
+        '", "value":"',
+        collection.secondaryMetadata[collectibleId].value[i],
+        '"}',
+        i == collection.secondaryMetadata[collectibleId].propertyCount - 1 ? '' : ',')
+      );
+    }
+
+    SingleCollectible storage collectible = collection.collectibles[collectibleId];
+    uint256 asset = collectible.currentVersion - 1;
     string memory encoded = string(
         abi.encodePacked(
           'data:application/json;base64,',
@@ -199,16 +280,21 @@ library LibPackStorage {
             bytes(
               abi.encodePacked(
                 '{"name":"',
-                collection.collectibles[collectibleId].title,
+                collectible.title,
                 collection.editioned ? ' #' : '',
                 collection.editioned ? toString(edition + 1) : '',
                 '", "description":"',
-                collection.collectibles[collectibleId].description,
+                collectible.description,
                 '", "image": "',
-                collection._baseURI,
-                collection.collectibles[collectibleId].assets[asset],
+                collection.baseURI,
+                collectible.assets[asset],
+                '", "animation_url": "',
+                collection.baseURI,
+                collectible.assets[asset],
                 '", "attributes": [',
                 encodedMetadata,
+                '], "secondaryAttributes": [',
+                encodedSecondaryMetadata,
                 '] }'
               )
             )
