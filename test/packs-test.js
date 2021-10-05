@@ -6,10 +6,6 @@ function base64toJSON(string) {
   return JSON.parse(Buffer.from(string.replace('data:application/json;base64,',''), 'base64').toString())
 }
 
-/* TODO:
- * ROYALTIES
-*/
-
 describe("Packs Test", async function() {
   const collectionName = 'RELICS INSTINCT';
   const collectionSymbol = 'MONSTERCAT';
@@ -68,7 +64,7 @@ describe("Packs Test", async function() {
     const assets = [metadata[1].assets, metadata[2].assets];
     const metaData = [metadata[1].metaData, metadata[2].metaData];
     const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
-    const fees = [
+    let fees = [
       [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
       [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
     ];
@@ -161,7 +157,7 @@ describe("Packs Test", async function() {
   // SECOND COLLECTION
   const licenseURI2 = 'https://arweave.net/license';
   const editioned2 = true;
-  const tokenPrice2 = ethers.utils.parseEther("0.0007");
+  const tokenPrice2 = ethers.utils.parseEther("0.07");
   const bulkBuyLimit2 = 50;
   const nullAddress2 = '0x0000000000000000000000000000000000000000';
   const mintPassAddress2 = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
@@ -196,7 +192,7 @@ describe("Packs Test", async function() {
     const assets = [metadata[1].assets, metadata[2].assets];
     const metaData = [metadata[1].metaData, metadata[2].metaData];
     const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
-    const fees = [
+    let fees = [
       [[randomWallet2.address, feeSplit1]],
       [[randomWallet1.address, feeSplit2]]
     ];
@@ -212,18 +208,18 @@ describe("Packs Test", async function() {
   });
 
   it("should reject mints with insufficient funds", async function() {
-    expect(packsInstance.mintPack(1, {value: tokenPrice.div(2) })).to.be.reverted;
-    expect(packsInstance.bulkMintPack(1, 50, {value: tokenPrice.mul(49) })).to.be.reverted;
+    expect(packsInstance.mintPack(1, {value: tokenPrice2.div(2) })).to.be.reverted;
+    expect(packsInstance.bulkMintPack(1, 50, {value: tokenPrice2.mul(49) })).to.be.reverted;
   });
 
   it("should bulk mint all tokens", async function() {
     const bulkCount = Number(metadata[2].coreData[2]);
-    expect(packsInstance.bulkMintPack(1, 10000, {value: tokenPrice.mul(10000) })).to.be.reverted;
+    expect(packsInstance.bulkMintPack(1, 10000, {value: tokenPrice2.mul(10000) })).to.be.reverted;
 
-    await packsInstance.bulkMintPack(1, bulkCount, {value: tokenPrice.mul(bulkCount) });
+    await packsInstance.bulkMintPack(1, bulkCount, {value: tokenPrice2.mul(bulkCount) });
     // expect((await packsInstance.getTokens()).length).to.equal(totalTokenCount - 1 - bulkCount);
 
-    await packsInstance.bulkMintPack(1, totalTokenCount - 1 - bulkCount, {value: tokenPrice.mul(totalTokenCount - 1 - bulkCount) });
+    await packsInstance.bulkMintPack(1, totalTokenCount - 1 - bulkCount, {value: tokenPrice2.mul(totalTokenCount - 1 - bulkCount) });
     // expect((await packsInstance.getTokens()).length).to.equal(0);
 
     const [owner] = await ethers.getSigners();
@@ -231,10 +227,10 @@ describe("Packs Test", async function() {
   });
 
   it("should return correct EIP-2981 royalty", async function() {
-    const tokenPrice = 10000;
-    let royaltyInfo = await packsInstance.royaltyInfo(200100001, tokenPrice);
+    const price = 10000;
+    let royaltyInfo = await packsInstance.royaltyInfo(200100001, price);
     expect(royaltyInfo[0]).to.equal(randomWallet1.address);
-    expect(royaltyInfo[1].toNumber()).to.equal(tokenPrice / (feeSplit1 / 100));
+    expect(royaltyInfo[1].toNumber()).to.equal(price / (feeSplit1 / 100));
   });
 
   /* TODO: Write test to check non-editioned names */

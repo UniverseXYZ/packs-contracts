@@ -85,7 +85,6 @@ library LibPackStorage {
     string title
   );
 
-  
   event LogUpdateMetadata(
     uint256 cID,
     uint256 collectibleId,
@@ -140,6 +139,7 @@ library LibPackStorage {
     address _mintPass,
     uint256 _mintPassDuration
   ) external onlyDAO {
+    require(_initParams[1] <= 50, "Bulk buy limit of 50");
     Storage storage ds = packStorage();
 
     ds.collection[ds.collectionCount].baseURI = _baseURI;
@@ -350,9 +350,8 @@ library LibPackStorage {
                 '", "image": "',
                 collection.baseURI,
                 collectible.assets[asset],
-                '", "animation_url": "',
-                collection.baseURI,
-                collectible.assets[asset],
+                '", "license": "',
+                getLicense(cID),
                 '", "attributes": [',
                 encodedMetadata,
                 '], "secondaryAttributes": [',
