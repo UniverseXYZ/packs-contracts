@@ -60,7 +60,7 @@ describe("Packs Test", async function() {
 
   it("should create collectible", async function() {
     const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
-    await packsInstance.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData);
+    await packsInstance.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData, fees);
   });
 
   it("should bulk add collectible", async function() {
@@ -72,7 +72,7 @@ describe("Packs Test", async function() {
       [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
       [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
     ];
-    await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData);
+    await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
   });
 
   // it("should match the total token count", async function() {
@@ -149,6 +149,15 @@ describe("Packs Test", async function() {
     expect(license).to.equal('https://arweave.net/license');
   })
 
+  it("should return correct rarible secondary splits", async function() {
+    let recipients = await packsInstance.getFeeRecipients(100100001);
+    let bps = await packsInstance.getFeeBps(100100001);
+    expect(recipients[0]).to.equal(randomWallet1.address);
+    expect(recipients[1]).to.equal(randomWallet2.address);
+    expect(bps[0].toNumber()).to.equal(feeSplit1);
+    expect(bps[1].toNumber()).to.equal(feeSplit2);
+  });
+
   // SECOND COLLECTION
   const licenseURI2 = 'https://arweave.net/license';
   const editioned2 = true;
@@ -172,9 +181,14 @@ describe("Packs Test", async function() {
     await packsInstance.createNewCollection(...args);
   })
 
+  it("should return two collections", async function() {
+    const collectionCount = await packsInstance.getCollectionCount();
+    expect(collectionCount).to.equal(2);
+  });
+
   it("should create collectible", async function() {
-    const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
-    await packsInstance.addCollectible(1, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData);
+    const fees = [[randomWallet1.address, feeSplit1]];
+    await packsInstance.addCollectible(1, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData, fees);
   });
 
   it("should bulk add collectible", async function() {
@@ -183,10 +197,10 @@ describe("Packs Test", async function() {
     const metaData = [metadata[1].metaData, metadata[2].metaData];
     const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
     const fees = [
-      [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
-      [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
+      [[randomWallet2.address, feeSplit1]],
+      [[randomWallet1.address, feeSplit2]]
     ];
-    await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData);
+    await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
   });
 
   it("should mint one token", async function() {
@@ -214,6 +228,13 @@ describe("Packs Test", async function() {
 
     const [owner] = await ethers.getSigners();
     expect(await packsInstance.ownerOf(200100001)).to.equal(owner.address);
+  });
+
+  it("should return correct EIP-2981 royalty", async function() {
+    const tokenPrice = 10000;
+    let royaltyInfo = await packsInstance.royaltyInfo(200100001, tokenPrice);
+    expect(royaltyInfo[0]).to.equal(randomWallet1.address);
+    expect(royaltyInfo[1].toNumber()).to.equal(tokenPrice / (feeSplit1 / 100));
   });
 
   /* TODO: Write test to check non-editioned names */

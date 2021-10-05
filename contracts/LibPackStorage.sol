@@ -12,6 +12,11 @@ library LibPackStorage {
 
   bytes32 constant STORAGE_POSITION = keccak256("com.universe.packs.storage");
 
+  struct Fee {
+    address payable recipient;
+    uint256 value;
+  }
+
   struct SingleCollectible {
     string title; // Collectible name
     string description; // Collectible description
@@ -36,6 +41,7 @@ library LibPackStorage {
     mapping (uint256 => SingleCollectible) collectibles; // Unique assets
     mapping (uint256 => Metadata) metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
     mapping (uint256 => Metadata) secondaryMetadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
+    mapping (uint256 => Fee[]) secondaryFees;
     mapping (uint256 => string) licenseURI; // URL to external license or file
     mapping (address => bool) freeClaims;
 
@@ -47,7 +53,7 @@ library LibPackStorage {
     bool editioned; // Display edition # in token name
     uint256 licenseVersion; // Tracker of latest license
 
-    uint32[] shuffleIDs;
+    uint64[] shuffleIDs;
 
     bool mintPass;
     ERC721 mintPassContract;
@@ -70,6 +76,40 @@ library LibPackStorage {
     }
   }
 
+  event LogCreateNewCollection(
+    uint256 index
+  );
+
+  event LogAddCollectible(
+    uint256 cID,
+    string title
+  );
+
+  
+  event LogUpdateMetadata(
+    uint256 cID,
+    uint256 collectibleId,
+    uint256 propertyIndex,
+    string value
+  );
+
+  event LogAddVersion(
+    uint256 cID,
+    uint256 collectibleId,
+    string asset
+  );
+
+  event LogUpdateVersion(
+    uint256 cID,
+    uint256 collectibleId,
+    uint256 versionNumber
+  );
+
+  event LogAddNewLicense(
+    uint256 cID,
+    string license
+  );
+
   function random(uint256 cID) internal view returns (uint) {
     return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, packStorage().collection[cID].totalTokenCount)));
   }
@@ -87,7 +127,7 @@ library LibPackStorage {
     Storage storage ds = packStorage();
 
     for (uint256 i = 0; i < editions; i++) {
-      uint32 tokenID = uint32((cID + 1) * 100000000) + uint32((collectibleCount + 1) * 100000) + uint32(i + 1);
+      uint64 tokenID = uint64((cID + 1) * 100000000) + uint64((collectibleCount + 1) * 100000) + uint64(i + 1);
       ds.collection[cID].shuffleIDs.push(tokenID);
     }
   }
@@ -117,13 +157,31 @@ library LibPackStorage {
     }
 
     ds.collectionCount++;
+
+    emit LogCreateNewCollection(ds.collectionCount);
   }
 
   // Add single collectible asset with main info and metadata properties
-  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata) external onlyDAO {
+  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, Fee[] memory _fees) external onlyDAO {
     Storage storage ds = packStorage();
 
-    ds.collection[cID].collectibles[ds.collection[cID].collectibleCount] = SingleCollectible({
+    Collection storage collection = ds.collection[cID];
+    uint256 collectibleCount = collection.collectibleCount;
+
+    uint256 sum = 0;
+    for (uint256 i = 0; i < _fees.length; i++) {
+      require(_fees[i].recipient != address(0x0), "Recipient should be present");
+      require(_fees[i].value != 0, "Fee value should be positive");
+      collection.secondaryFees[collectibleCount].push(Fee({
+        recipient: _fees[i].recipient,
+        value: _fees[i].value
+      }));
+      sum += _fees[i].value;
+    }
+
+    require(sum < 10000, "Fee should be less than 100%");
+
+    collection.collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
       description: _coreData[1],
       count: safeParseInt(_coreData[2]),
@@ -141,9 +199,6 @@ library LibPackStorage {
       modifiables[i] = (keccak256(abi.encodePacked((_metadataValues[i][2]))) == keccak256(abi.encodePacked(('1')))); // 1 is modifiable, 0 is permanent
     }
 
-    Collection storage collection = ds.collection[cID];
-    uint256 collectibleCount = collection.collectibleCount;
-
     collection.metadata[collectibleCount] = Metadata({
       name: propertyNames,
       value: propertyValues,
@@ -151,19 +206,19 @@ library LibPackStorage {
       propertyCount: _metadataValues.length
     });
 
-    string[] memory secondaryPropertyNames = new string[](_secondaryMetadata.length);
-    string[] memory secondaryPropertyValues = new string[](_secondaryMetadata.length);
-    bool[] memory secondaryModifiables = new bool[](_secondaryMetadata.length);
+    propertyNames = new string[](_secondaryMetadata.length);
+    propertyValues = new string[](_secondaryMetadata.length);
+    modifiables = new bool[](_secondaryMetadata.length);
     for (uint256 i = 0; i < _secondaryMetadata.length; i++) {
-      secondaryPropertyNames[i] = _secondaryMetadata[i][0];
-      secondaryPropertyValues[i] = _secondaryMetadata[i][1];
-      secondaryModifiables[i] = (keccak256(abi.encodePacked((_secondaryMetadata[i][2]))) == keccak256(abi.encodePacked(('1')))); // 1 is modifiable, 0 is permanent
+      propertyNames[i] = _secondaryMetadata[i][0];
+      propertyValues[i] = _secondaryMetadata[i][1];
+      modifiables[i] = (keccak256(abi.encodePacked((_secondaryMetadata[i][2]))) == keccak256(abi.encodePacked(('1')))); // 1 is modifiable, 0 is permanent
     }
 
     collection.secondaryMetadata[collectibleCount] = Metadata({
-      name: secondaryPropertyNames,
-      value: secondaryPropertyValues,
-      modifiable: secondaryModifiables,
+      name: propertyNames,
+      value: propertyValues,
+      modifiable: modifiables,
       propertyCount: _secondaryMetadata.length
     });
 
@@ -172,6 +227,8 @@ library LibPackStorage {
 
     collection.collectibleCount++;
     collection.totalTokenCount += editions;
+
+    emit LogAddCollectible(cID, _coreData[0]);
   }
 
   function mintChecks(uint256 cID, bool freeClaim) external {
@@ -197,6 +254,7 @@ library LibPackStorage {
     Storage storage ds = packStorage();
     require(ds.collection[cID].metadata[collectibleId - 1].modifiable[propertyIndex], 'Not allowed');
     ds.collection[cID].metadata[collectibleId - 1].value[propertyIndex] = value;
+    emit LogUpdateMetadata(cID, collectibleId, propertyIndex, value);
   }
 
   // Add new asset, does not automatically increase current version
@@ -204,6 +262,7 @@ library LibPackStorage {
     Storage storage ds = packStorage();
     ds.collection[cID].collectibles[collectibleNumber - 1].assets[ds.collection[cID].collectibles[collectibleNumber - 1].totalVersionCount - 1] = asset;
     ds.collection[cID].collectibles[collectibleNumber - 1].totalVersionCount++;
+    emit LogAddVersion(cID, collectibleNumber, asset);
   }
 
   // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
@@ -214,6 +273,7 @@ library LibPackStorage {
     require(versionNumber <= ds.collection[cID].collectibles[collectibleNumber - 1].assets.length, "Versions must be less than asset count");
     require(collectibleNumber > 0, "Collectible IDs start at 1");
     ds.collection[cID].collectibles[collectibleNumber - 1].currentVersion = versionNumber;
+    emit LogUpdateVersion(cID, collectibleNumber, versionNumber);
   }
 
   // Adds new license and updates version to latest
@@ -221,6 +281,8 @@ library LibPackStorage {
     Storage storage ds = packStorage();
     ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion] = _license;
     ds.collection[cID].licenseVersion++;
+    emit LogAddNewLicense(cID, _license);
+
   }
 
   // Returns license URI
@@ -303,6 +365,43 @@ library LibPackStorage {
       );
 
     return encoded;
+  }
+
+  function getFeeRecipients(uint256 tokenId) public view returns (address payable[] memory) {
+    Storage storage ds = packStorage();
+
+    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
+    uint256 collectibleId = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 8, bytes(toString(tokenId)).length - 5)) - 1;
+    uint256 cID = ((tokenId - ((collectibleId + 1) * 100000)) - (edition + 1)) / 100000000 - 1;
+    Fee[] memory _fees = ds.collection[cID].secondaryFees[collectibleId];
+    address payable[] memory result = new address payable[](_fees.length);
+    for (uint i = 0; i < _fees.length; i++) {
+      result[i] = _fees[i].recipient;
+    }
+    return result;
+  }
+
+  function getFeeBps(uint256 tokenId) public view returns (uint[] memory) {
+    Storage storage ds = packStorage();
+
+    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
+    uint256 collectibleId = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 8, bytes(toString(tokenId)).length - 5)) - 1;
+    uint256 cID = ((tokenId - ((collectibleId + 1) * 100000)) - (edition + 1)) / 100000000 - 1;
+    Fee[] memory _fees = ds.collection[cID].secondaryFees[collectibleId];
+    uint[] memory result = new uint[](_fees.length);
+    for (uint i = 0; i < _fees.length; i++) {
+      result[i] = _fees[i].value;
+    }
+
+    return result;
+  }
+
+  function royaltyInfo(uint256 tokenId, uint256 value) public view returns (address recipient, uint256 amount){
+    address payable[] memory recipient = getFeeRecipients(tokenId);
+    require(recipient.length <= 1, "More than 1 royalty receiver");
+
+    if (recipient.length == 0) return (address(this), 0);
+    return (recipient[0], getFeeBps(tokenId)[0] * value / 10000);
   }
 
   function toString(uint256 value) internal pure returns (string memory) {

@@ -11,7 +11,6 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./LibPackStorage.sol";
-import 'hardhat/console.sol';
 
 contract Packs is IERC721, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
@@ -50,44 +49,18 @@ contract Packs is IERC721, ERC721, ReentrancyGuard {
 
     _setBaseURI(_baseURI);
   }
-  
-  event LogCreateNewCollection(
-    uint256 index
-  );
-
-  event LogAddCollectible(
-    uint256 cID,
-    string title
-  );
 
   event LogMintPack(
     address minter,
     uint256 tokenID
   );
-  
-  event LogUpdateMetadata(
-    uint256 cID,
-    uint256 collectibleId,
-    uint256 propertyIndex,
-    string value
-  );
 
-  event LogAddVersion(
-    uint256 cID,
-    uint256 collectibleId,
-    string asset
-  );
+  bytes4 private constant _INTERFACE_ID_ROYALTIES_RARIBLE = 0xb7799584;
+  bytes4 private constant _INTERFACE_ID_ROYALTIES_EIP2981 = 0x2a55205a;
 
-  event LogUpdateVersion(
-    uint256 cID,
-    uint256 collectibleId,
-    uint256 versionNumber
-  );
-
-  event LogAddNewLicense(
-    uint256 cID,
-    string license
-  );
+  function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
+    return interfaceId == _INTERFACE_ID_ROYALTIES_RARIBLE || interfaceId == _INTERFACE_ID_ROYALTIES_EIP2981;
+  }
 
   modifier onlyDAO() {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
@@ -104,18 +77,19 @@ contract Packs is IERC721, ERC721, ReentrancyGuard {
   function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration) public onlyDAO {
     LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration);
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-    emit LogCreateNewCollection(ds.collectionCount);
   }
 
-  /**** cID refers to collection ID ****/
-  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata) public onlyDAO {
-    LibPackStorage.addCollectible(cID, _coreData, _assets, _metadataValues, _secondaryMetadata);
-    emit LogAddCollectible(cID, _coreData[0]);
+  /**** 
+    - cID refers to collection ID
+    - Should not have more than 1000 editions of the same collectible (gas limit recommended, technically can support ~4000 editions)
+  ****/
+  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) public onlyDAO {
+    LibPackStorage.addCollectible(cID, _coreData, _assets, _metadataValues, _secondaryMetadata, _fees);
   }
 
-  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues, string[][][] memory _secondaryMetadata) public onlyDAO {
+  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues, string[][][] memory _secondaryMetadata, LibPackStorage.Fee[][] memory _fees) public onlyDAO {
     for (uint256 i = 0; i < _coreData.length; i++) {
-      addCollectible(cID, _coreData[i], _assets[i], _metadataValues[i], _secondaryMetadata[i]);
+      addCollectible(cID, _coreData[i], _assets[i], _metadataValues[i], _secondaryMetadata[i],  _fees[i]);
     }
   }
 
@@ -189,22 +163,18 @@ contract Packs is IERC721, ERC721, ReentrancyGuard {
 
   function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
     LibPackStorage.updateMetadata(cID, collectibleId, propertyIndex, value);
-    emit LogUpdateMetadata(cID, collectibleId, propertyIndex, value);
   }
 
   function addVersion(uint256 cID, uint256 collectibleNumber, string memory asset) public onlyDAO {
     LibPackStorage.addVersion(cID, collectibleNumber, asset);
-    emit LogAddVersion(cID, collectibleNumber, asset);
   }
 
   function updateVersion(uint256 cID, uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
     LibPackStorage.updateVersion(cID, collectibleNumber, versionNumber);
-    emit LogUpdateVersion(cID, collectibleNumber, versionNumber);
   }
 
   function addNewLicense(uint256 cID, string memory _license) public onlyDAO {
     LibPackStorage.addNewLicense(cID, _license);
-    emit LogAddNewLicense(cID, _license);
   }
 
   function getLicense(uint256 cID) public view returns (string memory) {
@@ -215,7 +185,26 @@ contract Packs is IERC721, ERC721, ReentrancyGuard {
     return LibPackStorage.getLicenseVersion(cID, versionNumber);
   }
 
+  function getCollectionCount() public view returns (uint256) {
+    return LibPackStorage.packStorage().collectionCount;
+  }
+
   function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
     return LibPackStorage.tokenURI(tokenId);
+  }
+
+  function getFeeRecipients(uint256 tokenId) public view returns (address payable[] memory) {
+    require(_exists(tokenId), "Nonexistent token");
+    return LibPackStorage.getFeeRecipients(tokenId);
+  }
+
+  function getFeeBps(uint256 tokenId) public view returns (uint256[] memory) {
+    require(_exists(tokenId), "Nonexistent token");
+    return LibPackStorage.getFeeBps(tokenId);
+  }
+
+  function royaltyInfo(uint256 tokenId, uint256 value) public view returns (address recipient, uint256 amount){
+    require(_exists(tokenId), "Nonexistent token");
+    return LibPackStorage.royaltyInfo(tokenId, value);
   }
 }
