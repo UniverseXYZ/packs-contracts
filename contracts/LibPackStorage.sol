@@ -76,6 +76,11 @@ library LibPackStorage {
     }
   }
 
+  event LogMintPack(
+    address minter,
+    uint256 tokenID
+  );
+
   event LogCreateNewCollection(
     uint256 index
   );
@@ -111,6 +116,17 @@ library LibPackStorage {
 
   function random(uint256 cID) internal view returns (uint) {
     return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, packStorage().collection[cID].totalTokenCount)));
+  }
+
+  function randomTokenID(uint256 cID) external returns (uint256, uint256) {
+    Storage storage ds = packStorage();
+
+    uint256 randomTokenID = random(cID) % ds.collection[cID].shuffleIDs.length;
+    uint256 tokenID = ds.collection[cID].shuffleIDs[randomTokenID];
+
+    emit LogMintPack(msg.sender, tokenID);
+
+    return (randomTokenID, tokenID);
   }
 
   modifier onlyDAO() {
@@ -249,6 +265,11 @@ library LibPackStorage {
     }
   }
 
+  function remainingTokens(uint256 cID) public view returns (uint256) {
+    Storage storage ds = packStorage();
+    return ds.collection[cID].shuffleIDs.length;
+  }
+
   // Modify property field only if marked as updateable
   function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
     Storage storage ds = packStorage();
@@ -282,7 +303,6 @@ library LibPackStorage {
     ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion] = _license;
     ds.collection[cID].licenseVersion++;
     emit LogAddNewLicense(cID, _license);
-
   }
 
   // Returns license URI

@@ -51,11 +51,6 @@ contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
     _setBaseURI(_baseURI);
   }
 
-  event LogMintPack(
-    address minter,
-    uint256 tokenID
-  );
-
   bytes4 private constant _INTERFACE_ID_ROYALTIES_RARIBLE = 0xb7799584;
   bytes4 private constant _INTERFACE_ID_ROYALTIES_EIP2981 = 0x2a55205a;
 
@@ -113,8 +108,7 @@ contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
   function randomTokenID(uint256 cID) private returns (uint256) {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
-    uint256 randomTokenID = LibPackStorage.random(cID) % ds.collection[cID].shuffleIDs.length;
-    uint256 tokenID = ds.collection[cID].shuffleIDs[randomTokenID];
+    (uint256 randomTokenID, uint256 tokenID) = LibPackStorage.randomTokenID(cID);
 
     ds.collection[cID].shuffleIDs[randomTokenID] = ds.collection[cID].shuffleIDs[ds.collection[cID].shuffleIDs.length - 1];
     ds.collection[cID].shuffleIDs.pop();
@@ -137,7 +131,6 @@ contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
 
     uint256 tokenID = randomTokenID(cID);
     _mint(_msgSender(), tokenID);
-    emit LogMintPack(msg.sender, tokenID);
   }
 
   function bulkMintPack(uint256 cID, uint256 amount) public override payable nonReentrant {
@@ -154,8 +147,11 @@ contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
     for (uint256 i = 0; i < amount; i++) {
       uint256 tokenID = randomTokenID(cID);
       _mint(_msgSender(), tokenID);
-      emit LogMintPack(msg.sender, tokenID);
     }
+  }
+
+  function remainingTokens(uint256 cID) public override view returns (uint256) {
+    return LibPackStorage.remainingTokens(cID);
   }
 
   function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) public override onlyDAO {

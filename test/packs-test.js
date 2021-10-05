@@ -79,6 +79,7 @@ describe("Packs Test", async function() {
     await ethers.provider.send('evm_setNextBlockTimestamp', [saleStartTime]);
     await ethers.provider.send('evm_mine');
     await packsInstance.mintPack(0, {value: tokenPrice });
+    expect(await packsInstance.remainingTokens(0)).to.equal(59);
     // await packsInstance.functions['mint()']({value: tokenPrice})
     // expect((await packsInstance.getTokens()).length).to.equal(totalTokenCount - 1);
   });
@@ -100,6 +101,7 @@ describe("Packs Test", async function() {
 
     const [owner] = await ethers.getSigners();
     expect(await packsInstance.ownerOf(100100001)).to.equal(owner.address);
+    expect(await packsInstance.remainingTokens(0)).to.equal(0);
   });
 
   it("metadata should match and be updated", async function() {

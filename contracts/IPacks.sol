@@ -41,6 +41,8 @@ interface IPacks {
 
   function bulkMintPack(uint256 cID, uint256 amount) external payable;
 
+  function remainingTokens(uint256 cID) external view returns (uint256);
+
   function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) external;
 
   function addVersion(uint256 cID, uint256 collectibleNumber, string memory asset) external;
