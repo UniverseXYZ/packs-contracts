@@ -12,6 +12,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IPacks.sol";
 import "./LibPackStorage.sol";
+import 'hardhat/console.sol';
 
 contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
   using SafeMath for uint256;

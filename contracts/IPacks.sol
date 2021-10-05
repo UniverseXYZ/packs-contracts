@@ -24,13 +24,17 @@ interface IPacks {
 
   /// @notice Creates a new collection / drop (first collection is created via constructor)
   /// @param _baseURI Base URI (e.g. https://arweave.net/)
-  /// @param _editioned TODO: REMOVE EDITIONED
+  /// @param _editioned Toggle to show edition # in returned metadata
   /// @param _initParams Initialization parameters in array [token price, bulk buy max quantity, start time of sale]
   /// @param _licenseURI Global license URI of collection / drop
   /// @param _mintPass ERC721 contract address to allow 1 free mint prior to sale start time
   /// @param _mintPassDuration Duration before sale start time allowing free mints
   function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration) external;
   
+  /// @notice Adds a collectible with multiple versions of artwork, metadata, and royalty declaration
+  /// @param cID Collection ID
+  /// @param _coreData Array of parameters [title, description, # of NFTs, current artwork version index starting 1]
+  /// @param _assets Array of artwork assets
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) external;
 
   function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues, string[][][] memory _secondaryMetadata, LibPackStorage.Fee[][] memory _fees) external;

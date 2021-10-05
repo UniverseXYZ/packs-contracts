@@ -50,7 +50,8 @@ async function main() {
   let assets = [metadata[0].assets, metadata[1].assets];
   let metaData = [metadata[0].metaData, metadata[1].metaData];
   let secondaryMetaData = [metadata[0].secondaryMetaData, metadata[1].secondaryMetaData];
-  await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData);
+  let fees = [[],[]];
+  await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
 
   console.log('Instinct 1 and 2 deployed');
 
@@ -58,7 +59,8 @@ async function main() {
   assets = [metadata[2].assets];
   metaData = [metadata[2].metaData];
   secondaryMetaData = [metadata[2].secondaryMetaData];
-  await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData);
+  fees = [[]];
+  await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
 
   console.log('Instinct 3 deployed');
 
@@ -88,7 +90,8 @@ async function main() {
   assets = [metadata[0].assets, metadata[1].assets];
   metaData = [metadata[0].metaData, metadata[1].metaData];
   secondaryMetaData = [metadata[0].secondaryMetaData, metadata[1].secondaryMetaData];
-  await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData);
+  fees = [[],[]];
+  await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
 
   console.log('Uncaged 1 and 2 deployed');
 
@@ -96,7 +99,8 @@ async function main() {
   assets = [metadata[2].assets];
   metaData = [metadata[2].metaData];
   secondaryMetaData = [metadata[2].secondaryMetaData];
-  await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData);
+  fees = [[]];
+  await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
 
   console.log('Uncaged 3 deployed');
 

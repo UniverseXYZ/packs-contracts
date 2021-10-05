@@ -55,7 +55,7 @@ describe("Packs Test", async function() {
   });
 
   it("should create collectible", async function() {
-    const fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
+    let fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
     await packsInstance.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData, fees);
   });
 

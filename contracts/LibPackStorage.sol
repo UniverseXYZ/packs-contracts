@@ -5,7 +5,6 @@ pragma experimental ABIEncoderV2;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import 'base64-sol/base64.sol';
-import 'hardhat/console.sol';
 
 library LibPackStorage {
   using SafeMath for uint256;
@@ -196,6 +195,8 @@ library LibPackStorage {
     }
 
     require(sum < 10000, "Fee should be less than 100%");
+    require(safeParseInt(_coreData[2]) > 0, "NFTs for given asset must be greater than 0");
+    require(safeParseInt(_coreData[3]) > 0 && safeParseInt(_coreData[3]) <= _assets.length, "Version cannot exceed asset count");
 
     collection.collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
