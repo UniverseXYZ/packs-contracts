@@ -106,7 +106,7 @@ interface IPacks is IERC721 {
 
   /// @notice Dynamically generates tokenURI as base64 encoded JSON of on-chain metadata
   /// @param tokenId NFT/Token ID number
-  /// function tokenURI(uint256 tokenId) external view returns (string memory);
+  function tokenURI(uint256 tokenId) external view returns (string memory);
 
   /// @notice Returns addresses of secondary sale fees (Rarible Royalties Standard)
   /// @param tokenId NFT/Token ID number

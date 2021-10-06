@@ -56,7 +56,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   bytes4 private constant _INTERFACE_ID_ROYALTIES_EIP2981 = 0x2a55205a;
 
   function supportsInterface(bytes4 interfaceId) public view virtual override(ERC165, IERC165) returns (bool) {
-    return interfaceId == _INTERFACE_ID_ROYALTIES_RARIBLE || interfaceId == _INTERFACE_ID_ROYALTIES_EIP2981;
+    return interfaceId == _INTERFACE_ID_ROYALTIES_RARIBLE || interfaceId == _INTERFACE_ID_ROYALTIES_EIP2981 || super.supportsInterface(interfaceId);
   }
 
   modifier onlyDAO() {
@@ -182,7 +182,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     return LibPackStorage.packStorage().collectionCount;
   }
 
-  function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
+  function tokenURI(uint256 tokenId) public view virtual override(ERC721, IPacks) returns (string memory) {
     return LibPackStorage.tokenURI(tokenId);
   }
 
