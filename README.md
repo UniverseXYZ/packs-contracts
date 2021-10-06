@@ -2,37 +2,24 @@
 
 ### 1. Initialize a collection via constructor
 
-- The auction is opened for deposits until the *startTime* timestamp is reached
-- The depositor can deposit NFTs into each defined slot, up to the slot limit
-- The depositor can withdraw NFTs before the auction has started
-- The auction can be cancelled before the *startTime* timestamp
-- If the auction has started and there are no deposited NFTs, the auction becomes void and does not accept deposits
+- Deployment of contract initializes first collection providing baseURI, display edition #'s, NFT sale price, max bulk buy limit, sale start time, license pertaining to collection, and a free mint pass for existing holders of a different NFT collection
+- Adding more collections can provide creator ability to have multiple "drops" using same contract
 
-### 2. Auction start
+### 2. Add collectibles
 
-- Users are allowed to to bid to the auction (with ERC20 token or ETH)
-- There is no restriction on the bid amount until all slots have been filled
-- Once there are more bids than slots, every next bid should be higher than the next winning bid
-- Each user is allowed to withdraw his bid if it is a non winning bid
-- Users are allowed to bid until the *endTime* timestamp is reached
+- Adding collectibles for a collection occurs after collection is created
+- Gas limit restricts to up to around 5 collectibles added with 10 metadata key/value pairs per transaction
+- Metadata properties can be marked as editable by the contract owner / DAO
+- Should not have more than 1000 editions of the same collectible (gas limit recommended, technically can support ~4000 editions)
 
-### 3. Auction end
+### 3. User minting
 
-- When the *endTime* timestamp is reached, the *finalizeAuction* function should be called. It will check which slots have been won, assign the winners and the bid amounts
-- Once the auction is finalized, the revenue for each slot should be captured. Without this step, the auctioneer wouldn’t be able to collect his winnings and the bidders wouldn’t be able to withdraw their NFTs
-- In the case of auction with little amount of slots, all slots revenue can be captured in a batch transaction *captureSlotRevenueRange*
+- Users with whitelist / mint pass NFTs can mint 1 NFT anytime within specified duration before sale start time per defined collection
+- Users without mint pass can begin minting NFTs any time after sale start time
+- Token IDs are randomly distributed using on-chain randomness function. This is hard to game as it is difficult to predict when mints happen which order
 
-### 4. Capture revenue
+### 4. Adjusting Properties
 
-- When the revenue has been captured, the winners are allowed to withdraw the NFTs they’ve won. This is done by calling the *claimERC721Rewards*. There could be a case, where there are more NFTs in a slot and one transaction could not be enough (due to gas limitations). In this case the function should be called multiple times with the remaining amounts.
-- In the case there is a slot which hasn’t been won by anyone (either because the reserve price hasn't been met or there weren't enough bids), the depositor can withdraw his NFTs with the *withdrawERC721FromNonWinningSlot* function. It has the same mechanics as *claimERC721Rewards*
-- To collect the revenue from the auctions, *distributeCapturedAuctionRevenue* should be called for each slot.
-
-### Functions related to each stage:
-
-- **Create** - *createAuction*
-- **Cancel** - *cancelAuction*, *withdrawDepositedERC721*
-- **Deposit** - *depositERC721*, *batchDepositToAuction*
-- **Bidding** - *ethBid*, *erc20Bid*, *withdrawEthBid*, *withdrawERC20Bid*
-- **Finalize** - *finalizeAuction*, *captureSlotRevenue*, *captureSlotRevenueRange*, *claimERC721Rewards*, *withdrawERC721FromNonWinningSlot*
-- **Revenue distribution** - *distributeCapturedAuctionRevenue*, *distributeSecondarySaleFees*, *distributeRoyalties*
+- Contract owner / DAO can adjust properties (if marked as editable) and add new versions to collectibles.
+- Contract owner / DAO can add new versions of a collection's license
+- Contract owner / DAO can create a new collection and begin the stages again

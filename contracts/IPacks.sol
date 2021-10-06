@@ -34,38 +34,89 @@ interface IPacks {
   /// @notice Adds a collectible with multiple versions of artwork, metadata, and royalty declaration
   /// @param cID Collection ID
   /// @param _coreData Array of parameters [title, description, # of NFTs, current artwork version index starting 1]
-  /// @param _assets Array of artwork assets
+  /// @param _assets Array of artwork assets, starting index 0 indicative of version 1
+  /// @param _metadataValues Array of key value pairs for property name and value [key, value, 0 = uneditable || 1 = editable]
+  /// @param _secondaryMetadata Array of key value pairs for property name and value
+  /// @param _fees Array of different percentage payout splits on secondary sales
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) external;
 
+  /// @notice Add multiple collectibles in one function call, same parameters as addCollectible but in array
+  /// @param cID Collection ID
+  /// @param _coreData Array of parameters [title, description, # of NFTs, current artwork version index starting 1]
+  /// @param _assets Array of artwork assets, starting index 0 indicative of version 1
+  /// @param _metadataValues Array of key value pairs for property name and value
+  /// @param _secondaryMetadata Array of key value pairs for property name and value
+  /// @param _fees Array of different percentage payout splits on secondary sales
   function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues, string[][][] memory _secondaryMetadata, LibPackStorage.Fee[][] memory _fees) external;
   
+  /// @notice Checks if owner of an NFT in free mint required ERC721 collection address
+  /// @param cID Collection ID
+  /// @param minter Address of user
   function checkMintPass(uint256 cID, address minter) external view returns (uint256);
 
+  /// @notice Mints an NFT with random token ID
+  /// @param cID Collection ID
   function mintPack(uint256 cID) external payable;
 
+  /// @notice Mints multiple NFTs with random token IDs
+  /// @param cID Collection ID
+  /// @param amount # of NFTs to mint
   function bulkMintPack(uint256 cID, uint256 amount) external payable;
 
+  /// @notice Returns remaining NFTs available to purchase
+  /// @param cID Collection ID
   function remainingTokens(uint256 cID) external view returns (uint256);
 
+  /// @notice Updates metadata value given property is editable
+  /// @param cID Collection ID
+  /// @param collectibleId Collectible index (value 1 is index 0)
+  /// @param propertyIndex Index of property to update (value 0 is index 0)
+  /// @param value Value of property to update
   function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) external;
 
-  function addVersion(uint256 cID, uint256 collectibleNumber, string memory asset) external;
+  /// @notice Adds new URI version with provided asset
+  /// @param cID Collection ID
+  /// @param collectibleId Collectible index (value 1 is index 0)
+  /// @param asset Asset hash without baseURI included
+  function addVersion(uint256 cID, uint256 collectibleId, string memory asset) external;
 
-  function updateVersion(uint256 cID, uint256 collectibleNumber, uint256 versionNumber) external;
+  /// @notice Updates asset version of collectible
+  /// @param cID Collection ID
+  /// @param collectibleId Collectible index (value 1 is index 0)
+  /// @param versionNumber New version number to set collectible's asset to
+  function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) external;
 
+  /// @notice Adds new license URL for collection, auto increments license version number
+  /// @param cID Collection ID
+  /// @param _license Full URL of license
   function addNewLicense(uint256 cID, string memory _license) external;
 
+  /// @notice Gets latest license URL
+  /// @param cID Collection ID
   function getLicense(uint256 cID) external view returns (string memory);
 
+  /// @notice Gets license given a license version
+  /// @param cID Collection ID
+  /// @param versionNumber Version number of license
   function getLicenseVersion(uint256 cID, uint256 versionNumber) external view returns (string memory);
 
+  /// @notice Returns number of collections
   function getCollectionCount() external view returns (uint256);
 
+  /// @notice Dynamically generates tokenURI as base64 encoded JSON of on-chain metadata
+  /// @param tokenId NFT/Token ID number
   function tokenURI(uint256 tokenId) external view virtual returns (string memory);
 
+  /// @notice Returns addresses of secondary sale fees (Rarible Royalties Standard)
+  /// @param tokenId NFT/Token ID number
   function getFeeRecipients(uint256 tokenId) external view returns (address payable[] memory);
 
+  /// @notice Returns basis point values of secondary sale fees (Rarible Royalties Standard)
+  /// @param tokenId NFT/Token ID number
   function getFeeBps(uint256 tokenId) external view returns (uint256[] memory);
 
+  /// @notice Returns address and value of secondary sale fee (EIP-2981 royalties standard)
+  /// @param tokenId NFT/Token ID number
+  /// @param value ETH/ERC20 value to calculate from
   function royaltyInfo(uint256 tokenId, uint256 value) external view returns (address recipient, uint256 amount);
 }

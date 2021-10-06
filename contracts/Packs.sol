@@ -159,12 +159,12 @@ contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
     LibPackStorage.updateMetadata(cID, collectibleId, propertyIndex, value);
   }
 
-  function addVersion(uint256 cID, uint256 collectibleNumber, string memory asset) public override onlyDAO {
-    LibPackStorage.addVersion(cID, collectibleNumber, asset);
+  function addVersion(uint256 cID, uint256 collectibleId, string memory asset) public override onlyDAO {
+    LibPackStorage.addVersion(cID, collectibleId, asset);
   }
 
-  function updateVersion(uint256 cID, uint256 collectibleNumber, uint256 versionNumber) public override onlyDAO {
-    LibPackStorage.updateVersion(cID, collectibleNumber, versionNumber);
+  function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) public override onlyDAO {
+    LibPackStorage.updateVersion(cID, collectibleId, versionNumber);
   }
 
   function addNewLicense(uint256 cID, string memory _license) public override onlyDAO {

@@ -280,22 +280,22 @@ library LibPackStorage {
   }
 
   // Add new asset, does not automatically increase current version
-  function addVersion(uint256 cID, uint256 collectibleNumber, string memory asset) public onlyDAO {
+  function addVersion(uint256 cID, uint256 collectibleId, string memory asset) public onlyDAO {
     Storage storage ds = packStorage();
-    ds.collection[cID].collectibles[collectibleNumber - 1].assets[ds.collection[cID].collectibles[collectibleNumber - 1].totalVersionCount - 1] = asset;
-    ds.collection[cID].collectibles[collectibleNumber - 1].totalVersionCount++;
-    emit LogAddVersion(cID, collectibleNumber, asset);
+    ds.collection[cID].collectibles[collectibleId - 1].assets[ds.collection[cID].collectibles[collectibleId - 1].totalVersionCount - 1] = asset;
+    ds.collection[cID].collectibles[collectibleId - 1].totalVersionCount++;
+    emit LogAddVersion(cID, collectibleId, asset);
   }
 
   // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
-  function updateVersion(uint256 cID, uint256 collectibleNumber, uint256 versionNumber) public onlyDAO {
+  function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) public onlyDAO {
     Storage storage ds = packStorage();
 
     require(versionNumber > 0, "Versions start at 1");
-    require(versionNumber <= ds.collection[cID].collectibles[collectibleNumber - 1].assets.length, "Versions must be less than asset count");
-    require(collectibleNumber > 0, "Collectible IDs start at 1");
-    ds.collection[cID].collectibles[collectibleNumber - 1].currentVersion = versionNumber;
-    emit LogUpdateVersion(cID, collectibleNumber, versionNumber);
+    require(versionNumber <= ds.collection[cID].collectibles[collectibleId - 1].assets.length, "Versions must be less than asset count");
+    require(collectibleId > 0, "Collectible IDs start at 1");
+    ds.collection[cID].collectibles[collectibleId - 1].currentVersion = versionNumber;
+    emit LogUpdateVersion(cID, collectibleId, versionNumber);
   }
 
   // Adds new license and updates version to latest
@@ -306,13 +306,11 @@ library LibPackStorage {
     emit LogAddNewLicense(cID, _license);
   }
 
-  // Returns license URI
   function getLicense(uint256 cID) public view returns (string memory) {
     Storage storage ds = packStorage();
     return ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion - 1];
   }
 
-  // Returns license version count
   function getLicenseVersion(uint256 cID, uint256 versionNumber) public view returns (string memory) {
     Storage storage ds = packStorage();
     return ds.collection[cID].licenseURI[versionNumber - 1];
@@ -387,6 +385,7 @@ library LibPackStorage {
     return encoded;
   }
 
+  // Secondary sale fees apply to each individual collectible ID (will apply to a range of tokenIDs);
   function getFeeRecipients(uint256 tokenId) public view returns (address payable[] memory) {
     Storage storage ds = packStorage();
 
@@ -418,7 +417,7 @@ library LibPackStorage {
 
   function royaltyInfo(uint256 tokenId, uint256 value) public view returns (address recipient, uint256 amount){
     address payable[] memory recipient = getFeeRecipients(tokenId);
-    require(recipient.length <= 1, "More than 1 royalty receiver");
+    require(recipient.length <= 1, "More than 1 royalty recipient");
 
     if (recipient.length == 0) return (address(this), 0);
     return (recipient[0], getFeeBps(tokenId)[0] * value / 10000);
