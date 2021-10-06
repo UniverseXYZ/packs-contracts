@@ -274,7 +274,7 @@ library LibPackStorage {
   // Modify property field only if marked as updateable
   function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
     Storage storage ds = packStorage();
-    require(ds.collection[cID].metadata[collectibleId - 1].modifiable[propertyIndex], 'Not allowed');
+    require(ds.collection[cID].metadata[collectibleId - 1].modifiable[propertyIndex], 'Field not editable');
     ds.collection[cID].metadata[collectibleId - 1].value[propertyIndex] = value;
     emit LogUpdateMetadata(cID, collectibleId, propertyIndex, value);
   }
