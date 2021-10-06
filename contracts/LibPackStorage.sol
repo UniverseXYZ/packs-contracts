@@ -120,12 +120,12 @@ library LibPackStorage {
   function randomTokenID(uint256 cID) external returns (uint256, uint256) {
     Storage storage ds = packStorage();
 
-    uint256 randomTokenID = random(cID) % ds.collection[cID].shuffleIDs.length;
-    uint256 tokenID = ds.collection[cID].shuffleIDs[randomTokenID];
+    uint256 randomID = random(cID) % ds.collection[cID].shuffleIDs.length;
+    uint256 tokenID = ds.collection[cID].shuffleIDs[randomID];
 
     emit LogMintPack(msg.sender, tokenID);
 
-    return (randomTokenID, tokenID);
+    return (randomID, tokenID);
   }
 
   modifier onlyDAO() {
@@ -248,7 +248,7 @@ library LibPackStorage {
     emit LogAddCollectible(cID, _coreData[0]);
   }
 
-  function mintChecks(uint256 cID, bool freeClaim) external {
+  function mintChecks(uint256 cID, bool freeClaim) external view {
     Storage storage ds = packStorage();
     require((freeClaim && (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration)) || (block.timestamp > ds.collection[cID].saleStartTime)), "Sale has not yet started");
   }
@@ -416,11 +416,11 @@ library LibPackStorage {
   }
 
   function royaltyInfo(uint256 tokenId, uint256 value) public view returns (address recipient, uint256 amount){
-    address payable[] memory recipient = getFeeRecipients(tokenId);
-    require(recipient.length <= 1, "More than 1 royalty recipient");
+    address payable[] memory rec = getFeeRecipients(tokenId);
+    require(rec.length <= 1, "More than 1 royalty recipient");
 
-    if (recipient.length == 0) return (address(this), 0);
-    return (recipient[0], getFeeBps(tokenId)[0] * value / 10000);
+    if (rec.length == 0) return (address(this), 0);
+    return (rec[0], getFeeBps(tokenId)[0] * value / 10000);
   }
 
   function toString(uint256 value) internal pure returns (string memory) {

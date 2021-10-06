@@ -2,7 +2,7 @@ const hre = require("hardhat");
 const mock = require('../test/mock-deploy.json');
 
 async function main() {
-  const collectionName = 'RELICS';
+  const collectionName = 'RELICS TEST';
   const collectionSymbol = 'MONSTERCAT';
   const baseURI = 'https://arweave.net/';
   const licenseURI = 'https://arweave.net/license';

@@ -7,11 +7,12 @@ pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
 import './LibPackStorage.sol';
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 
 /// @title Creators can release NFTs with multiple collectibles, across multiple collections/drops, and buyers will receive a random tokenID
 /// @notice This interface should be implemented by the Packs contract
 /// @dev This interface should be implemented by the Packs contract
-interface IPacks {
+interface IPacks is IERC721 {
 
   /* 
    * cID refers to collection ID
@@ -105,7 +106,7 @@ interface IPacks {
 
   /// @notice Dynamically generates tokenURI as base64 encoded JSON of on-chain metadata
   /// @param tokenId NFT/Token ID number
-  function tokenURI(uint256 tokenId) external view virtual returns (string memory);
+  /// function tokenURI(uint256 tokenId) external view returns (string memory);
 
   /// @notice Returns addresses of secondary sale fees (Rarible Royalties Standard)
   /// @param tokenId NFT/Token ID number

@@ -14,7 +14,7 @@ import "./IPacks.sol";
 import "./LibPackStorage.sol";
 import 'hardhat/console.sol';
 
-contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
+contract Packs is IPacks, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
 
   constructor(
@@ -73,7 +73,6 @@ contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
 
   function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration) public override onlyDAO {
     LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration);
-    LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
   }
 
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) public override onlyDAO {
@@ -109,9 +108,9 @@ contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
   function randomTokenID(uint256 cID) private returns (uint256) {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
-    (uint256 randomTokenID, uint256 tokenID) = LibPackStorage.randomTokenID(cID);
+    (uint256 randomID, uint256 tokenID) = LibPackStorage.randomTokenID(cID);
 
-    ds.collection[cID].shuffleIDs[randomTokenID] = ds.collection[cID].shuffleIDs[ds.collection[cID].shuffleIDs.length - 1];
+    ds.collection[cID].shuffleIDs[randomID] = ds.collection[cID].shuffleIDs[ds.collection[cID].shuffleIDs.length - 1];
     ds.collection[cID].shuffleIDs.pop();
 
     return tokenID;
@@ -183,7 +182,7 @@ contract Packs is IPacks, IERC721, ERC721, ReentrancyGuard {
     return LibPackStorage.packStorage().collectionCount;
   }
 
-  function tokenURI(uint256 tokenId) public view virtual override(ERC721, IPacks) returns (string memory) {
+  function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
     return LibPackStorage.tokenURI(tokenId);
   }
 
