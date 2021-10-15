@@ -32,7 +32,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
     ds.daoAddress = msg.sender;
-    ds.daoInitialized = false;
+    ds.daoInitialized = true;
     ds.collectionCount = 1;
 
     ds.collection[0].baseURI = _baseURI;
@@ -121,7 +121,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     bool freeClaim = canFreeClaim(cID);
     LibPackStorage.mintChecks(cID, freeClaim);
  
-   if (!freeClaim) {
+    if (!freeClaim) {
       uint256 excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
       if (excessAmount > 0) {
         (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
@@ -199,5 +199,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   function royaltyInfo(uint256 tokenId, uint256 value) public override view returns (address recipient, uint256 amount){
     require(_exists(tokenId), "Nonexistent token");
     return LibPackStorage.royaltyInfo(tokenId, value);
+  }
+
+  function withdraw(address _to, uint amount) public onlyDAO {
+    payable(_to).call{value:amount, gas:200000}("");
   }
 }

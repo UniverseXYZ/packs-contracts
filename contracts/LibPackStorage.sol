@@ -259,11 +259,6 @@ library LibPackStorage {
     require(amount <= ds.collection[cID].bulkBuyLimit, "Cannot bulk buy more than the preset limit");
     require(amount <= ds.collection[cID].shuffleIDs.length, "Total supply reached");
     require((block.timestamp > ds.collection[cID].saleStartTime), "Sale has not yet started");
-
-    if (ds.daoInitialized) {
-      (bool transferToDaoStatus, ) = ds.daoAddress.call{value:ds.collection[cID].tokenPrice.mul(amount)}("");
-      require(transferToDaoStatus, "Address: unable to send value, recipient may have reverted");
-    }
   }
 
   function remainingTokens(uint256 cID) public view returns (uint256) {
