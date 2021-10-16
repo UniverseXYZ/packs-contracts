@@ -99,6 +99,8 @@ describe("Packs Test", async function() {
     await packsInstance.bulkMintPack(0, totalTokenCount - 1 - bulkCount, {value: tokenPrice.mul(totalTokenCount - 1 - bulkCount) });
     // expect((await packsInstance.getTokens()).length).to.equal(0);
 
+    expect(packsInstance.mintPack(0, {value: tokenPrice })).to.be.reverted;
+
     const [owner] = await ethers.getSigners();
     expect(await packsInstance.ownerOf(100100001)).to.equal(owner.address);
     expect(await packsInstance.remainingTokens(0)).to.equal(0);

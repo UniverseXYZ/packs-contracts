@@ -250,7 +250,8 @@ library LibPackStorage {
 
   function mintChecks(uint256 cID, bool freeClaim) external view {
     Storage storage ds = packStorage();
-    require((freeClaim && (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration)) || (block.timestamp > ds.collection[cID].saleStartTime)), "Sale has not yet started");
+    if (freeClaim) require (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration), "Redeem Unavailable");
+    else require(block.timestamp > ds.collection[cID].saleStartTime, "Sale has not yet started");
   }
 
   function bulkMintChecks(uint256 cID, uint256 amount) external {
