@@ -14,6 +14,10 @@ import "./IPacks.sol";
 import "./LibPackStorage.sol";
 import 'hardhat/console.sol';
 
+/* TODO:
+ * REFUND IF MINTPASS
+*/
+
 contract Packs is IPacks, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
 

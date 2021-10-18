@@ -46,23 +46,33 @@ async function main() {
   console.log("Packs deployed to:", packsInstance.address);
 
   // Add instinct metadata
-  let coreData = [metadata[0].coreData, metadata[1].coreData];
-  let assets = [metadata[0].assets, metadata[1].assets];
-  let metaData = [metadata[0].metaData, metadata[1].metaData];
-  let secondaryMetaData = [metadata[0].secondaryMetaData, metadata[1].secondaryMetaData];
-  let fees = [[],[]];
-  await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+  let coreData = [];
+  let assets = [];
+  let metaData = [];
+  let secondaryMetaData = [];
+  let fees = [];
+  let i = 0;
+  while (i < metadata.length) {
+    coreData.push(metadata[i].coreData)
+    assets.push(metadata[i].assets)
+    metaData.push(metadata[i].metaData)
+    secondaryMetaData.push(metadata[i].secondaryMetaData)
+    fees.push([])
+    if (i % 5 === 0) {
+      await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+      coreData = [];
+      assets = [];
+      metaData = [];
+      secondaryMetaData = [];
+      fees = [];
+    }
 
-  console.log('Instinct 1 and 2 deployed');
+    i++;
+  }
 
-  coreData = [metadata[2].coreData];
-  assets = [metadata[2].assets];
-  metaData = [metadata[2].metaData];
-  secondaryMetaData = [metadata[2].secondaryMetaData];
-  fees = [[]];
-  await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+  if (coreData.length > 0) await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
 
-  console.log('Instinct 3 deployed');
+  console.log('Instinct metadata deployed');
 
   metadata = mock.uncaged;
 
@@ -86,23 +96,33 @@ async function main() {
   await packsInstance.createNewCollection(...args);
 
   // Add uncaged metadata
-  coreData = [metadata[0].coreData, metadata[1].coreData];
-  assets = [metadata[0].assets, metadata[1].assets];
-  metaData = [metadata[0].metaData, metadata[1].metaData];
-  secondaryMetaData = [metadata[0].secondaryMetaData, metadata[1].secondaryMetaData];
-  fees = [[],[]];
-  await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+  coreData = [];
+  assets = [];
+  metaData = [];
+  secondaryMetaData = [];
+  fees = [];
+  i = 0;
+  while (i < metadata.length) {
+    coreData.push(metadata[i].coreData)
+    assets.push(metadata[i].assets)
+    metaData.push(metadata[i].metaData)
+    secondaryMetaData.push(metadata[i].secondaryMetaData)
+    fees.push([])
+    if (i % 5 === 0) {
+      await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+      coreData = [];
+      assets = [];
+      metaData = [];
+      secondaryMetaData = [];
+      fees = [];
+    }
 
-  console.log('Uncaged 1 and 2 deployed');
+    i++;
+  }
 
-  coreData = [metadata[2].coreData];
-  assets = [metadata[2].assets];
-  metaData = [metadata[2].metaData];
-  secondaryMetaData = [metadata[2].secondaryMetaData];
-  fees = [[]];
-  await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+  if (coreData.length > 0) await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
 
-  console.log('Uncaged 3 deployed');
+  console.log('Uncaged metadata deployed');
 
   await new Promise(resolve => setTimeout(resolve, 20000));
 
