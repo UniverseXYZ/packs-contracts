@@ -43,6 +43,7 @@ library LibPackStorage {
     mapping (uint256 => Fee[]) secondaryFees;
     mapping (uint256 => string) licenseURI; // URL to external license or file
     mapping (address => bool) freeClaims;
+    mapping (uint256 => bool) mintPassClaims;
 
     uint256 collectibleCount; // Total unique assets count
     uint256 totalTokenCount; // Total NFT count to be minted
@@ -55,6 +56,7 @@ library LibPackStorage {
     uint64[] shuffleIDs;
 
     bool mintPass;
+    bool mintPassOnePerWallet;
     ERC721 mintPassContract;
     uint256 mintPassDuration;
   }
@@ -152,7 +154,8 @@ library LibPackStorage {
     uint256[] memory _initParams,
     string memory _licenseURI,
     address _mintPass,
-    uint256 _mintPassDuration
+    uint256 _mintPassDuration,
+    bool _mintPassOnePerWallet
   ) external onlyDAO {
     require(_initParams[1] <= 50, "Bulk buy limit of 50");
     Storage storage ds = packStorage();
@@ -167,6 +170,7 @@ library LibPackStorage {
 
     if (_mintPass != address(0)) {
       ds.collection[ds.collectionCount].mintPass = true;
+      ds.collection[ds.collectionCount].mintPassOnePerWallet = _mintPassOnePerWallet;
       ds.collection[ds.collectionCount].mintPassContract = ERC721(_mintPass);
       ds.collection[ds.collectionCount].mintPassDuration = _mintPassDuration;
     }
@@ -248,10 +252,52 @@ library LibPackStorage {
     emit LogAddCollectible(cID, _coreData[0]);
   }
 
+  function checkMintPass(uint256 cID, address minter) private returns (bool) {
+    Storage storage ds = packStorage();
+    uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
+    bool done = false;
+    uint256 counter = 0;
+    bool canClaim = false;
+    while (!done) {
+      uint256 tokenID = ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter);
+      if (ds.collection[cID].mintPassClaims[tokenID] != true) {
+        ds.collection[cID].mintPassClaims[tokenID] = true;
+        done = true;
+        canClaim = true;
+      }
+
+      if (counter == count - 1) done = true;
+      else counter++;
+    }
+
+    return canClaim;
+  }
+
+  function canFreeClaim(uint256 cID, address user) external returns (bool)  {
+    Storage storage ds = packStorage();
+
+    bool freeClaim = false;
+    if (ds.collection[cID].mintPass) {
+      if (!ds.collection[cID].mintPassOnePerWallet || !ds.collection[cID].freeClaims[user]) {
+        if (checkMintPass(cID, user)) {
+          freeClaim = true;
+          ds.collection[cID].freeClaims[user] = true;
+        }
+      }
+    }
+
+    return freeClaim;
+  }
+
   function mintChecks(uint256 cID, bool freeClaim) external view {
     Storage storage ds = packStorage();
-    if (freeClaim) require (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration), "Redeem Unavailable");
-    else require(block.timestamp > ds.collection[cID].saleStartTime, "Sale has not yet started");
+    if (freeClaim) {
+      require (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration), "Sale has not yet started");
+    } else if (block.timestamp < (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration)) {
+      require(false, "Sale has not yet started");
+    } else {
+      require(block.timestamp > ds.collection[cID].saleStartTime, "Redeem Unavailable");
+    }
   }
 
   function bulkMintChecks(uint256 cID, uint256 amount) external {

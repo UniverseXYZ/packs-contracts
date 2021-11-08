@@ -8,7 +8,6 @@ pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IPacks.sol";
 import "./LibPackStorage.sol";
@@ -29,7 +28,8 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     uint256[] memory _initParams,
     string memory _licenseURI,
     address _mintPass,
-    uint256 _mintPassDuration
+    uint256 _mintPassDuration,
+    bool _mintPassOnePerWallet
   ) ERC721(name, symbol) {
     require(_initParams[1] <= 50, "Bulk buy limit of 50");
 
@@ -49,6 +49,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
     if (_mintPass != address(0)) {
       ds.collection[0].mintPass = true;
+      ds.collection[0].mintPassOnePerWallet = _mintPassOnePerWallet;
       ds.collection[0].mintPassContract = ERC721(_mintPass);
       ds.collection[0].mintPassDuration = _mintPassDuration;
     }
@@ -75,8 +76,8 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
   }
 
-  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration) public override onlyDAO {
-    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration);
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool _mintPassOnePerWallet) public override onlyDAO {
+    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassOnePerWallet);
   }
 
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) public override onlyDAO {
@@ -87,26 +88,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     for (uint256 i = 0; i < _coreData.length; i++) {
       addCollectible(cID, _coreData[i], _assets[i], _metadataValues[i], _secondaryMetadata[i],  _fees[i]);
     }
-  }
-
-  function checkMintPass(uint256 cID, address minter) public override view returns (uint256) {
-    LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-    uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
-    return count;
-  }
-
-  function canFreeClaim(uint256 cID) private returns (bool)  {
-    LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-
-    bool freeClaim = false;
-    if (ds.collection[cID].mintPass && !ds.collection[cID].freeClaims[msg.sender]) {
-      if (checkMintPass(cID, msg.sender) > 0) {
-        freeClaim = true;
-        ds.collection[cID].freeClaims[msg.sender] = true;
-      }
-    }
-
-    return freeClaim;
   }
 
   function randomTokenID(uint256 cID) private returns (uint256) {
@@ -122,7 +103,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
   function mintPack(uint256 cID) public override payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-    bool freeClaim = canFreeClaim(cID);
+    bool freeClaim = LibPackStorage.canFreeClaim(cID, msg.sender);
     LibPackStorage.mintChecks(cID, freeClaim);
  
     if (!freeClaim) {

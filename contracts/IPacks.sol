@@ -7,12 +7,12 @@ pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
 import './LibPackStorage.sol';
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
 
 /// @title Creators can release NFTs with multiple collectibles, across multiple collections/drops, and buyers will receive a random tokenID
 /// @notice This interface should be implemented by the Packs contract
 /// @dev This interface should be implemented by the Packs contract
-interface IPacks is IERC721 {
+interface IPacks is IERC721Enumerable {
 
   /* 
    * cID refers to collection ID
@@ -30,7 +30,8 @@ interface IPacks is IERC721 {
   /// @param _licenseURI Global license URI of collection / drop
   /// @param _mintPass ERC721 contract address to allow 1 free mint prior to sale start time
   /// @param _mintPassDuration Duration before sale start time allowing free mints
-  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration) external;
+  /// @param _mintPassOnePerWallet One free mint per wallet
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool _mintPassOnePerWallet) external;
   
   /// @notice Adds a collectible with multiple versions of artwork, metadata, and royalty declaration
   /// @param cID Collection ID
@@ -53,7 +54,7 @@ interface IPacks is IERC721 {
   /// @notice Checks if owner of an NFT in free mint required ERC721 collection address
   /// @param cID Collection ID
   /// @param minter Address of user
-  function checkMintPass(uint256 cID, address minter) external view returns (uint256);
+  // function checkMintPass(uint256 cID, address minter) external view returns (uint256);
 
   /// @notice Mints an NFT with random token ID
   /// @param cID Collection ID

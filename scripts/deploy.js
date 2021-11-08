@@ -10,8 +10,9 @@ async function main() {
   const tokenPrice = ethers.utils.parseEther("0.0007");
   const bulkBuyLimit = 50;
   const nullAddress = '0x0000000000000000000000000000000000000000';
-  const mintPassAddress = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
+  const mintPassAddress = '0x9657f64f9542422c798119bbcd0f27a0baec2dcc';
   const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
+  const mintPassOnePerWallet = false;
   const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
   let metadata = mock.instinct;
 
@@ -23,7 +24,8 @@ async function main() {
     [tokenPrice, bulkBuyLimit, saleStartTime],
     licenseURI,
     mintPassAddress, // mintPassAddress or nullAddress for no mint pass
-    mintPassDuration
+    mintPassDuration,
+    mintPassOnePerWallet
   ];
 
   let packsInstance;
@@ -81,8 +83,9 @@ async function main() {
   const tokenPrice2 = ethers.utils.parseEther("0.0007");
   const bulkBuyLimit2 = 50;
   const nullAddress2 = '0x0000000000000000000000000000000000000000';
-  const mintPassAddress2 = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
+  const mintPassAddress2 = '0x9657f64f9542422c798119bbcd0f27a0baec2dcc';
   const mintPassDuration2 = 600; // 600 = 10 minutes, 3600 = 1 hour
+  const mintPassOnePerWallet2 = true;
   const saleStartTime2 = saleStartTime + mintPassDuration;
   const args = [
     baseURI,
@@ -90,7 +93,8 @@ async function main() {
     [tokenPrice2, bulkBuyLimit2, saleStartTime2],
     licenseURI2,
     mintPassAddress2, // mintPassAddress or nullAddress for no mint pass
-    mintPassDuration2
+    mintPassDuration2,
+    mintPassOnePerWallet2
   ]
 
   await packsInstance.createNewCollection(...args);

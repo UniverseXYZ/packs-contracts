@@ -17,6 +17,7 @@ describe("Packs Test", async function() {
   const nullAddress = '0x0000000000000000000000000000000000000000';
   const mintPassAddress = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
   const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
+  const mintPassOnePerWallet = false;
   const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
   const metadata = mock.data;
   const tokenCounts = [Number(metadata[0].coreData[2]), Number(metadata[1].coreData[2]), Number(metadata[2].coreData[2])];
@@ -49,7 +50,8 @@ describe("Packs Test", async function() {
       [tokenPrice, bulkBuyLimit, saleStartTime],
       licenseURI,
       nullAddress, // mintPassAddress or nullAddress for no mint pass
-      mintPassDuration
+      mintPassDuration,
+      mintPassOnePerWallet
     );
     await packsInstance.deployed();
   });
@@ -175,7 +177,8 @@ describe("Packs Test", async function() {
       [tokenPrice2, bulkBuyLimit2, saleStartTime2],
       licenseURI2,
       nullAddress2, // mintPassAddress or nullAddress for no mint pass
-      mintPassDuration2
+      mintPassDuration2,
+      mintPassOnePerWallet
     ]
 
     await packsInstance.createNewCollection(...args);
