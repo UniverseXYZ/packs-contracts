@@ -115,6 +115,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   }
 
   function bulkMintPack(uint256 cID, uint256 amount) public override payable nonReentrant {
+    require(amount > 0, 'Please provide an amount');
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
     LibPackStorage.bulkMintChecks(cID, amount);

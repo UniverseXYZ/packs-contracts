@@ -343,6 +343,7 @@ library LibPackStorage {
   // Adds new license and updates version to latest
   function addNewLicense(uint256 cID, string memory _license) public onlyDAO {
     Storage storage ds = packStorage();
+    require(cID < ds.collectionCount, 'Collectible ID does not exist');
     ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion] = _license;
     ds.collection[cID].licenseVersion++;
     emit LogAddNewLicense(cID, _license);
