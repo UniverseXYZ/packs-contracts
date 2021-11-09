@@ -76,6 +76,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   }
 
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) public override onlyDAO {
+    require(_coreData.length == 4, 'Core data misformatted');
     LibPackStorage.addCollectible(cID, _coreData, _assets, _metadataValues, _secondaryMetadata, _fees);
   }
 
