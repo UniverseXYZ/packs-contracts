@@ -11,11 +11,6 @@ import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./IPacks.sol";
 import "./LibPackStorage.sol";
-import 'hardhat/console.sol';
-
-/* TODO:
- * REFUND IF MINTPASS
-*/
 
 contract Packs is IPacks, ERC721, ReentrancyGuard {
   using SafeMath for uint256;
@@ -106,12 +101,13 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     bool freeClaim = LibPackStorage.canFreeClaim(cID, msg.sender);
     LibPackStorage.mintChecks(cID, freeClaim);
  
-    if (!freeClaim) {
-      uint256 excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
-      if (excessAmount > 0) {
-        (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
-        require(returnExcessStatus, "Failed to return excess.");
-      }
+    uint256 excessAmount;
+    if (!freeClaim) excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
+    else excessAmount = msg.value.sub(0);
+
+    if (excessAmount > 0) {
+      (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
+      require(returnExcessStatus, "Failed to return excess.");
     }
 
     uint256 tokenID = randomTokenID(cID);
