@@ -24,7 +24,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration,
-    bool _mintPassOnePerWallet
+    bool _mintPassOnePerWallet,
+    bool _mintPassOnly,
+    bool _mintPassFree
   ) ERC721(name, symbol) {
     require(_initParams[1] <= 50, "Bulk buy limit of 50");
 
@@ -47,6 +49,8 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
       ds.collection[0].mintPassOnePerWallet = _mintPassOnePerWallet;
       ds.collection[0].mintPassContract = ERC721(_mintPass);
       ds.collection[0].mintPassDuration = _mintPassDuration;
+      ds.collection[0].mintPassOnly = _mintPassOnly;
+      ds.collection[0].mintPassFree = _mintPassFree;
     }
 
     _setBaseURI(_baseURI);
@@ -71,8 +75,8 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
   }
 
-  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool _mintPassOnePerWallet) public override onlyDAO {
-    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassOnePerWallet);
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool _mintPassOnePerWallet, bool _mintPassOnly, bool _mintPassFree) public override onlyDAO {
+    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassOnePerWallet, _mintPassOnly, _mintPassFree);
   }
 
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) public override onlyDAO {
@@ -99,11 +103,11 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
   function mintPack(uint256 cID) public override payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-    bool freeClaim = LibPackStorage.canFreeClaim(cID, msg.sender);
-    LibPackStorage.mintChecks(cID, freeClaim);
+    bool canMintPass = LibPackStorage.checkMintPass(cID, msg.sender);
  
+    // TODO: CHECK LOGIC OF THIS
     uint256 excessAmount;
-    if (!freeClaim) excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
+    if (!canMintPass && !ds.collection[cID].mintPassFree) excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
     else excessAmount = msg.value.sub(0);
 
     if (excessAmount > 0) {
@@ -118,6 +122,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   function bulkMintPack(uint256 cID, uint256 amount) public override payable nonReentrant {
     require(amount > 0, 'Please provide an amount');
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
+    require(!ds.collection[cID].mintPassOnly, 'Cannot bulk mint');
 
     LibPackStorage.bulkMintChecks(cID, amount);
 

@@ -31,7 +31,7 @@ interface IPacks is IERC721Enumerable {
   /// @param _mintPass ERC721 contract address to allow 1 free mint prior to sale start time
   /// @param _mintPassDuration Duration before sale start time allowing free mints
   /// @param _mintPassOnePerWallet One free mint per wallet
-  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool _mintPassOnePerWallet) external;
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool _mintPassOnePerWallet, bool _mintPassOnly, bool _mintPassFree) external;
   
   /// @notice Adds a collectible with multiple versions of artwork, metadata, and royalty declaration
   /// @param cID Collection ID
