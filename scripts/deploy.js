@@ -13,6 +13,8 @@ async function main() {
   const mintPassAddress = '0x9657f64f9542422c798119bbcd0f27a0baec2dcc';
   const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
   const mintPassOnePerWallet = false;
+  const mintPassOnly = true;
+  const mintPassFree = false;
   const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
   let metadata = mock.instinct;
 
@@ -25,7 +27,9 @@ async function main() {
     licenseURI,
     mintPassAddress, // mintPassAddress or nullAddress for no mint pass
     mintPassDuration,
-    mintPassOnePerWallet
+    mintPassOnePerWallet,
+    mintPassOnly,
+    mintPassFree
   ];
 
   let packsInstance;
@@ -86,7 +90,9 @@ async function main() {
   const mintPassAddress2 = '0x9657f64f9542422c798119bbcd0f27a0baec2dcc';
   const mintPassDuration2 = 600; // 600 = 10 minutes, 3600 = 1 hour
   const mintPassOnePerWallet2 = true;
-  const saleStartTime2 = saleStartTime + mintPassDuration;
+  const mintPassOnly2 = false;
+  const mintPassFree2 = true;
+  const saleStartTime2 = saleStartTime;
   const args = [
     baseURI,
     editioned2,
@@ -94,7 +100,9 @@ async function main() {
     licenseURI2,
     mintPassAddress2, // mintPassAddress or nullAddress for no mint pass
     mintPassDuration2,
-    mintPassOnePerWallet2
+    mintPassOnePerWallet2,
+    mintPassOnly2,
+    mintPassFree2
   ]
 
   await packsInstance.createNewCollection(...args);

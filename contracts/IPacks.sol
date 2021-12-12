@@ -65,6 +65,11 @@ interface IPacks is IERC721Enumerable {
   /// @param amount # of NFTs to mint
   function bulkMintPack(uint256 cID, uint256 amount) external payable;
 
+  /// @notice Returns if an NFT was used as mint pass claim
+  /// @param cID Collection ID
+  /// @param tokenId NFT tokenID
+  function mintPassClaimed(uint256 cID, uint256 tokenId) external view returns (bool);
+
   /// @notice Returns remaining NFTs available to purchase
   /// @param cID Collection ID
   function remainingTokens(uint256 cID) external view returns (uint256);

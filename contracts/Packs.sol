@@ -20,7 +20,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     string memory symbol,
     string memory _baseURI,
     bool _editioned,
-    uint256[] memory _initParams,
+    uint256[] memory _initParams, // Ensure second parameter is under 50 for ETH mainnet (gas fee max for bulk
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration,
@@ -28,8 +28,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     bool _mintPassOnly,
     bool _mintPassFree
   ) ERC721(name, symbol) {
-    require(_initParams[1] <= 50, "Bulk buy limit of 50");
-
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
     ds.daoAddress = msg.sender;
@@ -80,7 +78,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   }
 
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) public override onlyDAO {
-    require(_coreData.length == 4, 'Core data misformatted');
+    require(_coreData.length == 4, 'Misformat');
     LibPackStorage.addCollectible(cID, _coreData, _assets, _metadataValues, _secondaryMetadata, _fees);
   }
 
@@ -105,10 +103,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
     bool canMintPass = LibPackStorage.checkMintPass(cID, msg.sender);
  
-    // TODO: CHECK LOGIC OF THIS
     uint256 excessAmount;
-    if (!canMintPass && !ds.collection[cID].mintPassFree) excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
-    else excessAmount = msg.value.sub(0);
+    if (canMintPass && ds.collection[cID].mintPassFree) excessAmount = msg.value.sub(0);
+    else excessAmount = msg.value.sub(ds.collection[cID].tokenPrice);
 
     if (excessAmount > 0) {
       (bool returnExcessStatus, ) = _msgSender().call{value: excessAmount}("");
@@ -120,10 +117,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   }
 
   function bulkMintPack(uint256 cID, uint256 amount) public override payable nonReentrant {
-    require(amount > 0, 'Please provide an amount');
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-    require(!ds.collection[cID].mintPassOnly, 'Cannot bulk mint');
-
     LibPackStorage.bulkMintChecks(cID, amount);
 
     uint256 excessAmount = msg.value.sub(ds.collection[cID].tokenPrice.mul(amount));
@@ -136,6 +130,10 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
       uint256 tokenID = randomTokenID(cID);
       _mint(_msgSender(), tokenID);
     }
+  }
+
+  function mintPassClaimed(uint256 cID, uint256 tokenId) public override view returns (bool) {
+    return LibPackStorage.mintPassClaimed(cID, tokenId);
   }
 
   function remainingTokens(uint256 cID) public override view returns (uint256) {

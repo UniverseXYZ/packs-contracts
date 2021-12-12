@@ -294,7 +294,7 @@ library LibPackStorage {
 
     if (ds.collection[cID].mintPassOnly) {
       require(canMintPass, "Minting is restricted to mint passes only");
-      require(block.timestamp > ds.collection[cID].saleStartTime, "Sale has not yet started");
+      require(block.timestamp > ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration, "Sale has not yet started");
     } else {
       require(!ds.collection[cID].mintPassOnly);
       if (canMintPass) require (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration), "Sale has not yet started");
@@ -307,9 +307,16 @@ library LibPackStorage {
   function bulkMintChecks(uint256 cID, uint256 amount) external {
     Storage storage ds = packStorage();
 
+    require(amount > 0, 'Missing amount');
+    require(!ds.collection[cID].mintPassOnly, 'Cannot bulk mint');
     require(amount <= ds.collection[cID].bulkBuyLimit, "Cannot bulk buy more than the preset limit");
     require(amount <= ds.collection[cID].shuffleIDs.length, "Total supply reached");
     require((block.timestamp > ds.collection[cID].saleStartTime), "Sale has not yet started");
+  }
+
+  function mintPassClaimed(uint256 cID, uint256 tokenId) public view returns (bool) {
+    Storage storage ds = packStorage();
+    return (ds.collection[cID].mintPassClaims[tokenId] == true);
   }
 
   function remainingTokens(uint256 cID) public view returns (uint256) {
