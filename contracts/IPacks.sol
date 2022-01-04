@@ -70,6 +70,11 @@ interface IPacks is IERC721Enumerable {
   /// @param tokenId NFT tokenID
   function mintPassClaimed(uint256 cID, uint256 tokenId) external view returns (bool);
 
+  /// @notice Returns enumerable list of tokens that can be used to claim for mint pass
+  /// @param cID Collection ID
+  /// @param minter address of holder
+  function tokensClaimable(uint256 cID, address minter) external view returns (uint256[] memory);
+
   /// @notice Returns remaining NFTs available to purchase
   /// @param cID Collection ID
   function remainingTokens(uint256 cID) external view returns (uint256);

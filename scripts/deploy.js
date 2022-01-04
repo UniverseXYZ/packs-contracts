@@ -12,7 +12,7 @@ async function main() {
   const nullAddress = '0x0000000000000000000000000000000000000000';
   const mintPassAddress = '0x9657f64f9542422c798119bbcd0f27a0baec2dcc';
   const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
-  const mintPassOnePerWallet = true;
+  const mintPassOnePerWallet = false;
   const mintPassOnly = true;
   const mintPassFree = false;
   const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;

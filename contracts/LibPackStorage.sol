@@ -318,6 +318,28 @@ library LibPackStorage {
     return (ds.collection[cID].mintPassClaims[tokenId] == true);
   }
 
+  function tokensClaimable(uint256 cID, address minter) public view returns (uint256[] memory) {
+    Storage storage ds = packStorage();
+
+    uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
+    bool done = false;
+    uint256 counter = 0;
+    uint256 index = 0;
+    uint256[] memory claimable = new uint256[](count);
+    while (!done && count > 0) {
+      uint256 tokenID = ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter);
+      if (ds.collection[cID].mintPassClaims[tokenID] != true) {
+        claimable[index] = tokenID;
+        index++;
+      }
+
+      if (counter == count - 1) done = true;
+      else counter++;
+    }
+
+    return claimable;
+  }
+
   function remainingTokens(uint256 cID) public view returns (uint256) {
     Storage storage ds = packStorage();
     return ds.collection[cID].shuffleIDs.length;

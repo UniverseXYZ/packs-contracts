@@ -20,7 +20,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     string memory symbol,
     string memory _baseURI,
     bool _editioned,
-    uint256[] memory _initParams, // Ensure second parameter is under 50 for ETH mainnet (gas fee max for bulk
+    uint256[] memory _initParams,
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration,
@@ -32,24 +32,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
     ds.daoAddress = msg.sender;
     ds.daoInitialized = true;
-    ds.collectionCount = 1;
+    ds.collectionCount = 0;
 
-    ds.collection[0].baseURI = _baseURI;
-    ds.collection[0].editioned = _editioned;
-    ds.collection[0].tokenPrice = _initParams[0];
-    ds.collection[0].bulkBuyLimit = _initParams[1];
-    ds.collection[0].saleStartTime = _initParams[2];
-    ds.collection[0].licenseURI[0] = _licenseURI;
-    ds.collection[0].licenseVersion = 1;
-
-    if (_mintPass != address(0)) {
-      ds.collection[0].mintPass = true;
-      ds.collection[0].mintPassOnePerWallet = _mintPassOnePerWallet;
-      ds.collection[0].mintPassContract = ERC721(_mintPass);
-      ds.collection[0].mintPassDuration = _mintPassDuration;
-      ds.collection[0].mintPassOnly = _mintPassOnly;
-      ds.collection[0].mintPassFree = _mintPassFree;
-    }
+    createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassOnePerWallet, _mintPassOnly, _mintPassFree);
 
     _setBaseURI(_baseURI);
   }
@@ -134,6 +119,10 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
   function mintPassClaimed(uint256 cID, uint256 tokenId) public override view returns (bool) {
     return LibPackStorage.mintPassClaimed(cID, tokenId);
+  }
+
+  function tokensClaimable(uint256 cID, address minter) public override view returns (uint256[] memory) {
+    return LibPackStorage.tokensClaimable(cID, minter);
   }
 
   function remainingTokens(uint256 cID) public override view returns (uint256) {
