@@ -264,7 +264,7 @@ library LibPackStorage {
     bool done = false;
     uint256 counter = 0;
     bool canClaim = false;
-    while (!done) {
+    while (!done && count > 0) {
       uint256 tokenID = ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter);
       if (ds.collection[cID].mintPassClaims[tokenID] != true) {
         ds.collection[cID].mintPassClaims[tokenID] = true;
@@ -296,7 +296,6 @@ library LibPackStorage {
       require(canMintPass, "Minting is restricted to mint passes only");
       require(block.timestamp > ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration, "Sale has not yet started");
     } else {
-      require(!ds.collection[cID].mintPassOnly);
       if (canMintPass) require (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration), "Sale has not yet started");
       else require(block.timestamp > ds.collection[cID].saleStartTime, "Sale has not yet started");
     }
