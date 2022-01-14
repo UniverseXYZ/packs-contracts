@@ -1,5 +1,28 @@
 ## Packs specs / functionality
 
+
+### Overview
+
+- Upon primary mint, receive a random editioned NFT
+- Total 2000 editions over entire collection
+- Multiple drops / collections within same contract
+- Royalty split *per NFT*
+- Mint passes
+
+### Initial Parameters
+
+- Collection Name,
+- Collection Symbol (e.g. RELICS),
+- BaseURI,
+- Editioned (0 or 1 for false / true),
+- [Token Price, Bulk Buy Limit (e.g. 50), Sale Start Time (timestamp)],
+- LicenseURI,
+- Mint Pass Address (nullAddress for no mint pass)
+- Mint Pass Duration (timestamp subtraction),
+- Mint Pass One Per Wallet (true/false),
+- Mint Pass Only (true/false),
+- Mint Pass Free (true/false)
+
 ### 1. Initialize a collection via constructor
 
 - Deployment of contract initializes first collection providing baseURI, display edition #'s, NFT sale price, max bulk buy limit, sale start time, license pertaining to collection, and a free mint pass for existing holders of a different NFT collection
