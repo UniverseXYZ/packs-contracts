@@ -11,16 +11,16 @@
 
 ### Initial Parameters
 
-- Collection Name,
-- Collection Symbol (e.g. RELICS),
-- BaseURI,
-- Editioned (0 or 1 for false / true),
-- [Token Price, Bulk Buy Limit (e.g. 50), Sale Start Time (timestamp)],
-- LicenseURI,
+- Collection Name
+- Collection Symbol (e.g. RELICS)
+- BaseURI
+- Editioned (0 or 1 for false / true)
+- [Token Price, Bulk Buy Limit (e.g. 50), Sale Start Time (timestamp)]
+- LicenseURI
 - Mint Pass Address (nullAddress for no mint pass)
-- Mint Pass Duration (timestamp subtraction),
-- Mint Pass One Per Wallet (true/false),
-- Mint Pass Only (true/false),
+- Mint Pass Duration (timestamp subtraction)
+- Mint Pass One Per Wallet (true/false)
+- Mint Pass Only (true/false)
 - Mint Pass Free (true/false)
 
 ### 1. Initialize a collection via constructor
