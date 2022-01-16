@@ -2,38 +2,12 @@
   "instinct": [
     {
       "coreData": [
-        "Mark Twain",
-        "Music by Half an Orange - Visuals by Half an Orange",
-        "30",
-        "1"
-      ],
-      "assets": ["shU4zosUCcrvq3B95HwyV7R6RRzzebnu1lYIDikVhQo"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Half an Orange", "0"],
-	["Instinct", "Designer: Half an Orange", "1"],
-	["Instinct", "BPM: 115", "1"],
-	["Instinct", "Key: Bb Minor", "1"],
-	["Instinct", "Genre: Electronic", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21900294", "1"],
-        ["Duration", "2:48", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900294.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
         "Scared",
         "Music by Half an Orange & WRLD - Visuals by Half an Orange",
         "30",
         "1"
       ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
+      "assets": ["l_a24-DaIKQmA1LGSq9MT9f_H0xib7D1QU7RY9CmD9M"],
       "metaData": [
 	["Instinct", "Rarity: QUARTZ", "1"],
  	["Instinct", "Musician: Half an Orange & WRLD", "0"],
@@ -48,34 +22,9 @@
       ],
       "secondaryMetaData": [
         ["ISRC", "CA6D22000046", "1"],
-        ["Duration", "xxxxxxx", "1"],
-	["Stream", "", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Moondance",
-        "Music by Saxsquatch & Half an Orange - Visuals by Petirep",
-        "30",
-        "1"
-      ],
-      "assets": ["1HCN2He_lNA40jpr4MR2oMc0EZCKGeN2NgxPcruB5K4"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Saxsquatch & Half an Orange", "0"],
-	["Instinct", "Designer: Petirep", "1"],
-	["Instinct", "BPM: 122", "1"],
-	["Instinct", "Key: F# Minor", "1"],
-	["Instinct", "Genre: House", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22100358", "1"],
-        ["Duration", "2:35", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100358.mp4", "1"]
+        ["Duration", "3:12", "1"],
+        ["Audio", "https://arweave.net/EpOXTdPTGWNmoNjbs4uJ4WeTLBIDOe_v1VNmq6BRh60"],
+	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000046.mp4", "1"]
       ]
     },
     {
@@ -85,7 +34,7 @@
         "30",
         "1"
       ],
-      "assets": ["g-1DZZXcrw--YLA-N69NJEA1wglmEoUMgTBLA6LjrPQ"],
+      "assets": ["YzFYvmTKcuQRAatBI15psMqRjltAXooR1AjD2jZyVQI"],
       "metaData": [
 	["Instinct", "Rarity: EMERALD", "1"],
  	["Instinct", "Musician: Bad Computer & Danyka Nadeau", "0"],
@@ -101,59 +50,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000099", "1"],
         ["Duration", "3:36", "1"],
+        ["Audio", "https://arweave.net/DWAvnLlTy275GbencQWh3lUKf9k-TDvk2XdqK77FoHA"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000099.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Clarity",
-        "Music by Bad Computer - Visuals by Lydia Pourmand",
-        "30",
-        "1"
-      ],
-      "assets": ["vA4MeWKL0cybIqFuwOWcur4AArEz58ChDf9z5nlzlZc"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Bad Computer", "0"],
-	["Instinct", "Designer: Lydia Pourmand", "1"],
-	["Instinct", "BPM: 128", "1"],
-	["Instinct", "Key: B Major", "1"],
-	["Instinct", "Genre: House", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22000023", "1"],
-        ["Duration", "3:20", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000023.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "luv(drunk)",
-        "Music by Conro - Visuals by Dylan Pemberton",
-        "30",
-        "1"
-      ],
-      "assets": ["itmys-kDSAoUQ_nEi90nmtYYLwGdHvHh5DEgtbKhD70"],
-      "metaData": [
-	["Instinct", "Rarity: EMERALD", "1"],
- 	["Instinct", "Musician: Conro", "0"],
-	["Instinct", "Designer: Dylan Pemberton", "1"],
-	["Instinct", "BPM: 120", "1"],
-	["Instinct", "Key: C Minor", "1"],
-	["Instinct", "Genre: House", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22000535", "1"],
-        ["Duration", "3:00", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000535.mp4", "1"]
       ]
     },
     {
@@ -163,7 +61,7 @@
         "30",
         "1"
       ],
-      "assets": ["hagU-6Rwzl8qz0-W2OIEykVPYC3EdBX8e6BXjHK6OQM"],
+      "assets": ["4o3yRLjqPOuITMqJSusBiBTf8fyzGnHF5ZuAYeoVmxo"],
       "metaData": [
 	["Instinct", "Rarity: QUARTZ", "1"],
  	["Instinct", "Musician: Conro", "0"],
@@ -179,33 +77,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21900435", "1"],
         ["Duration", "3:08", "1"],
+        ["Audio", "https://arweave.net/gAbgWLGmJisHuT1GpET3jXM3UWkTkz6ZwYX6R4O-jMs"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900435.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Leave",
-        "Music by Dion Timmer ft Luma - Visuals by Amanda Cha",
-        "30",
-        "1"
-      ],
-      "assets": ["AJTbS__wkxj5PC3bS0SKjYtOVmgnlgnSnfMKPjscZRc"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Dion Timmer", "0"],
-	["Instinct", "Designer: Amanda Cha", "1"],
-	["Instinct", "BPM: 145", "1"],
-	["Instinct", "Key: A Major", "1"],
-	["Instinct", "Genre: Dubstep", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21800322", "1"],
-        ["Duration", "2:58", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21800322.mp4", "1"]
       ]
     },
     {
@@ -215,7 +88,7 @@
         "30",
         "1"
       ],
-      "assets": ["F_xFy78IACBEAtrsnB-monRIPOoQT-uZWNQdTW0pzRI"],
+      "assets": ["SPlDJkIMLQmtUB4Qjv5qOXqOjQplZRy7KQx580Phd1I"],
       "metaData": [
 	["Instinct", "Rarity: QUARTZ", "1"],
  	["Instinct", "Musician: Dion Timmer", "0"],
@@ -231,6 +104,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21800150", "1"],
         ["Duration", "4:07", "1"],
+        ["Audio", "https://arweave.net/r77rpcxiW6gH5HImDiGX1GHv6suoTvRKOk0TfvUS8Jo"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21800150.mp4", "1"]
       ]
     },
@@ -241,7 +115,7 @@
         "30",
         "1"
       ],
-      "assets": ["EgMsoXvIhHjOgJ3uV9dJXUX0JOnTbANQ8gL13tk72pM"],
+      "assets": ["qkpX55-Nimpj2bke-6OhBk3FXmtdgWwb5zL_ZapuNNc"],
       "metaData": [
 	["Instinct", "Rarity: QUARTZ", "1"],
  	["Instinct", "Musician: Drinks on Me", "0"],
@@ -257,6 +131,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22100219", "1"],
         ["Duration", "2:30", "1"],
+        ["Audio", "https://arweave.net/lZ06fg9sjRvvn366cbIPGB2C2D2hbbPTyOAhF-PvX8I"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100219.mp4", "1"]
       ]
     },
@@ -267,7 +142,7 @@
         "30",
         "1"
       ],
-      "assets": ["ZB9HuI6Hh6A05blGwS5ik5b6NKPpsB2dz4EZPEHJLUI"],
+      "assets": ["ceTFY-4no090Zp5heegSgnHR1nAkirwkjnpdPgy2HEA"],
       "metaData": [
 	["Instinct", "Rarity: QUARTZ", "1"],
  	["Instinct", "Musician: EDDIE", "0"],
@@ -283,59 +158,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22100256", "1"],
         ["Duration", "3:45", "1"],
+        ["Audio", "https://arweave.net/Ah6naEe2GQdLoua9H3h2T-D_TxDESh4mkuXlzWGngd8"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100256.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Dreamstate",
-        "Music by Ephixa - Visuals by Amanda Cha",
-        "30",
-        "1"
-      ],
-      "assets": ["BKrOWvi3QIV-LBHQsTGaZ5QmvupXNV2t2gA3dEwSJrU"],
-      "metaData": [
-	["Instinct", "Rarity: EMERALD", "1"],
- 	["Instinct", "Musician: Ephixa", "0"],
-	["Instinct", "Designer: Amanda Cha", "1"],
-	["Instinct", "BPM: 126", "1"],
-	["Instinct", "Key: F# Minor", "1"],
-	["Instinct", "Genre: House", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21800199", "1"],
-        ["Duration", "3:12", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21800199.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Sundance",
-        "Music by Ephixa & Heartful - Visuals by Amanda Cha & Lydia Pourmand",
-        "30",
-        "1"
-      ],
-      "assets": ["3OP97Hl7fgOL1VMQKaV3A0DjR4AuNxRia8TpDSVfSPs"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Ephixa & Heartful", "0"],
-	["Instinct", "Designer: Amanda Cha & Lydia Pourmand", "1"],
-	["Instinct", "BPM: 124", "1"],
-	["Instinct", "Key: G Major", "1"],
-	["Instinct", "Genre: Synthwave", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21900151", "1"],
-        ["Duration", "3:14", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900151.mp4", "1"]
       ]
     },
     {
@@ -345,9 +169,9 @@
         "30",
         "1"
       ],
-      "assets": ["6-2MdLe84D8WCwqZXilm8IqyPW-S8So9PVt1QNx6PAY"],
+      "assets": ["fSIq6r4aLb1Xk1oiDUE1FE3Xn90_6d5368ILHSauoyI"],
       "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
+	["Instinct", "Rarity: EMERALD", "1"],
  	["Instinct", "Musician: Glacier", "0"],
 	["Instinct", "Designer: Petirep", "1"],
 	["Instinct", "BPM: 98", "1"],
@@ -361,33 +185,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21900383", "1"],
         ["Duration", "3:26", "1"],
+        ["Audio", "https://arweave.net/hQX6LDrpwz7AXSpCm9rBS1GTc-ebXljvuxpCT83ajfY"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900383.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Enough",
-        "Music by Glacier - Visuals by Petirep",
-        "30",
-        "1"
-      ],
-      "assets": ["NJPyycFnOmwJ7SoPUL6nOJZo4_EBDJb2lYB5j_qVbE8"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Glacier", "0"],
-	["Instinct", "Designer: Petirep", "1"],
-	["Instinct", "BPM: 106", "1"],
-	["Instinct", "Key: F Minor", "1"],
-	["Instinct", "Genre: Future Bass", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21900346", "1"],
-        ["Duration", "3:55", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900346.mp4", "1"]
       ]
     },
     {
@@ -397,7 +196,7 @@
         "30",
         "1"
       ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
+      "assets": ["rE-rMVeiNHPkVpTDkHvKtjzoselIveqVSvskX2cw6uM"],
       "metaData": [
 	["Instinct", "Rarity: SAPPHIRE", "1"],
  	["Instinct", "Musician: Jay Cosmic & DESERT STAR", "0"],
@@ -413,6 +212,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21700326", "1"],
         ["Duration", "2:58", "1"],
+        ["Audio", "https://arweave.net/GYB1Z6Oql3JWbsEwUFUuF8-wOpIEylXU3yp5SUlwI24"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21700326.mp4", "1"]
       ]
     },
@@ -423,7 +223,7 @@
         "30",
         "1"
       ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
+      "assets": ["a-OTG-EfLywjsdk-FnyH6b-E_u3uxqaWePyysC4LCDU"],
       "metaData": [
 	["Instinct", "Rarity: QUARTZ", "1"],
  	["Instinct", "Musician: OBLVYN", "0"],
@@ -439,33 +239,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22100520", "1"],
         ["Duration", "2:41", "1"],
+        ["Audio", "https://arweave.net/RZcJUGmva7ecHwjT2KljlsJpQK9pAuBk1-AEiyHATE4"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100520.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Feel Your Heart",
-        "Music by Protostar ft Sam Tabor - Visuals by Devan Power",
-        "30",
-        "1"
-      ],
-      "assets": ["hpoiPGXX59HOVPUwuJeHkweoex0Oo9F5TYwFlAXnTjY"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Protostar", "0"],
-	["Instinct", "Designer: Devan Power", "1"],
-	["Instinct", "BPM: 174", "1"],
-	["Instinct", "Key: B Minor", "1"],
-	["Instinct", "Genre: Drum & Bass", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21900088", "1"],
-        ["Duration", "5:30", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900088.mp4", "1"]
       ]
     },
     {
@@ -475,7 +250,7 @@
         "30",
         "1"
       ],
-      "assets": ["nxmhi61hU1YbXMSEoNAl-1zlB42StQ-TDh54HGny9LU"],
+      "assets": ["PVmcVpj_YG0QJBQhLkMI97q1KnXYymfYhFHlWYtiVjQ"],
       "metaData": [
 	["Instinct", "Rarity: QUARTZ", "1"],
  	["Instinct", "Musician: Rameses B", "0"],
@@ -491,6 +266,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000093", "1"],
         ["Duration", "4:22", "1"],
+        ["Audio", "https://arweave.net/0pc03zV9yqhrKMZ0u4jt20FLIlZ3jaV9926ZzKGhQ10"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000093.mp4", "1"]
       ]
     },
@@ -501,7 +277,7 @@
         "30",
         "1"
       ],
-      "assets": ["ggBVKEpfFLV_NKlJ_2fi0LdB_SRbiq1buW1RPX5H6DU"],
+      "assets": ["4BfXIF6j4dxj8bKuH2neImL8YgxsBOdKYhHIOgUdwvM"],
       "metaData": [
 	["Instinct", "Rarity: EMERALD", "1"],
  	["Instinct", "Musician: Rogue", "0"],
@@ -517,127 +293,24 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21700324", "1"],
         ["Duration", "3:55", "1"],
+        ["Audio", "https://arweave.net/D-aDIxcRGLu2u9id9rSd_IPvzw4iG6bfTp5GX5-xylk"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21700324.mp4", "1"]
       ]
     },
     {
       "coreData": [
-        "I Need Ya",
-        "Music by Sabai, With Løve & RYYZN - Visuals by Red Five Visuals Group",
-        "30",
-        "1"
-      ],
-      "assets": ["dqakj9Om_SQZOtIMy5H38Ahm-wx_w9vvPUrQ84FZJv8"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Sabai, With Løve & RYYZN", "0"],
-	["Instinct", "Designer: Red Five Visuals Group", "1"],
-	["Instinct", "BPM: 120", "1"],
-	["Instinct", "Key: D Major", "1"],
-	["Instinct", "Genre: House", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22100227", "1"],
-        ["Duration", "3:37", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100227.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Friends",
-        "Music by Subtact ft Bri Tolani - Visuals by Amanda Cha",
-        "30",
-        "1"
-      ],
-      "assets": ["NqRiLE5-BI0lrI_iT3kqL0nfkmQ5gpSJyEz-DgJ7y9A"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Subtact", "0"],
-	["Instinct", "Designer: Amanda Cha", "1"],
-	["Instinct", "BPM: 155", "1"],
-	["Instinct", "Key: A Major", "1"],
-	["Instinct", "Genre: Future Bass", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21800083", "1"],
-        ["Duration", "3:30", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21800083.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Play it Cool",
-        "xxxxx",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Instinct", "Rarity: QUARTZ", "1"],
- 	["Instinct", "Musician: Terry Zhong", "0"],
-	["Instinct", "Designer: xxxx", "1"],
-	["Instinct", "BPM: 118", "1"],
-	["Instinct", "Key: C Minor", "1"],
-	["Instinct", "Genre: House", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21900405", "1"],
-        ["Duration", "2:36", "1"],
-	["Stream", "", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Bloom",
-        "Music by Throttle - Visuals by Lydia Pourmand",
-        "30",
-        "1"
-      ],
-      "assets": ["THY7ng_jIjz2KDz-TQ6BzIVweWoC-Q9hIf4w0QMzO1I"],
-      "metaData": [
-	["Instinct", "Rarity: EMERALD", "1"],
- 	["Instinct", "Musician: Throttle", "0"],
-	["Instinct", "Designer: Lydia Pourmand", "1"],
-	["Instinct", "BPM: 150", "1"],
-	["Instinct", "Key: Ab Major", "1"],
-	["Instinct", "Genre: Future Bass", "1"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21900299", "1"],
-        ["Duration", "4:53", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900299.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Cities",
+        "For Me",
         "Music by Throttle - Visuals by Vacades",
         "30",
         "1"
       ],
-      "assets": ["NJPyycFnOmwJ7SoPUL6nOJZo4_EBDJb2lYB5j_qVbE8"],
+      "assets": ["qBoPByjBlCSVhS045rb-uQX6xaPP9TwP9dVhwZunfPg"],
       "metaData": [
-	["Instinct", "Rarity: RUBY", "1"],
+	["Instinct", "Rarity: SAPPHIRE", "1"],
  	["Instinct", "Musician: Throttle", "0"],
 	["Instinct", "Designer: Vacades", "1"],
-	["Instinct", "BPM: 115", "1"],
-	["Instinct", "Key: D Minor", "1"],
+	["Instinct", "BPM: 127", "1"],
+	["Instinct", "Key: A Minor", "1"],
 	["Instinct", "Genre: House", "1"],
         ["Instinct", "Version: Original", "0"],
         ["Instinct", "Label: Monstercat", "0"],
@@ -645,103 +318,26 @@
         ["Instinct", "Season: 1", "0"]
       ],
       "secondaryMetaData": [
-        ["ISRC", "CA6D21900301", "1"],
-        ["Duration", "3:00", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900301.mp4", "1"]
+        ["ISRC", "CA6D21900300", "1"],
+        ["Duration", "3:50", "1"],
+        ["Audio", "https://arweave.net/F9GIRJKdhCgsY052uEv1aOhsjCpoU0FiopBKyoLkwDU"],
+	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900300.mp4", "1"]
       ]
     }
   ],
   "uncaged": [
      {
       "coreData": [
-        "Paradise",
-        "Music by Bad Computer - Visuals by Lydia Pourmand",
-        "30",
-        "1"
-      ],
-      "assets": ["yHv_ChlTsN92pA_e1z6qdwACi8fsgXSvxFIyH4MqEvY"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Bad Computer", "0"],
-	["Uncaged", "Designer: Lydia Pourmand", "1"],
-	["Uncaged", "BPM: 128", "1"],
-	["Uncaged", "Key: Ab Minor", "1"],
-	["Uncaged", "Genre: Electro House", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22100011", "1"],
-        ["Duration", "3:53", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100011.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Endgame",
-        "Music by Bossfight - Visuals by Devan Power",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Bossfight", "0"],
-	["Uncaged", "Designer: Devan Power", "1"],
-	["Uncaged", "BPM: 174", "1"],
-	["Uncaged", "Key: B Major", "1"],
-	["Uncaged", "Genre: Drumstep", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22100187", "1"],
-        ["Duration", "4:24", "1"],
-	["Stream", "xxxxxxx", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "No Sleep VIP",
-        "xxxxxxx",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Bossfight", "0"],
-	["Uncaged", "Designer: xxxxx", "1"],
-	["Uncaged", "BPM: 174", "1"],
-	["Uncaged", "Key: C# Major", "1"],
-	["Uncaged", "Genre: Dubstep", "1"],
-        ["Uncaged", "Version: VIP", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21900395", "1"],
-        ["Duration", "4:08", "1"],
-	["Stream", "xxxxxxx", "1"]
-      ]
-    },
-    {
-      "coreData": [
         "Ice Box",
-        "Music by Dirty Audio & ETC!ETC! - Visuals by Andrii Solok",
+        "Music by Dirty Audio & ETC!ETC! - Visuals by Andrew Solok",
         "30",
         "1"
       ],
-      "assets": ["vR4yvi4mkfhJisa-QIXC3eu8XxZ_uZHvz3KlGjENjHU"],
+      "assets": ["N4ND4wD7wxTfgme9ManS5fSYhgAO0mvJkP1-RVDVFR8"],
       "metaData": [
 	["Uncaged", "Rarity: QUARTZ", "1"],
  	["Uncaged", "Musician: Dirty Audio & ETC!ETC!", "0"],
-	["Uncaged", "Designer: Andrii Solok", "1"],
+	["Uncaged", "Designer: Andrew Solok", "1"],
 	["Uncaged", "BPM: 103", "1"],
 	["Uncaged", "Key: Bb Minor", "1"],
 	["Uncaged", "Genre: Electronic", "1"],
@@ -753,111 +349,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000350", "1"],
         ["Duration", "2:49", "1"],
+        ["Audio", "https://arweave.net/sMZtaTZE97GCzxqT-6GrUh1VxZwmRRmVWBz0-Rb4Dmw"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000350.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Evil Inside VIP",
-        "Music by Dirtyphonics & Bossfight - Visuals by Max Bowman",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Dirtyphonics & Bossfight", "0"],
-	["Uncaged", "Designer: Max Bowman", "1"],
-	["Uncaged", "BPM: 150", "1"],
-	["Uncaged", "Key: C# Major", "1"],
-	["Uncaged", "Genre: Dubstep", "1"],
-        ["Uncaged", "Version: VIP", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22000348", "1"],
-        ["Duration", "3:08", "1"],
-	["Stream", "xxxxxxx", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "High Caliber",
-        "Music by Drinks On Me & Event Horizon - Visuals by kmotion",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Drinks On Me & Event Horizon", "0"],
-	["Uncaged", "Designer: kmotion", "1"],
-	["Uncaged", "BPM: 126", "1"],
-	["Uncaged", "Key: E Minor", "1"],
-	["Uncaged", "Genre: House", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22100220", "1"],
-        ["Duration", "2:50", "1"],
-	["Stream", "xxxxx", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Back 2 U",
-        "xxxxx",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Droptek", "0"],
-	["Uncaged", "Designer: xxxx", "1"],
-	["Uncaged", "BPM: 172", "1"],
-	["Uncaged", "Key: Eb Minor", "1"],
-	["Uncaged", "Genre: Drum & Bass", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22000355", "1"],
-        ["Duration", "3:26", "1"],
-	["Stream", "xxxxxxx", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Orbit",
-        "Music by Ellis - Visuals by Daisy Finetto",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Ellis", "0"],
-	["Uncaged", "Designer: Daisy Finetto", "1"],
-	["Uncaged", "BPM: 116", "1"],
-	["Uncaged", "Key: D Major", "1"],
-	["Uncaged", "Genre: Electro House", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22100135", "1"],
-        ["Duration", "3:24", "1"],
-	["Stream", "xxxxxxxxx", "1"]
       ]
     },
     {
@@ -867,7 +360,7 @@
         "30",
         "1"
       ],
-      "assets": ["0k78yjl2YCkCNxdS28DrTjN553kzHXVNoGNcubn-DmE"],
+      "assets": ["7sOULe27bhqHMxiI4dujPOjLF7Soxs_N9SuBS-QVJwk"],
       "metaData": [
 	["Uncaged", "Rarity: EMERALD", "1"],
  	["Uncaged", "Musician: Eptic", "0"],
@@ -883,33 +376,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000007", "1"],
         ["Duration", "3:18", "1"],
+        ["Audio", "https://arweave.net/zrY41AFm35PgVXYWa_8U7YR_MAawaCty0Z1hFEniZJs"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000007.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Shadow People",
-        "Music by Eptic - Visuals by Eptic",
-        "30",
-        "1"
-      ],
-      "assets": ["NZ2rdj71OZ4pTSRzRRuBX93Ea0xKK2a5YFGrFQ4Dv4o"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Eptic", "0"],
-	["Uncaged", "Designer: Eptic", "1"],
-	["Uncaged", "BPM: 140", "1"],
-	["Uncaged", "Key: Bb Minor", "1"],
-	["Uncaged", "Genre: Dubstep", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22100173", "1"],
-        ["Duration", "3:06", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100173.mp4", "1"]
       ]
     },
     {
@@ -919,7 +387,7 @@
         "30",
         "1"
       ],
-      "assets": ["SKHiQE7TSSr_fBELSpyqZPht2kvQ_OKbTmhQPE0Jn40"],
+      "assets": ["fvrsG7Sbmm7CToJyh-j_UIp-h6ZULKAC4BCj-F9AQmg"],
       "metaData": [
 	["Uncaged", "Rarity: SAPPHIRE", "1"],
  	["Uncaged", "Musician: F.O.O.L", "0"],
@@ -935,21 +403,22 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000047", "1"],
         ["Duration", "3:42", "1"],
+        ["Audio", "https://arweave.net/kFujCkGW-8t1XAZ24RFXDzLi6c-K_A_UNnKFwcG_yl4"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000047.mp4", "1"]
       ]
     },
     {
       "coreData": [
         "Same Mistake",
-        "xxxxxxx",
+        "Music by Francis Derelle ft Josh Rubin - Visuals by Andrew Solok",
         "30",
         "1"
       ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
+      "assets": ["tNn-GNGR8K3OtRZP6GheE_EQ1jtb8X2dhNzJIf6yfps"],
       "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
+	["Uncaged", "Rarity: EMERALD", "1"],
  	["Uncaged", "Musician: Francis Derelle", "0"],
-	["Uncaged", "Designer: xxxxxxx", "1"],
+	["Uncaged", "Designer: Andrew Solok", "1"],
 	["Uncaged", "BPM: 148", "1"],
 	["Uncaged", "Key: B Minor", "1"],
 	["Uncaged", "Genre: Dubstep", "1"],
@@ -961,33 +430,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000486", "1"],
         ["Duration", "3:36", "1"],
-	["Stream", "xxxxxxxx", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "Ember",
-        "xxxxxxx",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Fransis Derelle, CRaymak & HVDES", "0"],
-	["Uncaged", "Designer: xxxxxxx", "1"],
-	["Uncaged", "BPM: 145", "1"],
-	["Uncaged", "Key: G Minor", "1"],
-	["Uncaged", "Genre: Dubstep", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22000475", "1"],
-        ["Duration", "3:12", "1"],
-	["Stream", "xxxxxx", "1"]
+        ["Audio", "https://arweave.net/-qpsmllKVOoQMA38TON6eUuvEJXgZAZmxFnRC_hzo5U"],
+	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000486.mp4", "1"]
       ]
     },
     {
@@ -997,7 +441,7 @@
         "30",
         "1"
       ],
-      "assets": ["SETUCcYNYYYkLuCkDSGazCIT-nhyEfgLf_Km5AO6WSU"],
+      "assets": ["s-sOr7rahuRXs0sqIEL3GLxVBtV5SB_ci_fBQVidsfY"],
       "metaData": [
 	["Uncaged", "Rarity: QUARTZ", "1"],
  	["Uncaged", "Musician: Justin OH & Nitro Fun", "0"],
@@ -1013,21 +457,22 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000230", "1"],
         ["Duration", "3:22", "1"],
+        ["Audio", "https://arweave.net/PIoKt7hZ7fy_46IeNuzNsfA0LZzhIVhtCxcUJ1uM_Cc"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000230.mp4", "1"]
       ]
     },
     {
       "coreData": [
         "This Time",
-        "xxxxxxx",
+        "Music by Kayzo - Visuals by Chadwick Makela",
         "30",
         "1"
       ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
+      "assets": ["LOFb4vBrHfe4rAWNhTRqPP4bxBzu7nC85MQ4lRFMOkU"],
       "metaData": [
 	["Uncaged", "Rarity: RUBY", "1"],
  	["Uncaged", "Musician: Kayzo", "0"],
-	["Uncaged", "Designer: xxxxxxx", "1"],
+	["Uncaged", "Designer: Chadwick Makela", "1"],
 	["Uncaged", "BPM: 150", "1"],
 	["Uncaged", "Key: D Major", "1"],
 	["Uncaged", "Genre: Hard Dance", "1"],
@@ -1039,7 +484,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21700058", "1"],
         ["Duration", "2:50", "1"],
-	["Stream", "xxxxxxxxxx", "1"]
+        ["Audio", "https://arweave.net/-D2OvtGmpbdnkUZgne_y-AizjNA0le3lRTC0LbddBkU"],
+	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21700058.mp4", "1"]
       ]
     },
     {
@@ -1049,7 +495,7 @@
         "30",
         "1"
       ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
+      "assets": ["oB4rp1BrbsRX8O9l6GLXo30c5GWgDIh3xcnnpurSt88"],
       "metaData": [
 	["Uncaged", "Rarity: QUARTZ", "1"],
  	["Uncaged", "Musician: Koven", "0"],
@@ -1065,7 +511,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22100172", "1"],
         ["Duration", "4:45", "1"],
-	["Stream", "xxxxxxxxxxx", "1"]
+        ["Audio", "https://arweave.net/Dy0vTOrED9YwaBEnsXQwdmiJPsZU76Ai93t48T0rksY"],
+	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100172.mp4", "1"]
       ]
     },
     {
@@ -1075,7 +522,7 @@
         "30",
         "1"
       ],
-      "assets": ["tRIushJ8UQeioOnH6UwW1p_mP5TP1qaBYqZvqugZLbg"],
+      "assets": ["spxHLuKJBoKF34XXh7o2ZOxcX6vpeKQauAGkdV3oqhI"],
       "metaData": [
 	["Uncaged", "Rarity: QUARTZ", "1"],
  	["Uncaged", "Musician: KUURO & Goja", "0"],
@@ -1091,6 +538,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000544", "1"],
         ["Duration", "3:18", "1"],
+        ["Audio", "https://arweave.net/L6AVM_vgC-0CaEi-OhixU1FEdhmHe_nsKkD3iSb9IG4"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000544.mp4", "1"]
       ]
     },
@@ -1101,9 +549,9 @@
         "30",
         "1"
       ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
+      "assets": ["ur8-MLUilU01YYfm6dHBoBVYDAK2KhuqCVv3GA7fxI8"],
       "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
+	["Uncaged", "Rarity: EMERALD", "1"],
  	["Uncaged", "Musician: Muzz", "0"],
 	["Uncaged", "Designer: Max Bowman", "1"],
 	["Uncaged", "BPM: 175", "1"],
@@ -1117,7 +565,8 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D22000192", "1"],
         ["Duration", "4:34", "1"],
-	["Stream", "xxxxxx", "1"]
+        ["Audio", "https://arweave.net/ooatAVSoaI3sWIpvMcxJZbkW3e5WiuaPeY6pJwBBDkQ"],
+	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22000192.mp4", "1"]
       ]
     },
     {
@@ -1127,7 +576,7 @@
         "30",
         "1"
       ],
-      "assets": ["UwQ0rMbgfIXpXFZ62BT2j1UgHyB7Lr_keu6p3b-8snA"],
+      "assets": ["YeT8lR6flwz4h9oC6z9PD3xCDkyzmKXhguKJGNhxV8s"],
       "metaData": [
 	["Uncaged", "Rarity: QUARTZ", "1"],
  	["Uncaged", "Musician: Pixel Terror", "0"],
@@ -1143,6 +592,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21900163", "1"],
         ["Duration", "3:30", "1"],
+        ["Audio", "https://arweave.net/eVQPaShPwAZtPMNmcEjy7eCbXwytA2RSN5gaaTdMIhk"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900163.mp4", "1"]
       ]
     },
@@ -1153,7 +603,7 @@
         "30",
         "1"
       ],
-      "assets": ["Tlu0HA7GwDM6cR5GgzYGAUoQ3QSAI2rSFTAO5RES_Sg"],
+      "assets": ["76hDo8DuheM4NTrVkwX4chyk9dU01m1lr-PUbBKnyl4"],
       "metaData": [
 	["Uncaged", "Rarity: QUARTZ", "1"],
  	["Uncaged", "Musician: REAPER", "0"],
@@ -1169,23 +619,24 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21900261", "1"],
         ["Duration", "3:04", "1"],
+        ["Audio", "https://arweave.net/J0Mh6oqoPfF00AKT6n22_vWfjb--hCM8zMGrjmXz0ZA"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900261.mp4", "1"]
       ]
     },
     {
       "coreData": [
-        "Us",
-        "Music by Snavs - Visuals by Devan Power",
+        "The Pit",
+        "Music by Bossfight - Visuals by Kadabura & Bossfight",
         "30",
         "1"
       ],
-      "assets": ["OnAWFF3dXaWost7bp3DxrB3dzCtYBAQx9vcQfCVaj3g"],
+      "assets": ["m9YbaH0QyfmneXpFgZHhLt7JDrT58VKQ4PHbbScl3QY"],
       "metaData": [
-	["Uncaged", "Rarity: RUBY", "1"],
- 	["Uncaged", "Musician: Snavs", "0"],
-	["Uncaged", "Designer: Devan Power", "1"],
+	["Uncaged", "Rarity: QUARTZ", "1"],
+ 	["Uncaged", "Musician: Bossfight", "0"],
+	["Uncaged", "Designer: Kadabura & Bossfight", "1"],
 	["Uncaged", "BPM: 150", "1"],
-	["Uncaged", "Key: E Minor", "1"],
+	["Uncaged", "Key: Bb Minor", "1"],
 	["Uncaged", "Genre: Dubstep", "1"],
         ["Uncaged", "Version: Original", "0"],
         ["Uncaged", "Label: Monstercat", "0"],
@@ -1193,87 +644,10 @@
         ["Uncaged", "Season: 1", "0"]
       ],
       "secondaryMetaData": [
-        ["ISRC", "CA6D21900098", "1"],
-        ["Duration", "3:03", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900098.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "You & Me",
-        "Music by Snavs - Visuals by Devan Power",
-        "30",
-        "1"
-      ],
-      "assets": ["LDLRbBK_UJ-qTbne5XASWL1H4yelZwvvFJd8un0xJG8"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Snavs", "0"],
-	["Uncaged", "Designer: Devan Power", "1"],
-	["Uncaged", "BPM: 150", "1"],
-	["Uncaged", "Key: B Major", "1"],
-	["Uncaged", "Genre: Trap", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D22100258", "1"],
-        ["Duration", "3:01", "1"],
-	["Stream", "xxxxxxx", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "EPIC",
-        "Music by Tokyo Machine - Visuals by Amanda Cha",
-        "30",
-        "1"
-      ],
-      "assets": ["9Spm2nvW0OxTRpl97kiI7HLDByy_DnCqa8F6hv0HzIg"],
-      "metaData": [
-	["Uncaged", "Rarity: SAPPHIRE", "1"],
- 	["Uncaged", "Musician: Tokyo Machine", "0"],
-	["Uncaged", "Designer: Amanda Cha", "1"],
-	["Uncaged", "BPM: 128", "1"],
-	["Uncaged", "Key: A Major", "1"],
-	["Uncaged", "Genre: Electro", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21800283", "1"],
-        ["Duration", "3:37", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21800283.mp4", "1"]
-      ]
-    },
-    {
-      "coreData": [
-        "SAIKOU",
-        "Music by Tokyo Machine - Visuals by Amanda Cha",
-        "30",
-        "1"
-      ],
-      "assets": ["meEeyuk2Nj6SlimmgJgjNc8zqpaamMujixgWbHmIUJQ"],
-      "metaData": [
-	["Uncaged", "Rarity: QUARTZ", "1"],
- 	["Uncaged", "Musician: Tokyo Machine", "0"],
-	["Uncaged", "Designer: Amanda Cha", "1"],
-	["Uncaged", "BPM: 128", "1"],
-	["Uncaged", "Key: A Major", "1"],
-	["Uncaged", "Genre: Electro House", "1"],
-        ["Uncaged", "Version: Original", "0"],
-        ["Uncaged", "Label: Monstercat", "0"],
-        ["Uncaged", "Brand: Uncaged", "0"],
-        ["Uncaged", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "CA6D21900162", "1"],
-        ["Duration", "2:56", "1"],
-	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900162.mp4", "1"]
+        ["ISRC", "CA6D22100475", "1"],
+        ["Duration", "3:48", "1"],
+        ["Audio", "https://arweave.net/K5nziwgwmbUkAlN1vfTx8Kleciarulb8MGY0N8L9UXY"],
+	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D22100475.mp4", "1"]
       ]
     }
   ]
