@@ -258,7 +258,7 @@ library LibPackStorage {
     emit LogAddCollectible(cID, _coreData[0]);
   }
 
-  function checkTokensForMintPass(uint256 cID, address minter) private returns (bool) {
+  function checkTokensForMintPass(uint256 cID, address minter, address contractAddress) private returns (bool) {
     Storage storage ds = packStorage();
     uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
     bool done = false;
@@ -271,8 +271,7 @@ library LibPackStorage {
         done = true;
         canClaim = true;
         if (ds.collection[cID].mintPassBurn) {
-          // ds.collection[cID].mintPassContract.approve(msg.sender, tokenID);
-          // ds.collection[cID].mintPassContract.safeTransferFrom(msg.sender, address(0xdEaD), tokenID);
+          ds.collection[cID].mintPassContract.safeTransferFrom(msg.sender, address(0xdEaD), tokenID);
         }
       }
 
@@ -283,13 +282,13 @@ library LibPackStorage {
     return canClaim;
   }
 
-  function checkMintPass(uint256 cID, address user) external returns (bool) {
+  function checkMintPass(uint256 cID, address user, address contractAddress) external returns (bool) {
     Storage storage ds = packStorage();
 
     bool canMintPass = false;
     if (ds.collection[cID].mintPass) {
       if (!ds.collection[cID].mintPassOnePerWallet || !ds.collection[cID].mintPassClaimed[user]) {
-        if (checkTokensForMintPass(cID, user)) {
+        if (checkTokensForMintPass(cID, user, contractAddress)) {
           canMintPass = true;
           if (ds.collection[cID].mintPassOnePerWallet) ds.collection[cID].mintPassClaimed[user] = true;
         }

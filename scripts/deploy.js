@@ -18,6 +18,7 @@ async function main() {
   const mintPassBurn = true;
   const mintPassParams = [mintPassOnePerWallet, mintPassOnly, mintPassFree, mintPassBurn]
   const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
+  console.log('sale start time', saleStartTime);
   let metadata = mock.instinct;
 
   const deployArgs = [
