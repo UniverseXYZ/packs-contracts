@@ -208,7 +208,7 @@ library LibPackStorage {
         recipient: _fees[i].recipient,
         value: _fees[i].value
       }));
-      sum += _fees[i].value;
+      sum = sum.add(_fees[i].value);
     }
 
     require(sum < 10000, "Fee should be less than 100%");
@@ -260,7 +260,7 @@ library LibPackStorage {
     createTokenIDs(cID, collectibleCount, editions);
 
     collection.collectibleCount++;
-    collection.totalTokenCount += editions;
+    collection.totalTokenCount = collection.totalTokenCount.add(editions);
 
     emit LogAddCollectible(cID, _coreData[0]);
   }
