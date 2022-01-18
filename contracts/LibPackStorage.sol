@@ -65,6 +65,7 @@ library LibPackStorage {
   }
 
   struct Storage {
+    address relicsAddress;
     address payable daoAddress;
     bool daoInitialized;
 
@@ -122,7 +123,7 @@ library LibPackStorage {
     return uint(keccak256(abi.encodePacked(block.difficulty, block.timestamp, packStorage().collection[cID].totalTokenCount)));
   }
 
-  function randomTokenID(uint256 cID) external returns (uint256, uint256) {
+  function randomTokenID(address relics, uint256 cID) external relicSafety(relics) returns (uint256, uint256) {
     Storage storage ds = packStorage();
 
     uint256 randomID = random(cID) % ds.collection[cID].shuffleIDs.length;
@@ -135,6 +136,12 @@ library LibPackStorage {
 
   modifier onlyDAO() {
     require(msg.sender == packStorage().daoAddress, "Wrong address");
+    _;
+  }
+
+  modifier relicSafety(address relics) {
+    Storage storage ds = packStorage();
+    require(relics == ds.relicsAddress);
     _;
   }
 
@@ -282,7 +289,7 @@ library LibPackStorage {
     return canClaim;
   }
 
-  function checkMintPass(uint256 cID, address user, address contractAddress) external returns (bool) {
+  function checkMintPass(address relics, uint256 cID, address user, address contractAddress) external relicSafety(relics) returns (bool) {
     Storage storage ds = packStorage();
 
     bool canMintPass = false;
@@ -349,7 +356,7 @@ library LibPackStorage {
   }
 
   // Modify property field only if marked as updateable
-  function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) public onlyDAO {
+  function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) external onlyDAO {
     Storage storage ds = packStorage();
     require(ds.collection[cID].metadata[collectibleId - 1].modifiable[propertyIndex], 'Field not editable');
     ds.collection[cID].metadata[collectibleId - 1].value[propertyIndex] = value;

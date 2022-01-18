@@ -159,9 +159,7 @@ describe("Packs Test", async function() {
   it("should update image asset and version", async function() {
     await packsInstance.addVersion(0, 1, 'fourrrrrrr');
     // await packsInstance.updateVersion(0, 1, 1);
-    console.log('yo wtf');
     const tokenJSON = base64toJSON(await packsInstance.tokenURI(100100008));
-    console.log(tokenJSON);
     expect(tokenJSON.image).to.equal(`${ baseURI }fourrrrrrr`);
   });
 

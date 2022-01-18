@@ -28,6 +28,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   ) ERC721(name, symbol) {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
+    ds.relicsAddress = address(this);
     ds.daoAddress = msg.sender;
     ds.daoInitialized = true;
     ds.collectionCount = 0;
@@ -74,7 +75,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
   function randomTokenID(uint256 cID) private returns (uint256) {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
-    (uint256 randomID, uint256 tokenID) = LibPackStorage.randomTokenID(cID);
+    (uint256 randomID, uint256 tokenID) = LibPackStorage.randomTokenID(address(this), cID);
 
     ds.collection[cID].shuffleIDs[randomID] = ds.collection[cID].shuffleIDs[ds.collection[cID].shuffleIDs.length - 1];
     ds.collection[cID].shuffleIDs.pop();
@@ -84,7 +85,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
   function mintPack(uint256 cID) public override payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-    bool canMintPass = LibPackStorage.checkMintPass(cID, msg.sender, address(this));
+    bool canMintPass = LibPackStorage.checkMintPass(address(this), cID, msg.sender, address(this));
  
     uint256 excessAmount;
     if (canMintPass && ds.collection[cID].mintPassFree) excessAmount = msg.value.sub(0);
