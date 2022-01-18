@@ -30,8 +30,8 @@ interface IPacks is IERC721Enumerable {
   /// @param _licenseURI Global license URI of collection / drop
   /// @param _mintPass ERC721 contract address to allow 1 free mint prior to sale start time
   /// @param _mintPassDuration Duration before sale start time allowing free mints
-  /// @param _mintPassOnePerWallet One free mint per wallet
-  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool _mintPassOnePerWallet, bool _mintPassOnly, bool _mintPassFree) external;
+  /// @param _mintPassParams Array of params for mintPass [One Per Wallet, Mint Pass ONLY, Mint Pass Free Mint, Mint Pass Burn]
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool[] memory _mintPassParams) external;
   
   /// @notice Adds a collectible with multiple versions of artwork, metadata, and royalty declaration
   /// @param cID Collection ID
@@ -92,25 +92,21 @@ interface IPacks is IERC721Enumerable {
   /// @param asset Asset hash without baseURI included
   function addVersion(uint256 cID, uint256 collectibleId, string memory asset) external;
 
-  /// @notice Updates asset version of collectible
-  /// @param cID Collection ID
-  /// @param collectibleId Collectible index (value 1 is index 0)
-  /// @param versionNumber New version number to set collectible's asset to
-  function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) external;
+  // /// @notice Updates asset version of collectible
+  // /// @param cID Collection ID
+  // /// @param collectibleId Collectible index (value 1 is index 0)
+  // /// @param versionNumber New version number to set collectible's asset to
+  // function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) external;
 
   /// @notice Adds new license URL for collection, auto increments license version number
   /// @param cID Collection ID
   /// @param _license Full URL of license
   function addNewLicense(uint256 cID, string memory _license) external;
 
-  /// @notice Gets latest license URL
-  /// @param cID Collection ID
-  function getLicense(uint256 cID) external view returns (string memory);
-
   /// @notice Gets license given a license version
   /// @param cID Collection ID
   /// @param versionNumber Version number of license
-  function getLicenseVersion(uint256 cID, uint256 versionNumber) external view returns (string memory);
+  function getLicense(uint256 cID, uint256 versionNumber) external view returns (string memory);
 
   /// @notice Returns number of collections
   function getCollectionCount() external view returns (uint256);

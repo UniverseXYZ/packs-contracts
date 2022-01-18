@@ -20,6 +20,8 @@ describe("Packs Test", async function() {
   const mintPassOnePerWallet = false;
   const mintPassOnly = true;
   const mintPassFree = false;
+  const mintPassBurn = true;
+  const mintPassParams = [mintPassOnePerWallet, mintPassOnly, mintPassFree, mintPassBurn]
   const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
   const metadata = mock.data;
   const tokenCounts = [Number(metadata[0].coreData[2]), Number(metadata[1].coreData[2]), Number(metadata[2].coreData[2])];
@@ -53,16 +55,34 @@ describe("Packs Test", async function() {
       licenseURI,
       nullAddress, // mintPassAddress or nullAddress for no mint pass
       mintPassDuration,
-      mintPassOnePerWallet,
-      mintPassOnly,
-      mintPassFree
+      mintPassParams
     );
     await packsInstance.deployed();
+
+    const Packs2 = await ethers.getContractFactory("Packs", {
+      libraries: {
+        LibPackStorage: libraryInstance.address
+      },
+    });
+
+    packsInstance2 = await Packs2.deploy(
+      collectionName,
+      collectionSymbol,
+      baseURI,
+      editioned,
+      [tokenPrice, bulkBuyLimit, saleStartTime],
+      licenseURI,
+      nullAddress, // mintPassAddress or nullAddress for no mint pass
+      mintPassDuration,
+      mintPassParams
+    );
+    await packsInstance2.deployed();
   });
 
   it("should create collectible", async function() {
     let fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
     await packsInstance.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData, fees);
+    await packsInstance2.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData, fees);
   });
 
   it("should bulk add collectible", async function() {
@@ -114,6 +134,8 @@ describe("Packs Test", async function() {
 
   it("metadata should match and be updated", async function() {
     const yo = await packsInstance.tokenURI(100100008);
+    const yo2 = await packsInstance2.tokenURI(100100008);
+    console.log('hmmm', yo2);
     const tokenJSON = base64toJSON(yo);
     expect(tokenJSON.name).to.equal(`${ metadata[0].coreData[0] } #8`);
     expect(tokenJSON.description).to.equal(metadata[0].coreData[1]);
@@ -136,22 +158,24 @@ describe("Packs Test", async function() {
 
   it("should update image asset and version", async function() {
     await packsInstance.addVersion(0, 1, 'fourrrrrrr');
-    await packsInstance.updateVersion(0, 1, 1);
+    // await packsInstance.updateVersion(0, 1, 1);
+    console.log('yo wtf');
     const tokenJSON = base64toJSON(await packsInstance.tokenURI(100100008));
+    console.log(tokenJSON);
     expect(tokenJSON.image).to.equal(`${ baseURI }fourrrrrrr`);
   });
 
   it("should add new license version", async function() {
-    const license = await packsInstance.getLicense(0);
+    const license = await packsInstance.getLicense(0, 1);
     expect(license).to.equal('https://arweave.net/license');
 
     await packsInstance.addNewLicense(0, 'https://arweave.net/new-license');
-    const updatedLicense = await packsInstance.getLicense(0);
+    const updatedLicense = await packsInstance.getLicense(0, 2);
     expect(updatedLicense).to.equal('https://arweave.net/new-license');
   });
 
   it("should have original license", async function() {
-    const license = await packsInstance.getLicenseVersion(0, 1);
+    const license = await packsInstance.getLicense(0, 1);
     expect(license).to.equal('https://arweave.net/license');
   })
 
@@ -171,8 +195,11 @@ describe("Packs Test", async function() {
   const bulkBuyLimit2 = 50;
   const nullAddress2 = '0x0000000000000000000000000000000000000000';
   const mintPassAddress2 = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
-  const mintPassOnly2 = false;
-  const mintPassFree2 = true;
+  const mintPassOnePerWallet2 = false;
+  const mintPassOnly2 = true;
+  const mintPassFree2 = false;
+  const mintPassBurn2 = false;
+  const mintPassParams2 = [mintPassOnePerWallet2, mintPassOnly2, mintPassFree2, mintPassBurn2]
   const mintPassDuration2 = 600; // 600 = 10 minutes, 3600 = 1 hour
   const saleStartTime2 = saleStartTime + mintPassDuration;
 
@@ -184,9 +211,7 @@ describe("Packs Test", async function() {
       licenseURI2,
       nullAddress2, // mintPassAddress or nullAddress for no mint pass
       mintPassDuration2,
-      mintPassOnePerWallet,
-      mintPassOnly2,
-      mintPassFree2
+      mintPassParams2
     ]
 
     await packsInstance.createNewCollection(...args);

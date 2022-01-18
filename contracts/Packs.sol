@@ -24,9 +24,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration,
-    bool _mintPassOnePerWallet,
-    bool _mintPassOnly,
-    bool _mintPassFree
+    bool[] memory _mintPassParams
   ) ERC721(name, symbol) {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
 
@@ -34,7 +32,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
     ds.collectionCount = 0;
 
-    createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassOnePerWallet, _mintPassOnly, _mintPassFree);
+    createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassParams);
 
     _setBaseURI(_baseURI);
   }
@@ -58,8 +56,8 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
   }
 
-  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool _mintPassOnePerWallet, bool _mintPassOnly, bool _mintPassFree) public override onlyDAO {
-    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassOnePerWallet, _mintPassOnly, _mintPassFree);
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool[] memory _mintPassParams) public override onlyDAO {
+    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassParams);
   }
 
   function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) public override onlyDAO {
@@ -137,20 +135,16 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     LibPackStorage.addVersion(cID, collectibleId, asset);
   }
 
-  function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) public override onlyDAO {
-    LibPackStorage.updateVersion(cID, collectibleId, versionNumber);
-  }
+  // function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) public override onlyDAO {
+  //   LibPackStorage.updateVersion(cID, collectibleId, versionNumber);
+  // }
 
   function addNewLicense(uint256 cID, string memory _license) public override onlyDAO {
     LibPackStorage.addNewLicense(cID, _license);
   }
 
-  function getLicense(uint256 cID) public override view returns (string memory) {
-    return LibPackStorage.getLicense(cID);
-  }
-
-  function getLicenseVersion(uint256 cID, uint256 versionNumber) public override view returns (string memory) {
-    return LibPackStorage.getLicenseVersion(cID, versionNumber);
+  function getLicense(uint256 cID, uint256 versionNumber) public override view returns (string memory) {
+    return LibPackStorage.getLicense(cID, versionNumber);
   }
 
   function getCollectionCount() public override view returns (uint256) {

@@ -59,6 +59,7 @@ library LibPackStorage {
     bool mintPass;
     bool mintPassOnly;
     bool mintPassFree;
+    bool mintPassBurn;
     bool mintPassOnePerWallet;
     uint256 mintPassDuration;
   }
@@ -157,9 +158,7 @@ library LibPackStorage {
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration,
-    bool _mintPassOnePerWallet,
-    bool _mintPassOnly,
-    bool _mintPassFree
+    bool[] memory _mintPassParams
   ) external onlyDAO {
     require(_initParams[1] <= 50, "Bulk buy limit of 50");
     Storage storage ds = packStorage();
@@ -174,11 +173,12 @@ library LibPackStorage {
 
     if (_mintPass != address(0)) {
       ds.collection[ds.collectionCount].mintPass = true;
-      ds.collection[ds.collectionCount].mintPassOnePerWallet = _mintPassOnePerWallet;
       ds.collection[ds.collectionCount].mintPassContract = ERC721(_mintPass);
       ds.collection[ds.collectionCount].mintPassDuration = _mintPassDuration;
-      ds.collection[ds.collectionCount].mintPassOnly = _mintPassOnly;
-      ds.collection[ds.collectionCount].mintPassFree = _mintPassFree;
+      ds.collection[ds.collectionCount].mintPassOnePerWallet = _mintPassParams[0];
+      ds.collection[ds.collectionCount].mintPassOnly = _mintPassParams[1];
+      ds.collection[ds.collectionCount].mintPassFree = _mintPassParams[2];
+      ds.collection[ds.collectionCount].mintPassBurn = _mintPassParams[3];
     }
 
     ds.collectionCount++;
@@ -270,6 +270,10 @@ library LibPackStorage {
         ds.collection[cID].mintPassClaims[tokenID] = true;
         done = true;
         canClaim = true;
+        if (ds.collection[cID].mintPassBurn) {
+          // ds.collection[cID].mintPassContract.approve(msg.sender, tokenID);
+          // ds.collection[cID].mintPassContract.safeTransferFrom(msg.sender, address(0xdEaD), tokenID);
+        }
       }
 
       if (counter == count - 1) done = true;
@@ -362,15 +366,15 @@ library LibPackStorage {
   }
 
   // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
-  function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) public onlyDAO {
-    Storage storage ds = packStorage();
+  // function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) public onlyDAO {
+  //   Storage storage ds = packStorage();
 
-    require(versionNumber > 0, "Versions start at 1");
-    require(versionNumber <= ds.collection[cID].collectibles[collectibleId - 1].assets.length, "Versions must be less than asset count");
-    require(collectibleId > 0, "Collectible IDs start at 1");
-    ds.collection[cID].collectibles[collectibleId - 1].currentVersion = versionNumber;
-    emit LogUpdateVersion(cID, collectibleId, versionNumber);
-  }
+  //   require(versionNumber > 0, "Versions start at 1");
+  //   require(versionNumber <= ds.collection[cID].collectibles[collectibleId - 1].assets.length, "Versions must be less than asset count");
+  //   require(collectibleId > 0, "Collectible IDs start at 1");
+  //   ds.collection[cID].collectibles[collectibleId - 1].currentVersion = versionNumber;
+  //   emit LogUpdateVersion(cID, collectibleId, versionNumber);
+  // }
 
   // Adds new license and updates version to latest
   function addNewLicense(uint256 cID, string memory _license) public onlyDAO {
@@ -381,14 +385,14 @@ library LibPackStorage {
     emit LogAddNewLicense(cID, _license);
   }
 
-  function getLicense(uint256 cID) public view returns (string memory) {
-    Storage storage ds = packStorage();
-    return ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion - 1];
-  }
-
-  function getLicenseVersion(uint256 cID, uint256 versionNumber) public view returns (string memory) {
+  function getLicense(uint256 cID, uint256 versionNumber) public view returns (string memory) {
     Storage storage ds = packStorage();
     return ds.collection[cID].licenseURI[versionNumber - 1];
+  }
+
+  function getCurrentLicense(uint256 cID) public view returns (string memory) {
+    Storage storage ds = packStorage();
+    return ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion - 1];
   }
 
   // Dynamic base64 encoded metadata generation using on-chain metadata and edition numbers
@@ -445,7 +449,7 @@ library LibPackStorage {
                 collection.baseURI,
                 collectible.assets[asset],
                 '", "license": "',
-                getLicense(cID),
+                getCurrentLicense(cID),
                 '", "attributes": [',
                 encodedMetadata,
                 '], "secondaryAttributes": [',
