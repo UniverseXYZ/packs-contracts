@@ -135,8 +135,8 @@ describe("Packs Test", async function() {
   it("metadata should match and be updated", async function() {
     const yo = await packsInstance.tokenURI(100100008);
     const yo2 = await packsInstance2.tokenURI(100100008);
-    console.log('hmmm', yo2);
     const tokenJSON = base64toJSON(yo);
+    console.log(tokenJSON);
     expect(tokenJSON.name).to.equal(`${ metadata[0].coreData[0] } #8`);
     expect(tokenJSON.description).to.equal(metadata[0].coreData[1]);
     expect(tokenJSON.image).to.equal(`${ baseURI }zhKl1KoFG4RSZqCRjnBudTvF27-aGDpqNv5wRSZe5-w`);

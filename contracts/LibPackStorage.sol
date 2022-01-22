@@ -419,6 +419,8 @@ library LibPackStorage {
         collection.metadata[collectibleId].name[i],
         '", "value":"',
         collection.metadata[collectibleId].value[i],
+        '", "permanent":"',
+        collection.metadata[collectibleId].modifiable[i] ? 'false' : 'true',
         '"}',
         i == collection.metadata[collectibleId].propertyCount - 1 ? '' : ',')
       );
@@ -432,6 +434,8 @@ library LibPackStorage {
         collection.secondaryMetadata[collectibleId].name[i],
         '", "value":"',
         collection.secondaryMetadata[collectibleId].value[i],
+        '", "permanent":"',
+        collection.secondaryMetadata[collectibleId].modifiable[i] ? 'false' : 'true',
         '"}',
         i == collection.secondaryMetadata[collectibleId].propertyCount - 1 ? '' : ',')
       );
