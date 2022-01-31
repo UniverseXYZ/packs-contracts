@@ -28,7 +28,7 @@ async function main() {
     editioned,
     [tokenPrice, bulkBuyLimit, saleStartTime],
     licenseURI,
-    mintPassAddress, // mintPassAddress or nullAddress for no mint pass
+    nullAddress, // mintPassAddress or nullAddress for no mint pass
     mintPassDuration,
     mintPassParams
   ];
@@ -101,7 +101,7 @@ async function main() {
     editioned2,
     [tokenPrice2, bulkBuyLimit2, saleStartTime2],
     licenseURI2,
-    mintPassAddress2, // mintPassAddress or nullAddress for no mint pass
+    nullAddress, // mintPassAddress or nullAddress for no mint pass
     mintPassDuration2,
     mintPassParams2
   ]

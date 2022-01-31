@@ -186,6 +186,13 @@ library LibPackStorage {
       ds.collection[ds.collectionCount].mintPassOnly = _mintPassParams[1];
       ds.collection[ds.collectionCount].mintPassFree = _mintPassParams[2];
       ds.collection[ds.collectionCount].mintPassBurn = _mintPassParams[3];
+    } else {
+      ds.collection[ds.collectionCount].mintPass = false;
+      ds.collection[ds.collectionCount].mintPassDuration = 0;
+      ds.collection[ds.collectionCount].mintPassOnePerWallet = false;
+      ds.collection[ds.collectionCount].mintPassOnly = false;
+      ds.collection[ds.collectionCount].mintPassFree = false;
+      ds.collection[ds.collectionCount].mintPassBurn = false;
     }
 
     ds.collectionCount++;
