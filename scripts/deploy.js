@@ -65,8 +65,9 @@ async function main() {
     metaData.push(metadata[i].metaData)
     secondaryMetaData.push(metadata[i].secondaryMetaData)
     fees.push([])
-    if (i % 5 === 0) {
+    if ((i+1) % 5 === 0) {
       await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+      console.log('Bulk collectibles added', coreData.length);
       coreData = [];
       assets = [];
       metaData = [];
@@ -77,7 +78,10 @@ async function main() {
     i++;
   }
 
-  if (coreData.length > 0) await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+  if (coreData.length > 0) {
+    await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+    console.log('Bulk collectibles added', coreData.length);
+  }
 
   console.log('Instinct metadata deployed');
 
@@ -121,8 +125,9 @@ async function main() {
     metaData.push(metadata[i].metaData)
     secondaryMetaData.push(metadata[i].secondaryMetaData)
     fees.push([])
-    if (i % 5 === 0) {
+    if ((i+1) % 5 === 0) {
       await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+      console.log('Bulk collectibles added', coreData.length);
       coreData = [];
       assets = [];
       metaData = [];
@@ -133,7 +138,10 @@ async function main() {
     i++;
   }
 
-  if (coreData.length > 0) await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+  if (coreData.length > 0) {
+    await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+    console.log('Bulk collectibles added', coreData.length);
+  }
 
   console.log('Uncaged metadata deployed');
 
