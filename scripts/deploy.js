@@ -29,7 +29,7 @@ async function main() {
     editioned,
     [tokenPrice, bulkBuyLimit, saleStartTime],
     licenseURI,
-    nullAddress, // mintPassAddress or nullAddress for no mint pass
+    mintPassAddress, // mintPassAddress or nullAddress for no mint pass
     mintPassDuration,
     mintPassParams
   ];
@@ -111,7 +111,7 @@ async function main() {
     editioned2,
     [tokenPrice2, bulkBuyLimit2, saleStartTime2],
     licenseURI2,
-    nullAddress, // mintPassAddress or nullAddress for no mint pass
+    mintPassAddress2, // mintPassAddress or nullAddress for no mint pass
     mintPassDuration2,
     mintPassParams2
   ]
@@ -173,14 +173,6 @@ async function main() {
   }
 
   console.log('Packs verified');
-
-  const bulkCount = 50;
-  const totalCount = 1500;
-  const counted = 0;
-  while (counted < totalCount) {
-    await packsInstance.bulkMintPack(0, bulkCount, {value: tokenPrice.mul(bulkCount) });
-    counted += bulkCount;
-  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
