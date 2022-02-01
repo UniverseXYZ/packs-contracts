@@ -590,7 +590,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21800083", "1"],
         ["Duration", "3:30", "1"],
-        ["Audio", "https://arweave.net/", "1"],
+        ["Audio", "https://arweave.net/Kg0LPxzPkHPnDV3CIwlY8efjRwSMMXFTG5V5AI-0xvY", "1"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21800083.mp4", "1"]
       ]
     },
@@ -617,7 +617,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21900405", "1"],
         ["Duration", "2:36", "1"],
-        ["Audio", "https://arweave.net/", "1"],
+        ["Audio", "https://arweave.net/_JHbkMwV7hujjbf-vGhuSNjCOlK8__8AWAOLkCb6spk", "1"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900405.mp4", "1"]
       ]
     },
@@ -644,7 +644,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21900299", "1"],
         ["Duration", "4:53", "1"],
-        ["Audio", "https://arweave.net/", "1"],
+        ["Audio", "https://arweave.net/G9PYJ7qVfdxC_x7DffBwG3P6szQghOJ_rhKdyUNUSAQ", "1"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900299.mp4", "1"]
       ]
     },
@@ -1008,7 +1008,7 @@
         "30",
         "1"
       ],
-      "assets": ["_zjvrInHgio4gYvr2JeBrfgqZaDDNgz22g4962A0fRQ"],
+      "assets": ["SsxkXYcMnAbC7cgs1cIP4ruz6IYDbaElfvwBjiI18Oc"],
       "metaData": [
 	["Uncaged", "Rarity: QUARTZ", "1"],
  	["Uncaged", "Musician: Fransis Derelle, CRaymak & HVDES", "0"],
@@ -1294,7 +1294,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21800283", "1"],
         ["Duration", "3:37", "1"],
-        ["Audio", "https://arweave.net/", "1"],
+        ["Audio", "https://arweave.net/1xXna84r1ybmULkedV-1gAqwbEUlutLV_2h1u0spkM0", "1"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21800283.mp4", "1"]
       ]
     },
@@ -1305,7 +1305,7 @@
         "30",
         "1"
       ],
-      "assets": [""],
+      "assets": ["_zjvrInHgio4gYvr2JeBrfgqZaDDNgz22g4962A0fRQ"],
       "metaData": [
 	["Uncaged", "Rarity: QUARTZ", "1"],
  	["Uncaged", "Musician: Bossfight", "0"],
@@ -1348,7 +1348,7 @@
       "secondaryMetaData": [
         ["ISRC", "CA6D21900162", "1"],
         ["Duration", "2:56", "1"],
-        ["Audio", "https://arweave.net/", "1"],
+        ["Audio", "https://arweave.net/64roebJH6FD2R1FlCx5IEGUEBi3HXamsKaDfecIoquk", "1"],
 	["Stream", "https://cdn.relics.xyz/nfts/S1-CA6D21900162.mp4", "1"]
       ]
     }

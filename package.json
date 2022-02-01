@@ -10,11 +10,13 @@
     "hardhat-contract-sizer": "^2.0.3"
   },
   "dependencies": {
+    "@ethersproject/hardware-wallets": "^5.5.0",
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@openzeppelin/contracts": "^3.4.1",
     "base64-sol": "^1.0.1",
     "chai": "^4.3.4",
     "dotenv": "^10.0.0",
+    "eth-provider": "^0.10.0",
     "hardhat-gas-reporter": "^1.0.4"
   }
 }

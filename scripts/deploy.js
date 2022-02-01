@@ -1,13 +1,14 @@
 const hre = require("hardhat");
+const { LedgerSigner } = require("@ethersproject/hardware-wallets");    
 const mock = require('../test/mock-deploy.json');
 
 async function main() {
-  const collectionName = 'RELICS TEST';
-  const collectionSymbol = 'MONSTERCAT';
+  const collectionName = 'RELICS';
+  const collectionSymbol = 'RELICS';
   const baseURI = 'https://arweave.net/';
   const licenseURI = 'https://arweave.net/license';
   const editioned = true;
-  const tokenPrice = ethers.utils.parseEther("0.0007");
+  const tokenPrice = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit = 50;
   const nullAddress = '0x0000000000000000000000000000000000000000';
   const mintPassAddress = '0x9657f64f9542422c798119bbcd0f27a0baec2dcc';
@@ -35,7 +36,12 @@ async function main() {
 
   let packsInstance;
 
-  const LibPackStorage = await hre.ethers.getContractFactory("LibPackStorage");
+  let LibPackStorage = await hre.ethers.getContractFactory("LibPackStorage");
+  console.log('hello');
+  const ledger = await new LedgerSigner(LibPackStorage.signer.provider, "hid", "m/44'/60'/0'/0"); 
+  console.log('connecting', ledger);
+  LibPackStorage = await LibPackStorage.connect(ledger)
+  console.log('connected', LibPackStorage);
   const libraryInstance = await LibPackStorage.deploy();
   await libraryInstance.deployed();
 
@@ -89,7 +95,7 @@ async function main() {
 
   const licenseURI2 = 'https://arweave.net/license';
   const editioned2 = true;
-  const tokenPrice2 = ethers.utils.parseEther("0.0007");
+  const tokenPrice2 = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit2 = 50;
   const nullAddress2 = '0x0000000000000000000000000000000000000000';
   const mintPassAddress2 = '0x9657f64f9542422c798119bbcd0f27a0baec2dcc';
@@ -167,6 +173,14 @@ async function main() {
   }
 
   console.log('Packs verified');
+
+  const bulkCount = 50;
+  const totalCount = 1500;
+  const counted = 0;
+  while (counted < totalCount) {
+    await packsInstance.bulkMintPack(0, bulkCount, {value: tokenPrice.mul(bulkCount) });
+    counted += bulkCount;
+  }
 }
 
 // We recommend this pattern to be able to use async/await everywhere
