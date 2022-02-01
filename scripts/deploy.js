@@ -6,7 +6,7 @@ async function main() {
   const collectionName = 'RELICS';
   const collectionSymbol = 'RELICS';
   const baseURI = 'https://arweave.net/';
-  const licenseURI = 'https://arweave.net/license';
+  const licenseURI = 'https://arweave.net/bUuJP82No7MGMJwk5mGrtT8tKj3l0-jszKfNdWabk2Q';
   const editioned = true;
   const tokenPrice = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit = 50;
@@ -94,7 +94,7 @@ async function main() {
 
   metadata = mock.uncaged;
 
-  const licenseURI2 = 'https://arweave.net/license';
+  const licenseURI2 = 'https://arweave.net/bUuJP82No7MGMJwk5mGrtT8tKj3l0-jszKfNdWabk2Q';
   const editioned2 = true;
   const tokenPrice2 = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit2 = 50;
