@@ -37,11 +37,11 @@ async function main() {
   let packsInstance;
 
   let LibPackStorage = await hre.ethers.getContractFactory("LibPackStorage");
-  console.log('hello');
-  const ledger = await new LedgerSigner(LibPackStorage.signer.provider, "hid", "m/44'/60'/0'/0"); 
-  console.log('connecting', ledger);
-  LibPackStorage = await LibPackStorage.connect(ledger)
-  console.log('connected', LibPackStorage);
+  // console.log('hello');
+  // const ledger = await new LedgerSigner(LibPackStorage.signer.provider, "hid", "m/44'/60'/0'/0"); 
+  // console.log('connecting', ledger);
+  // LibPackStorage = await LibPackStorage.connect(ledger)
+  // console.log('connected', LibPackStorage);
   const libraryInstance = await LibPackStorage.deploy();
   await libraryInstance.deployed();
 
