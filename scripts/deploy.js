@@ -1,5 +1,5 @@
 const hre = require("hardhat");
-const { LedgerSigner } = require("@ethersproject/hardware-wallets");    
+// const { LedgerSigner } = require("@ethersproject/hardware-wallets");    
 const mock = require('../test/mock-deploy.json');
 
 async function main() {
