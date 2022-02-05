@@ -272,14 +272,15 @@ library LibPackStorage {
     emit LogAddCollectible(cID, _coreData[0]);
   }
 
-  function checkTokensForMintPass(uint256 cID, address minter, address contractAddress) private returns (bool) {
+  function checkTokensForMintPass(uint256 cID, uint256 mintPassTokenId, address minter, address contractAddress) private returns (bool) {
     Storage storage ds = packStorage();
     uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
     bool done = false;
     uint256 counter = 0;
     bool canClaim = false;
+    bool supportsEnumerable = ds.collection[cID].mintPassContract.supportsInterface(0x780e9d63);
     while (!done && count > 0) {
-      uint256 tokenID = ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter);
+      uint256 tokenID = supportsEnumerable ? ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter) : mintPassTokenId;
       if (ds.collection[cID].mintPassClaims[tokenID] != true) {
         ds.collection[cID].mintPassClaims[tokenID] = true;
         done = true;
@@ -289,20 +290,20 @@ library LibPackStorage {
         }
       }
 
-      if (counter == count - 1) done = true;
+      if (counter == count - 1 || !supportsEnumerable) done = true;
       else counter++;
     }
 
     return canClaim;
   }
 
-  function checkMintPass(address relics, uint256 cID, address user, address contractAddress) external relicSafety(relics) returns (bool) {
+  function checkMintPass(address relics, uint256 cID, uint256 mintPassTokenId, address user, address contractAddress) external relicSafety(relics) returns (bool) {
     Storage storage ds = packStorage();
 
     bool canMintPass = false;
     if (ds.collection[cID].mintPass) {
       if (!ds.collection[cID].mintPassOnePerWallet || !ds.collection[cID].mintPassClaimed[user]) {
-        if (checkTokensForMintPass(cID, user, contractAddress)) {
+        if (checkTokensForMintPass(cID, mintPassTokenId, user, contractAddress)) {
           canMintPass = true;
           if (ds.collection[cID].mintPassOnePerWallet) ds.collection[cID].mintPassClaimed[user] = true;
         }

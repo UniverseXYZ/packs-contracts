@@ -58,7 +58,8 @@ interface IPacks is IERC721Enumerable {
 
   /// @notice Mints an NFT with random token ID
   /// @param cID Collection ID
-  function mintPack(uint256 cID) external payable;
+  /// @param mintPassTokenId Provide token ID to use as mint pass if appicable
+  function mintPack(uint256 cID, uint256 mintPassTokenId) external payable;
 
   /// @notice Mints multiple NFTs with random token IDs
   /// @param cID Collection ID

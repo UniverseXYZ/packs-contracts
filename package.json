@@ -13,10 +13,13 @@
     "@ethersproject/hardware-wallets": "^5.5.0",
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@openzeppelin/contracts": "^3.4.1",
+    "axios": "^0.25.0",
     "base64-sol": "^1.0.1",
     "chai": "^4.3.4",
-    "dotenv": "^10.0.0",
+    "dotenv": "^16.0.0",
     "eth-provider": "^0.10.0",
-    "hardhat-gas-reporter": "^1.0.4"
+    "hardhat-gas-reporter": "^1.0.4",
+    "ololog": "^1.1.175",
+    "web3": "^1.7.0"
   }
 }

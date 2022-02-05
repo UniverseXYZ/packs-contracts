@@ -31,14 +31,16 @@ module.exports = {
   },
   networks: {
     hardhat: {
-      allowUnlimitedContractSize: true
+      forking: {
+        url: `https://eth-mainnet.alchemyapi.io/v2/${ process.env.ALCHEMY_KEY }`,
+      },
     },
-    ropsten: {
-      url: `https://ropsten.infura.io/v3/${ process.env.INFURA_KEY }`,
+    mainnet: {
+      url: `https://eth-mainnet.alchemyapi.io/v2/${ process.env.ALCHEMY_KEY }`,
       accounts: [`0x${ process.env.MM_PRIVATE_KEY }`],
     },
     rinkeby: {
-      url: `https://rinkeby.infura.io/v3/${ process.env.INFURA_KEY }`,
+      url: `https://eth-rinkeby.alchemyapi.io/v2/${ process.env.ALCHEMY_RINKEBY }`,
       accounts: [`0x${ process.env.MM_PRIVATE_KEY }`],
     },
   },

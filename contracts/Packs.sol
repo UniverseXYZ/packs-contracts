@@ -83,9 +83,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     return tokenID;
   }
 
-  function mintPack(uint256 cID) public override payable nonReentrant {
+  function mintPack(uint256 cID, uint256 mintPassTokenId) public override payable nonReentrant {
     LibPackStorage.Storage storage ds = LibPackStorage.packStorage();
-    bool canMintPass = LibPackStorage.checkMintPass(address(this), cID, msg.sender, address(this));
+    bool canMintPass = LibPackStorage.checkMintPass(address(this), cID, mintPassTokenId, msg.sender, address(this));
  
     uint256 excessAmount;
     if (canMintPass && ds.collection[cID].mintPassFree) excessAmount = msg.value.sub(0);

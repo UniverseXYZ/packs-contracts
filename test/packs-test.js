@@ -104,14 +104,14 @@ describe("Packs Test", async function() {
   it("should mint one token", async function() {
     await ethers.provider.send('evm_setNextBlockTimestamp', [saleStartTime]);
     await ethers.provider.send('evm_mine');
-    await packsInstance.mintPack(0, {value: tokenPrice });
+    await packsInstance.mintPack(0, 0, {value: tokenPrice });
     expect(await packsInstance.remainingTokens(0)).to.equal(59);
     // await packsInstance.functions['mint()']({value: tokenPrice})
     // expect((await packsInstance.getTokens()).length).to.equal(totalTokenCount - 1);
   });
 
   it("should reject mints with insufficient funds", async function() {
-    expect(packsInstance.mintPack(0, {value: tokenPrice.div(2) })).to.be.reverted;
+    expect(packsInstance.mintPack(0, 0, {value: tokenPrice.div(2) })).to.be.reverted;
     expect(packsInstance.bulkMintPack(0, 50, {value: tokenPrice.mul(49) })).to.be.reverted;
   });
 
@@ -125,7 +125,7 @@ describe("Packs Test", async function() {
     await packsInstance.bulkMintPack(0, totalTokenCount - 1 - bulkCount, {value: tokenPrice.mul(totalTokenCount - 1 - bulkCount) });
     // expect((await packsInstance.getTokens()).length).to.equal(0);
 
-    expect(packsInstance.mintPack(0, {value: tokenPrice })).to.be.reverted;
+    expect(packsInstance.mintPack(0, 0, {value: tokenPrice })).to.be.reverted;
 
     const [owner] = await ethers.getSigners();
     expect(await packsInstance.ownerOf(100100001)).to.equal(owner.address);
@@ -240,13 +240,13 @@ describe("Packs Test", async function() {
   it("should mint one token", async function() {
     await ethers.provider.send('evm_setNextBlockTimestamp', [saleStartTime2]);
     await ethers.provider.send('evm_mine');
-    await packsInstance.mintPack(1, {value: tokenPrice2 });
+    await packsInstance.mintPack(1, 0, {value: tokenPrice2 });
     // await packsInstance.functions['mint()']({value: tokenPrice})
     // expect((await packsInstance.getTokens()).length).to.equal(totalTokenCount - 1);
   });
 
   it("should reject mints with insufficient funds", async function() {
-    expect(packsInstance.mintPack(1, {value: tokenPrice2.div(2) })).to.be.reverted;
+    expect(packsInstance.mintPack(1, 0, {value: tokenPrice2.div(2) })).to.be.reverted;
     expect(packsInstance.bulkMintPack(1, 50, {value: tokenPrice2.mul(49) })).to.be.reverted;
   });
 
