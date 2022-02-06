@@ -17,12 +17,12 @@ library LibPackStorage {
   }
 
   struct SingleCollectible {
+    uint16 count; // Amount of editions per collectible
+    uint16 totalVersionCount; // Total number of existing states
+    uint8 currentVersion; // Current existing state
     string title; // Collectible name
     string description; // Collectible description
-    uint256 count; // Amount of editions per collectible
     string[] assets; // Each asset in array is a version
-    uint256 totalVersionCount; // Total number of existing states
-    uint256 currentVersion; // Current existing state
   }
 
   struct Metadata {
@@ -33,9 +33,26 @@ library LibPackStorage {
   }
 
   struct Collection {
-    bool initialized;
+    uint16 collectibleCount; // Total unique assets count
+    uint16 bulkBuyLimit;
+    uint16 licenseVersion; // Tracker of latest license
+    uint256 totalTokenCount; // Total NFT count to be minted
+    uint256 tokenPrice;
+    uint256 saleStartTime;
 
     string baseURI; // Token ID base URL
+
+    bool initialized;
+    bool editioned; // Display edition # in token name
+    bool mintPass;
+    bool mintPassOnly;
+    bool mintPassFree;
+    bool mintPassBurn;
+    bool mintPassOnePerWallet;
+    uint256 mintPassDuration;
+
+    ERC721 mintPassContract;
+    uint32[] shuffleIDs;
 
     mapping (uint256 => SingleCollectible) collectibles; // Unique assets
     mapping (uint256 => Metadata) metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
@@ -44,24 +61,6 @@ library LibPackStorage {
     mapping (uint256 => string) licenseURI; // URL to external license or file
     mapping (address => bool) mintPassClaimed;
     mapping (uint256 => bool) mintPassClaims;
-
-    uint256 collectibleCount; // Total unique assets count
-    uint256 totalTokenCount; // Total NFT count to be minted
-    uint256 tokenPrice;
-    uint256 bulkBuyLimit;
-    uint256 saleStartTime;
-    bool editioned; // Display edition # in token name
-    uint256 licenseVersion; // Tracker of latest license
-
-    uint64[] shuffleIDs;
-
-    ERC721 mintPassContract;
-    bool mintPass;
-    bool mintPassOnly;
-    bool mintPassFree;
-    bool mintPassBurn;
-    bool mintPassOnePerWallet;
-    uint256 mintPassDuration;
   }
 
   struct Storage {
@@ -153,7 +152,7 @@ library LibPackStorage {
     Storage storage ds = packStorage();
 
     for (uint256 i = 0; i < editions; i++) {
-      uint64 tokenID = uint64((cID + 1) * 100000000) + uint64((collectibleCount + 1) * 100000) + uint64(i + 1);
+      uint32 tokenID = uint32((cID + 1) * 100000000) + uint32((collectibleCount + 1) * 100000) + uint32(i + 1);
       ds.collection[cID].shuffleIDs.push(tokenID);
     }
   }
@@ -173,7 +172,7 @@ library LibPackStorage {
     ds.collection[ds.collectionCount].baseURI = _baseURI;
     ds.collection[ds.collectionCount].editioned = _editioned;
     ds.collection[ds.collectionCount].tokenPrice = _initParams[0];
-    ds.collection[ds.collectionCount].bulkBuyLimit = _initParams[1];
+    ds.collection[ds.collectionCount].bulkBuyLimit = uint16(_initParams[1]);
     ds.collection[ds.collectionCount].saleStartTime = _initParams[2];
     ds.collection[ds.collectionCount].licenseURI[0] = _licenseURI;
     ds.collection[ds.collectionCount].licenseVersion = 1;
@@ -225,10 +224,10 @@ library LibPackStorage {
     collection.collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
       description: _coreData[1],
-      count: safeParseInt(_coreData[2]),
+      count: uint16(safeParseInt(_coreData[2])),
       assets: _assets,
-      currentVersion: safeParseInt(_coreData[3]),
-      totalVersionCount: _assets.length
+      currentVersion: uint8(safeParseInt(_coreData[3])),
+      totalVersionCount: uint16(_assets.length)
     });
 
     string[] memory propertyNames = new string[](_metadataValues.length);

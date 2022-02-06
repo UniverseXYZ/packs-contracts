@@ -1,6 +1,6 @@
 const { expect } = require("chai");
 const { utils } = require('ethers');
-const mock = require('./mock-instinct.json');
+const mock = require('./mock-test.json');
 
 function base64toJSON(string) {
   return JSON.parse(Buffer.from(string.replace('data:application/json;base64,',''), 'base64').toString())
