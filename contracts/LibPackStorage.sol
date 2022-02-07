@@ -19,17 +19,23 @@ library LibPackStorage {
   struct SingleCollectible {
     uint16 count; // Amount of editions per collectible
     uint16 totalVersionCount; // Total number of existing states
-    uint8 currentVersion; // Current existing state
+    uint16 currentVersion; // Current existing state
     string title; // Collectible name
     string description; // Collectible description
     string[] assets; // Each asset in array is a version
   }
 
   struct Metadata {
-    string[] name; // Trait or attribute property field name
+    uint8[] name; // Trait or attribute property field name
     string[] value; // Trait or attribute property value
     bool[] modifiable; // Can owner modify the value of field
-    uint256 propertyCount; // Tracker of total attributes
+    uint16 propertyCount; // Tracker of total attributes
+  }
+
+  struct MetadataStore {
+    uint8 propertyKey;
+    string value;
+    bool modifiable;
   }
 
   struct Collection {
@@ -55,8 +61,8 @@ library LibPackStorage {
     uint32[] shuffleIDs;
 
     mapping (uint256 => SingleCollectible) collectibles; // Unique assets
+    mapping (uint256 => string) metadataKeys;
     mapping (uint256 => Metadata) metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
-    mapping (uint256 => Metadata) secondaryMetadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
     mapping (uint256 => Fee[]) secondaryFees;
     mapping (uint256 => string) licenseURI; // URL to external license or file
     mapping (address => bool) mintPassClaimed;
@@ -148,10 +154,10 @@ library LibPackStorage {
    * Map token order w/ URI upon mints
    * Sample token ID (edition #77) with collection of 12 different assets: 1200077
    */
-  function createTokenIDs(uint256 cID, uint256 collectibleCount, uint256 editions) private {
+  function createTokenIDs(uint256 cID, uint256 collectibleCount, uint16 editions) private {
     Storage storage ds = packStorage();
 
-    for (uint256 i = 0; i < editions; i++) {
+    for (uint16 i = 0; i < editions; i++) {
       uint32 tokenID = uint32((cID + 1) * 100000000) + uint32((collectibleCount + 1) * 100000) + uint32(i + 1);
       ds.collection[cID].shuffleIDs.push(tokenID);
     }
@@ -161,6 +167,7 @@ library LibPackStorage {
     string memory _baseURI,
     bool _editioned,
     uint256[] memory _initParams,
+    string[] memory _metadataKeys,
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration,
@@ -194,13 +201,17 @@ library LibPackStorage {
       ds.collection[ds.collectionCount].mintPassBurn = false;
     }
 
+    for (uint8 i; i < _metadataKeys.length; i++) {
+      ds.collection[ds.collectionCount].metadataKeys[i] = _metadataKeys[i];
+    }
+
     ds.collectionCount++;
 
     emit LogCreateNewCollection(ds.collectionCount);
   }
 
   // Add single collectible asset with main info and metadata properties
-  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, Fee[] memory _fees) external onlyDAO {
+  function addCollectible(uint256 cID, string[] memory _coreData, uint16 _editions, string[] memory _assets, MetadataStore[] memory _metadataValues, Fee[] memory _fees) external onlyDAO {
     Storage storage ds = packStorage();
 
     Collection storage collection = ds.collection[cID];
@@ -218,51 +229,34 @@ library LibPackStorage {
     }
 
     require(sum < 10000, "Fee should be less than 100%");
-    require(safeParseInt(_coreData[2]) > 0, "NFTs for given asset must be greater than 0");
-    require(safeParseInt(_coreData[3]) > 0 && safeParseInt(_coreData[3]) <= _assets.length, "Version cannot exceed asset count");
+    require(_editions > 0, "NFTs for given asset must be greater than 0");
 
     collection.collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
       description: _coreData[1],
-      count: uint16(safeParseInt(_coreData[2])),
+      count: _editions,
+      currentVersion: uint16(_assets.length),
       assets: _assets,
-      currentVersion: uint8(safeParseInt(_coreData[3])),
       totalVersionCount: uint16(_assets.length)
     });
 
-    string[] memory propertyNames = new string[](_metadataValues.length);
+    uint8[] memory propertyNames = new uint8[](_metadataValues.length);
     string[] memory propertyValues = new string[](_metadataValues.length);
     bool[] memory modifiables = new bool[](_metadataValues.length);
     for (uint256 i = 0; i < _metadataValues.length; i++) {
-      propertyNames[i] = _metadataValues[i][0];
-      propertyValues[i] = _metadataValues[i][1];
-      modifiables[i] = (keccak256(abi.encodePacked((_metadataValues[i][2]))) == keccak256(abi.encodePacked(('1')))); // 1 is modifiable, 0 is permanent
+      propertyNames[i] = _metadataValues[i].propertyKey;
+      propertyValues[i] = _metadataValues[i].value;
+      modifiables[i] = _metadataValues[i].modifiable; // 1 is modifiable, 0 is permanent
     }
 
     collection.metadata[collectibleCount] = Metadata({
       name: propertyNames,
       value: propertyValues,
       modifiable: modifiables,
-      propertyCount: _metadataValues.length
+      propertyCount: uint16(_metadataValues.length)
     });
 
-    propertyNames = new string[](_secondaryMetadata.length);
-    propertyValues = new string[](_secondaryMetadata.length);
-    modifiables = new bool[](_secondaryMetadata.length);
-    for (uint256 i = 0; i < _secondaryMetadata.length; i++) {
-      propertyNames[i] = _secondaryMetadata[i][0];
-      propertyValues[i] = _secondaryMetadata[i][1];
-      modifiables[i] = (keccak256(abi.encodePacked((_secondaryMetadata[i][2]))) == keccak256(abi.encodePacked(('1')))); // 1 is modifiable, 0 is permanent
-    }
-
-    collection.secondaryMetadata[collectibleCount] = Metadata({
-      name: propertyNames,
-      value: propertyValues,
-      modifiable: modifiables,
-      propertyCount: _secondaryMetadata.length
-    });
-
-    uint256 editions = safeParseInt(_coreData[2]);
+    uint16 editions = _editions;
     createTokenIDs(cID, collectibleCount, editions);
 
     collection.collectibleCount++;
@@ -423,28 +417,13 @@ library LibPackStorage {
       encodedMetadata = string(abi.encodePacked(
         encodedMetadata,
         '{"trait_type":"',
-        collection.metadata[collectibleId].name[i],
+        collection.metadataKeys[collection.metadata[collectibleId].name[i]],
         '", "value":"',
         collection.metadata[collectibleId].value[i],
         '", "permanent":"',
         collection.metadata[collectibleId].modifiable[i] ? 'false' : 'true',
         '"}',
         i == collection.metadata[collectibleId].propertyCount - 1 ? '' : ',')
-      );
-    }
-
-    string memory encodedSecondaryMetadata = '';
-    for (uint i = 0; i < collection.secondaryMetadata[collectibleId].propertyCount; i++) {
-      encodedSecondaryMetadata = string(abi.encodePacked(
-        encodedSecondaryMetadata,
-        '{"trait_type":"',
-        collection.secondaryMetadata[collectibleId].name[i],
-        '", "value":"',
-        collection.secondaryMetadata[collectibleId].value[i],
-        '", "permanent":"',
-        collection.secondaryMetadata[collectibleId].modifiable[i] ? 'false' : 'true',
-        '"}',
-        i == collection.secondaryMetadata[collectibleId].propertyCount - 1 ? '' : ',')
       );
     }
 
@@ -469,8 +448,6 @@ library LibPackStorage {
                 getCurrentLicense(cID),
                 '", "attributes": [',
                 encodedMetadata,
-                '], "secondaryAttributes": [',
-                encodedSecondaryMetadata,
                 '] }'
               )
             )

@@ -24,7 +24,8 @@ describe("Packs Test", async function() {
   const mintPassParams = [mintPassOnePerWallet, mintPassOnly, mintPassFree, mintPassBurn]
   const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
   const metadata = mock.data;
-  const tokenCounts = [Number(metadata[0].coreData[2]), Number(metadata[1].coreData[2]), Number(metadata[2].coreData[2])];
+  const metadataKeys = mock.metadataKeys;
+  const tokenCounts = [10, 20, 30];
 
   let totalTokenCount = 0;
   tokenCounts.forEach(e => totalTokenCount += e);
@@ -52,6 +53,7 @@ describe("Packs Test", async function() {
       baseURI,
       editioned,
       [tokenPrice, bulkBuyLimit, saleStartTime],
+      metadataKeys,
       licenseURI,
       nullAddress, // mintPassAddress or nullAddress for no mint pass
       mintPassDuration,
@@ -71,6 +73,7 @@ describe("Packs Test", async function() {
       baseURI,
       editioned,
       [tokenPrice, bulkBuyLimit, saleStartTime],
+      metadataKeys,
       licenseURI,
       nullAddress, // mintPassAddress or nullAddress for no mint pass
       mintPassDuration,
@@ -81,20 +84,21 @@ describe("Packs Test", async function() {
 
   it("should create collectible", async function() {
     let fees = [[randomWallet1.address, feeSplit1], [randomWallet2.address, feeSplit2]];
-    await packsInstance.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData, fees);
-    await packsInstance2.addCollectible(0, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData, fees);
+    await packsInstance.bulkAddCollectible(0, [metadata[0].coreData], [metadata[0].editions], [metadata[0].assets], [metadata[0].metaData], [fees]);
+    await packsInstance2.bulkAddCollectible(0, [metadata[0].coreData], [metadata[0].editions], [metadata[0].assets], [metadata[0].metaData], [fees]);
   });
 
   it("should bulk add collectible", async function() {
     const coreData = [metadata[1].coreData, metadata[2].coreData];
     const assets = [metadata[1].assets, metadata[2].assets];
+    const editions = [metadata[1].editions, metadata[2].editions]
     const metaData = [metadata[1].metaData, metadata[2].metaData];
-    const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
+    // const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
     let fees = [
       [[randomWallet2.address, feeSplit1], [randomWallet1.address, feeSplit2]],
       [[randomWallet1.address, feeSplit2], [randomWallet2.address, feeSplit1]]
     ];
-    await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+    await packsInstance.bulkAddCollectible(0, coreData, editions, assets, metaData, fees);
   });
 
   // it("should match the total token count", async function() {
@@ -116,7 +120,7 @@ describe("Packs Test", async function() {
   });
 
   it("should bulk mint all tokens", async function() {
-    const bulkCount = Number(metadata[2].coreData[2]);
+    const bulkCount = Number(20);
     expect(packsInstance.bulkMintPack(0, 10000, {value: tokenPrice.mul(10000) })).to.be.reverted;
 
     await packsInstance.bulkMintPack(0, bulkCount, {value: tokenPrice.mul(bulkCount) });
@@ -140,7 +144,7 @@ describe("Packs Test", async function() {
     expect(tokenJSON.name).to.equal(`${ metadata[0].coreData[0] } #8`);
     expect(tokenJSON.description).to.equal(metadata[0].coreData[1]);
     expect(tokenJSON.image).to.equal(`${ baseURI }zhKl1KoFG4RSZqCRjnBudTvF27-aGDpqNv5wRSZe5-w`);
-    expect(tokenJSON.attributes[0].trait_type).to.equal(metadata[0].metaData[0][0]);
+    expect(tokenJSON.attributes[0].trait_type).to.equal(metadataKeys[0]);
     expect(tokenJSON.attributes[0].value).to.equal(metadata[0].metaData[0][1]);
   });
 
@@ -148,7 +152,7 @@ describe("Packs Test", async function() {
     const newMetadata = 'new new';
     await packsInstance.updateMetadata(0, 1, 0, newMetadata);
     const tokenJSON = base64toJSON(await packsInstance.tokenURI(100100008));
-    expect(tokenJSON.attributes[0].trait_type).to.equal(metadata[0].metaData[0][0]);
+    expect(tokenJSON.attributes[0].trait_type).to.equal(metadataKeys[0]);
     expect(tokenJSON.attributes[0].value).to.equal(newMetadata);
   });
 
@@ -206,6 +210,7 @@ describe("Packs Test", async function() {
       baseURI,
       editioned2,
       [tokenPrice2, bulkBuyLimit2, saleStartTime2],
+      metadataKeys,
       licenseURI2,
       nullAddress2, // mintPassAddress or nullAddress for no mint pass
       mintPassDuration2,
@@ -222,19 +227,20 @@ describe("Packs Test", async function() {
 
   it("should create collectible", async function() {
     const fees = [[randomWallet1.address, feeSplit1]];
-    await packsInstance.addCollectible(1, metadata[0].coreData, metadata[0].assets, metadata[0].metaData, metadata[0].secondaryMetaData, fees);
+    await packsInstance.bulkAddCollectible(1, [metadata[0].coreData], [metadata[1].editions], [metadata[0].assets], [metadata[0].metaData], [fees]);
   });
 
   it("should bulk add collectible", async function() {
     const coreData = [metadata[1].coreData, metadata[2].coreData];
     const assets = [metadata[1].assets, metadata[2].assets];
+    const editions = [metadata[1].editions, metadata[2].editions]
     const metaData = [metadata[1].metaData, metadata[2].metaData];
-    const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
+    // const secondaryMetaData = [metadata[1].secondaryMetaData, metadata[2].secondaryMetaData];
     let fees = [
       [[randomWallet2.address, feeSplit1]],
       [[randomWallet1.address, feeSplit2]]
     ];
-    await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+    await packsInstance.bulkAddCollectible(1, coreData, editions, assets, metaData, fees);
   });
 
   it("should mint one token", async function() {
@@ -251,7 +257,7 @@ describe("Packs Test", async function() {
   });
 
   it("should bulk mint all tokens", async function() {
-    const bulkCount = Number(metadata[2].coreData[2]);
+    const bulkCount = Number(20);
     expect(packsInstance.bulkMintPack(1, 10000, {value: tokenPrice2.mul(10000) })).to.be.reverted;
 
     await packsInstance.bulkMintPack(1, bulkCount, {value: tokenPrice2.mul(bulkCount) });

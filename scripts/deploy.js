@@ -11,7 +11,7 @@ async function main() {
   const tokenPrice = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit = 50;
   const nullAddress = '0x0000000000000000000000000000000000000000';
-  const mintPassAddress = '0xcebcf9c6fe1366ed0d79eec6e2e44824a4c408ad';
+  const mintPassAddress = '0x56c4476316ac2231a73cdaa8b0ac5331752bfd72';
   const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
   const mintPassOnePerWallet = false;
   const mintPassOnly = true;
@@ -22,6 +22,7 @@ async function main() {
   const saleStartTime = 1644019200; // Jan 4th 2022, 7PM EST
   console.log('sale start time', saleStartTime);
   let metadata = mock.instinct;
+  const metadataKeys = mock.metadataKeys;
 
   const deployArgs = [
     collectionName,
@@ -29,6 +30,7 @@ async function main() {
     baseURI,
     editioned,
     [tokenPrice, bulkBuyLimit, saleStartTime],
+    metadataKeys,
     licenseURI,
     mintPassAddress, // mintPassAddress or nullAddress for no mint pass
     mintPassDuration,
@@ -56,21 +58,22 @@ async function main() {
 
   // Add instinct metadata
   let coreData = [];
+  let editions = [];
   let assets = [];
   let metaData = [];
-  let secondaryMetaData = [];
   let fees = [];
   let i = 0;
   while (i < metadata.length) {
     coreData.push(metadata[i].coreData)
+    editions.push(metadata[i].editions)
     assets.push(metadata[i].assets)
     metaData.push(metadata[i].metaData)
-    secondaryMetaData.push(metadata[i].secondaryMetaData)
     fees.push([])
     if ((i+1) % 5 === 0) {
-      await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+      await packsInstance.bulkAddCollectible(0, coreData, editions, assets, metaData, fees);
       console.log('Bulk collectibles added', coreData.length);
       coreData = [];
+      editions = [];
       assets = [];
       metaData = [];
       secondaryMetaData = [];
@@ -81,7 +84,7 @@ async function main() {
   }
 
   if (coreData.length > 0) {
-    await packsInstance.bulkAddCollectible(0, coreData, assets, metaData, secondaryMetaData, fees);
+    await packsInstance.bulkAddCollectible(0, coreData, editions, assets, metaData, fees);
     console.log('Bulk collectibles added', coreData.length);
   }
 
@@ -106,6 +109,7 @@ async function main() {
     baseURI,
     editioned2,
     [tokenPrice2, bulkBuyLimit2, saleStartTime2],
+    metadataKeys,
     licenseURI2,
     mintPassAddress2, // mintPassAddress or nullAddress for no mint pass
     mintPassDuration2,
@@ -116,6 +120,7 @@ async function main() {
 
   // Add uncaged metadata
   coreData = [];
+  editions = [];
   assets = [];
   metaData = [];
   secondaryMetaData = [];
@@ -123,12 +128,13 @@ async function main() {
   i = 0;
   while (i < metadata.length) {
     coreData.push(metadata[i].coreData)
+    editions.push(metadata[i].editions);
     assets.push(metadata[i].assets)
     metaData.push(metadata[i].metaData)
     secondaryMetaData.push(metadata[i].secondaryMetaData)
     fees.push([])
     if ((i+1) % 5 === 0) {
-      await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+      await packsInstance.bulkAddCollectible(1, coreData, editions, assets, metaData, fees);
       console.log('Bulk collectibles added', coreData.length);
       coreData = [];
       assets = [];
@@ -141,7 +147,7 @@ async function main() {
   }
 
   if (coreData.length > 0) {
-    await packsInstance.bulkAddCollectible(1, coreData, assets, metaData, secondaryMetaData, fees);
+    await packsInstance.bulkAddCollectible(1, coreData, editions, assets, metaData, fees);
     console.log('Bulk collectibles added', coreData.length);
   }
 

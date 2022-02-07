@@ -1,78 +1,83 @@
 {
+  "metadataKeys": [
+    "Rarity",
+    "Musician",
+    "Designer",
+    "BPM",
+    "Key",
+    "Version",
+    "Label",
+    "Brand",
+    "Season",
+    "Duration",
+    "ISRC",
+    "Stream"
+  ],
   "data": [
     {
       "coreData": [
         "Dreamstate",
-        "Music by Ephixa. Visuals by GameShrimp",
-        "10",
-        "1"
+        "Music by Ephixa. Visuals by GameShrimp"
       ],
+      "editions": 20,
       "assets": ["zhKl1KoFG4RSZqCRjnBudTvF27-aGDpqNv5wRSZe5-w"],
       "metaData": [
-	      ["Instinct", "Rarity: Quartz", "1"],
- 	      ["Instinct", "Musician: Ephixa", "0"],
-	      ["Instinct", "Designer: GameShrimp", "0"],
-	      ["Instinct", "BPM: 126", "0"],
-	      ["Instinct", "Key: F# Minor", "0"],
-        ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "US-S1Z-92-00001", "1"],
-        ["Duration", "3:12", "0"],
-	      ["Stream", "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Ephixa_Dreamstate-%7B720p_320kbps%7D.mp4", "1"]
+	      [0, "Quartz", 1],
+ 	      [1, "Ephixa", 0],
+	      [2, "GameShrimp", 0],
+	      [3, "126", 0],
+	      [4, "F# Minor", 0],
+        [5, "Original", 0],
+        [6, "Monstercat", 0],
+        [7, "Instinct", 0],
+        [8, "1", 0],
+        [9, "3:12", 0],
+        [10, "US-S1Z-92-00001", 0],
+	      [11, "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Ephixa_Dreamstate-%7B720p_320kbps%7D.mp4", 1]
       ]
     },
     {
       "coreData": [
         "Left Behind",
-        "Music by Half an Orange & Outwild. Visuals by Kez",
-        "20",
-        "1"
+        "Music by Half an Orange & Outwild. Visuals by Kez"
       ],
+      "editions": 20,
       "assets": ["wd_tYp5ObgqqQKAZFpYrtSWfIGVZoW7XuCLg7lLpxtI"],
       "metaData": [
-	      ["Instinct", "Rarity: Quartz", "1"],
- 	      ["Instinct", "Musician: Half an Orange", "0"],
-	      ["Instinct", "Designer: Kez", "0"],
-	      ["Instinct", "BPM: 176", "0"],
-	      ["Instinct", "Key: F# Major", "0"],
-	      ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "US-S1Z-91-00001", "1"],
-        ["Duration", "3:34", "0"],
-	      ["Stream", "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Halfanorange_Leftbehind-%7B720p_320kbps%7D.mp4", "1"]
+	      [0, "Quartz", 1],
+ 	      [1, "Ephixa", 0],
+	      [2, "GameShrimp", 0],
+	      [3, "126", 0],
+	      [4, "F# Minor", 0],
+        [5, "Original", 0],
+        [6, "Monstercat", 0],
+        [7, "Instinct", 0],
+        [8, "1", 0],
+        [9, "3:12", 0],
+        [10, "US-S1Z-92-00001", 0],
+	      [11, "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Ephixa_Dreamstate-%7B720p_320kbps%7D.mp4", 1]
       ]
     },
     {
       "coreData": [
         "Hang Up",
-        "Music by WRLD. Visuals by XXX",
-        "30",
-        "2"
+        "Music by WRLD. Visuals by XXX"
       ],
+      "editions": 20,
       "assets": ["wd_tYp5ObgqqQKAZFpYrtSWfIGVZoW7XuCLg7lLpxtI", "nkQbgtoP6X1yPW9FOYLL31wPIuC22uiNRePu42WZlTU"],
       "metaData": [
-	      ["Instinct", "Rarity: Emerald", "1"],
- 	      ["Instinct", "Musician: WRLD", "0"],
-	      ["Instinct", "Designer: XXX", "0"],
-	      ["Instinct", "BPM: 120", "0"],
-	      ["Instinct", "Key: F Minor", "0"],
- 	      ["Instinct", "Version: Original", "0"],
-        ["Instinct", "Label: Monstercat", "0"],
-        ["Instinct", "Brand: Instinct", "0"],
-        ["Instinct", "Season: 1", "0"]
-      ],
-      "secondaryMetaData": [
-        ["ISRC", "US-S1Z-93-00001", "1"],
-        ["Duration1", "3:17", "0"],
-	      ["Stream1", "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Wrld_Hangup-%7B720p_320kbps%7D.mp4", "1"]
+	      [0, "Quartz", 1],
+ 	      [1, "Ephixa", 0],
+	      [2, "GameShrimp", 0],
+	      [3, "126", 0],
+	      [4, "F# Minor", 0],
+        [5, "Original", 0],
+        [6, "Monstercat", 0],
+        [7, "Instinct", 0],
+        [8, "1", 0],
+        [9, "3:12", 0],
+        [10, "US-S1Z-92-00001", 0],
+	      [11, "https://storage.googleapis.com/relicsxyz/nfts/Nft_Instinctseason1_Ephixa_Dreamstate-%7B720p_320kbps%7D.mp4", 1]
       ]
     }
   ]

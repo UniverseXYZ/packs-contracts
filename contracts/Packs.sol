@@ -21,6 +21,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     string memory _baseURI,
     bool _editioned,
     uint256[] memory _initParams,
+    string[] memory _metadataKeys,
     string memory _licenseURI,
     address _mintPass,
     uint256 _mintPassDuration,
@@ -33,7 +34,7 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
     ds.collectionCount = 0;
 
-    createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassParams);
+    createNewCollection(_baseURI, _editioned, _initParams, _metadataKeys, _licenseURI, _mintPass, _mintPassDuration, _mintPassParams);
 
     _setBaseURI(_baseURI);
   }
@@ -57,18 +58,13 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     ds.daoInitialized = true;
   }
 
-  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool[] memory _mintPassParams) public override onlyDAO {
-    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _licenseURI, _mintPass, _mintPassDuration, _mintPassParams);
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string[] memory _metadataKeys, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool[] memory _mintPassParams) public override onlyDAO {
+    LibPackStorage.createNewCollection(_baseURI, _editioned, _initParams, _metadataKeys, _licenseURI, _mintPass, _mintPassDuration, _mintPassParams);
   }
 
-  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) public override onlyDAO {
-    require(_coreData.length == 4, 'Misformat');
-    LibPackStorage.addCollectible(cID, _coreData, _assets, _metadataValues, _secondaryMetadata, _fees);
-  }
-
-  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues, string[][][] memory _secondaryMetadata, LibPackStorage.Fee[][] memory _fees) public override onlyDAO {
+  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, uint16[] memory _editions, string[][] memory _assets, LibPackStorage.MetadataStore[][] memory _metadataValues, LibPackStorage.Fee[][] memory _fees) public override onlyDAO {
     for (uint256 i = 0; i < _coreData.length; i++) {
-      addCollectible(cID, _coreData[i], _assets[i], _metadataValues[i], _secondaryMetadata[i],  _fees[i]);
+      LibPackStorage.addCollectible(cID, _coreData[i], _editions[i], _assets[i], _metadataValues[i], _fees[i]);
     }
   }
 

@@ -31,25 +31,16 @@ interface IPacks is IERC721Enumerable {
   /// @param _mintPass ERC721 contract address to allow 1 free mint prior to sale start time
   /// @param _mintPassDuration Duration before sale start time allowing free mints
   /// @param _mintPassParams Array of params for mintPass [One Per Wallet, Mint Pass ONLY, Mint Pass Free Mint, Mint Pass Burn]
-  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool[] memory _mintPassParams) external;
+  function createNewCollection(string memory _baseURI, bool _editioned, uint256[] memory _initParams, string[] memory _metadataKeys, string memory _licenseURI, address _mintPass, uint256 _mintPassDuration, bool[] memory _mintPassParams) external;
   
-  /// @notice Adds a collectible with multiple versions of artwork, metadata, and royalty declaration
-  /// @param cID Collection ID
-  /// @param _coreData Array of parameters [title, description, # of NFTs, current artwork version index starting 1]
-  /// @param _assets Array of artwork assets, starting index 0 indicative of version 1
-  /// @param _metadataValues Array of key value pairs for property name and value [key, value, 0 = uneditable || 1 = editable]
-  /// @param _secondaryMetadata Array of key value pairs for property name and value
-  /// @param _fees Array of different percentage payout splits on secondary sales
-  function addCollectible(uint256 cID, string[] memory _coreData, string[] memory _assets, string[][] memory _metadataValues, string[][] memory _secondaryMetadata, LibPackStorage.Fee[] memory _fees) external;
-
   /// @notice Add multiple collectibles in one function call, same parameters as addCollectible but in array
   /// @param cID Collection ID
   /// @param _coreData Array of parameters [title, description, # of NFTs, current artwork version index starting 1]
+  /// @param _editions Number of NFTs per asset
   /// @param _assets Array of artwork assets, starting index 0 indicative of version 1
   /// @param _metadataValues Array of key value pairs for property name and value
-  /// @param _secondaryMetadata Array of key value pairs for property name and value
   /// @param _fees Array of different percentage payout splits on secondary sales
-  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, string[][] memory _assets, string[][][] memory _metadataValues, string[][][] memory _secondaryMetadata, LibPackStorage.Fee[][] memory _fees) external;
+  function bulkAddCollectible(uint256 cID, string[][] memory _coreData, uint16[] memory _editions, string[][] memory _assets, LibPackStorage.MetadataStore[][] memory _metadataValues, LibPackStorage.Fee[][] memory _fees) external;
   
   /// @notice Checks if owner of an NFT in free mint required ERC721 collection address
   /// @param cID Collection ID
