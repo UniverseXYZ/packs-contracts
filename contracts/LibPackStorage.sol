@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: MIT
+// Written by Tim Kang <> illestrater
+// Thought innovation by Monstercat
+// Product by universe.xyz
+
 pragma solidity >=0.6.0 <0.8.0;
 pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import 'base64-sol/base64.sol';
+import './HelperFunctions.sol';
 
 library LibPackStorage {
   using SafeMath for uint256;
@@ -54,18 +59,19 @@ library LibPackStorage {
     bool mintPassOnly;
     bool mintPassFree;
     bool mintPassBurn;
-    bool mintPassOnePerWallet;
     uint256 mintPassDuration;
 
+    address mintPassAddress;
     ERC721 mintPassContract;
     uint32[] shuffleIDs;
+
+    uint16 metadataKeysLength;
 
     mapping (uint256 => SingleCollectible) collectibles; // Unique assets
     mapping (uint256 => string) metadataKeys;
     mapping (uint256 => Metadata) metadata; // Trait & property attributes, indexes should be coupled with 'collectibles'
     mapping (uint256 => Fee[]) secondaryFees;
     mapping (uint256 => string) licenseURI; // URL to external license or file
-    mapping (address => bool) mintPassClaimed;
     mapping (uint256 => bool) mintPassClaims;
   }
 
@@ -173,7 +179,7 @@ library LibPackStorage {
     uint256 _mintPassDuration,
     bool[] memory _mintPassParams
   ) external onlyDAO {
-    require(_initParams[1] <= 50, "Bulk buy limit of 50");
+    require(_initParams[1] <= 50, "Limit of 50");
     Storage storage ds = packStorage();
 
     ds.collection[ds.collectionCount].baseURI = _baseURI;
@@ -186,16 +192,15 @@ library LibPackStorage {
 
     if (_mintPass != address(0)) {
       ds.collection[ds.collectionCount].mintPass = true;
+      ds.collection[ds.collectionCount].mintPassAddress = _mintPass;
       ds.collection[ds.collectionCount].mintPassContract = ERC721(_mintPass);
       ds.collection[ds.collectionCount].mintPassDuration = _mintPassDuration;
-      ds.collection[ds.collectionCount].mintPassOnePerWallet = _mintPassParams[0];
-      ds.collection[ds.collectionCount].mintPassOnly = _mintPassParams[1];
-      ds.collection[ds.collectionCount].mintPassFree = _mintPassParams[2];
-      ds.collection[ds.collectionCount].mintPassBurn = _mintPassParams[3];
+      ds.collection[ds.collectionCount].mintPassOnly = _mintPassParams[0];
+      ds.collection[ds.collectionCount].mintPassFree = _mintPassParams[1];
+      ds.collection[ds.collectionCount].mintPassBurn = _mintPassParams[2];
     } else {
       ds.collection[ds.collectionCount].mintPass = false;
       ds.collection[ds.collectionCount].mintPassDuration = 0;
-      ds.collection[ds.collectionCount].mintPassOnePerWallet = false;
       ds.collection[ds.collectionCount].mintPassOnly = false;
       ds.collection[ds.collectionCount].mintPassFree = false;
       ds.collection[ds.collectionCount].mintPassBurn = false;
@@ -204,6 +209,8 @@ library LibPackStorage {
     for (uint8 i; i < _metadataKeys.length; i++) {
       ds.collection[ds.collectionCount].metadataKeys[i] = _metadataKeys[i];
     }
+
+    ds.collection[ds.collectionCount].metadataKeysLength = uint16(_metadataKeys.length);
 
     ds.collectionCount++;
 
@@ -219,8 +226,8 @@ library LibPackStorage {
 
     uint256 sum = 0;
     for (uint256 i = 0; i < _fees.length; i++) {
-      require(_fees[i].recipient != address(0x0), "Recipient should be present");
-      require(_fees[i].value != 0, "Fee value should be positive");
+      require(_fees[i].recipient != address(0x0), "No recipient");
+      require(_fees[i].value != 0, "Fee negative");
       collection.secondaryFees[collectibleCount].push(Fee({
         recipient: _fees[i].recipient,
         value: _fees[i].value
@@ -228,8 +235,8 @@ library LibPackStorage {
       sum = sum.add(_fees[i].value);
     }
 
-    require(sum < 10000, "Fee should be less than 100%");
-    require(_editions > 0, "NFTs for given asset must be greater than 0");
+    require(sum < 10000, "Fee GT 100%");
+    require(_editions > 0, "GT 0");
 
     collection.collectibles[collectibleCount] = SingleCollectible({
       title: _coreData[0],
@@ -265,6 +272,28 @@ library LibPackStorage {
     emit LogAddCollectible(cID, _coreData[0]);
   }
 
+  // function tokensClaimable(uint256 cID, address minter) public view returns (uint256[] memory) {
+  //   Storage storage ds = packStorage();
+
+  //   uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
+  //   bool done = false;
+  //   uint256 counter = 0;
+  //   uint256 index = 0;
+  //   uint256[] memory claimable = new uint256[](count);
+  //   while (!done && count > 0) {
+  //     uint256 tokenID = ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter);
+  //     if (ds.collection[cID].mintPassClaims[tokenID] != true) {
+  //       claimable[index] = tokenID;
+  //       index++;
+  //     }
+
+  //     if (counter == count - 1) done = true;
+  //     else counter++;
+  //   }
+
+  //   return claimable;
+  // }
+
   function checkTokensForMintPass(uint256 cID, uint256 mintPassTokenId, address minter, address contractAddress) private returns (bool) {
     Storage storage ds = packStorage();
     uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
@@ -294,21 +323,14 @@ library LibPackStorage {
     Storage storage ds = packStorage();
 
     bool canMintPass = false;
-    if (ds.collection[cID].mintPass) {
-      if (!ds.collection[cID].mintPassOnePerWallet || !ds.collection[cID].mintPassClaimed[user]) {
-        if (checkTokensForMintPass(cID, mintPassTokenId, user, contractAddress)) {
-          canMintPass = true;
-          if (ds.collection[cID].mintPassOnePerWallet) ds.collection[cID].mintPassClaimed[user] = true;
-        }
-      }
-    }
+    if (ds.collection[cID].mintPass && checkTokensForMintPass(cID, mintPassTokenId, user, contractAddress)) canMintPass = true;
 
     if (ds.collection[cID].mintPassOnly) {
-      require(canMintPass, "Minting is restricted to mint passes only");
-      require(block.timestamp > ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration, "Sale has not yet started");
+      require(canMintPass, "Mint pass only");
+      require(block.timestamp > ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration, "ERR: Sale start");
     } else {
-      if (canMintPass) require (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration), "Sale has not yet started");
-      else require(block.timestamp > ds.collection[cID].saleStartTime, "Sale has not yet started");
+      if (canMintPass) require (block.timestamp > (ds.collection[cID].saleStartTime - ds.collection[cID].mintPassDuration), "ERR: Sale start");
+      else require(block.timestamp > ds.collection[cID].saleStartTime, "ERR: Sale start");
     }
 
     return canMintPass;
@@ -318,37 +340,15 @@ library LibPackStorage {
     Storage storage ds = packStorage();
 
     require(amount > 0, 'Missing amount');
-    require(!ds.collection[cID].mintPassOnly, 'Cannot bulk mint');
-    require(amount <= ds.collection[cID].bulkBuyLimit, "Cannot bulk buy more than the preset limit");
+    require(!ds.collection[cID].mintPassOnly, 'Mint pass only');
+    require(amount <= ds.collection[cID].bulkBuyLimit, "Over limit");
     require(amount <= ds.collection[cID].shuffleIDs.length, "Total supply reached");
-    require((block.timestamp > ds.collection[cID].saleStartTime), "Sale has not yet started");
+    require((block.timestamp > ds.collection[cID].saleStartTime), "ERR: Sale start");
   }
 
   function mintPassClaimed(uint256 cID, uint256 tokenId) public view returns (bool) {
     Storage storage ds = packStorage();
     return (ds.collection[cID].mintPassClaims[tokenId] == true);
-  }
-
-  function tokensClaimable(uint256 cID, address minter) public view returns (uint256[] memory) {
-    Storage storage ds = packStorage();
-
-    uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
-    bool done = false;
-    uint256 counter = 0;
-    uint256 index = 0;
-    uint256[] memory claimable = new uint256[](count);
-    while (!done && count > 0) {
-      uint256 tokenID = ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter);
-      if (ds.collection[cID].mintPassClaims[tokenID] != true) {
-        claimable[index] = tokenID;
-        index++;
-      }
-
-      if (counter == count - 1) done = true;
-      else counter++;
-    }
-
-    return claimable;
   }
 
   function remainingTokens(uint256 cID) public view returns (uint256) {
@@ -359,7 +359,7 @@ library LibPackStorage {
   // Modify property field only if marked as updateable
   function updateMetadata(uint256 cID, uint256 collectibleId, uint256 propertyIndex, string memory value) external onlyDAO {
     Storage storage ds = packStorage();
-    require(ds.collection[cID].metadata[collectibleId - 1].modifiable[propertyIndex], 'Field not editable');
+    require(ds.collection[cID].metadata[collectibleId - 1].modifiable[propertyIndex], 'Uneditable');
     ds.collection[cID].metadata[collectibleId - 1].value[propertyIndex] = value;
     emit LogUpdateMetadata(cID, collectibleId, propertyIndex, value);
   }
@@ -372,21 +372,10 @@ library LibPackStorage {
     emit LogAddVersion(cID, collectibleId, asset);
   }
 
-  // Set version number, index starts at version 1, collectible 1 (so shifts 1 for 0th index)
-  // function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) public onlyDAO {
-  //   Storage storage ds = packStorage();
-
-  //   require(versionNumber > 0, "Versions start at 1");
-  //   require(versionNumber <= ds.collection[cID].collectibles[collectibleId - 1].assets.length, "Versions must be less than asset count");
-  //   require(collectibleId > 0, "Collectible IDs start at 1");
-  //   ds.collection[cID].collectibles[collectibleId - 1].currentVersion = versionNumber;
-  //   emit LogUpdateVersion(cID, collectibleId, versionNumber);
-  // }
-
   // Adds new license and updates version to latest
   function addNewLicense(uint256 cID, string memory _license) public onlyDAO {
     Storage storage ds = packStorage();
-    require(cID < ds.collectionCount, 'Collectible ID does not exist');
+    require(cID < ds.collectionCount, 'ID DNE');
     ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion] = _license;
     ds.collection[cID].licenseVersion++;
     emit LogAddNewLicense(cID, _license);
@@ -402,12 +391,51 @@ library LibPackStorage {
     return ds.collection[cID].licenseURI[ds.collection[cID].licenseVersion - 1];
   }
 
+  function getCollectionInfo(uint256 cID) public view returns (string memory) {
+    Storage storage ds = packStorage();
+    
+    string memory encodedMetadata = '';
+    for (uint i = 0; i < ds.collection[cID].metadataKeysLength; i++) {
+      encodedMetadata = string(abi.encodePacked(
+        encodedMetadata,
+        '{"index":"',
+        HelperFunctions.toString(i),
+        '", "name":"',
+        ds.collection[cID].metadataKeys[i],
+        '"}',
+        i == ds.collection[cID].metadataKeysLength - 1 ? '' : ',')
+      );
+    }
+
+    return string(
+              abi.encodePacked(
+                '{"weiPrice": "',
+                HelperFunctions.toString(ds.collection[cID].tokenPrice),
+                '", "saleStart": "',
+                HelperFunctions.toString(ds.collection[cID].saleStartTime),
+                '", "mintPass": "',
+                ds.collection[cID].mintPass ? 'true' : 'false',
+                '", "passAddress": "',
+                HelperFunctions.addressToString(ds.collection[cID].mintPassAddress),
+                '", "passDuration": "',
+                HelperFunctions.toString(ds.collection[cID].mintPassDuration),
+                '", "passOnly": "',
+                ds.collection[cID].mintPassOnly ? 'true' : 'false',
+                '", "passBurn": "',
+                ds.collection[cID].mintPassBurn ? 'true' : 'false',
+                '", "metadata": [',
+                  encodedMetadata,
+                '] }'
+      )
+    );
+  }
+
   // Dynamic base64 encoded metadata generation using on-chain metadata and edition numbers
   function tokenURI(uint256 tokenId) public view returns (string memory) {
     Storage storage ds = packStorage();
 
-    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
-    uint256 collectibleId = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 8, bytes(toString(tokenId)).length - 5)) - 1;
+    uint256 edition = HelperFunctions.safeParseInt(HelperFunctions.substring(HelperFunctions.toString(tokenId), bytes(HelperFunctions.toString(tokenId)).length - 5, bytes(HelperFunctions.toString(tokenId)).length)) - 1;
+    uint256 collectibleId = HelperFunctions.safeParseInt(HelperFunctions.substring(HelperFunctions.toString(tokenId), bytes(HelperFunctions.toString(tokenId)).length - 8, bytes(HelperFunctions.toString(tokenId)).length - 5)) - 1;
     uint256 cID = ((tokenId - ((collectibleId + 1) * 100000)) - (edition + 1)) / 100000000 - 1;
     string memory encodedMetadata = '';
 
@@ -438,7 +466,7 @@ library LibPackStorage {
                 '{"name":"',
                 collectible.title,
                 collection.editioned ? ' #' : '',
-                collection.editioned ? toString(edition + 1) : '',
+                collection.editioned ? HelperFunctions.toString(edition + 1) : '',
                 '", "description":"',
                 collectible.description,
                 '", "image": "',
@@ -462,8 +490,8 @@ library LibPackStorage {
   function getFeeRecipients(uint256 tokenId) public view returns (address payable[] memory) {
     Storage storage ds = packStorage();
 
-    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
-    uint256 collectibleId = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 8, bytes(toString(tokenId)).length - 5)) - 1;
+    uint256 edition = HelperFunctions.safeParseInt(HelperFunctions.substring(HelperFunctions.toString(tokenId), bytes(HelperFunctions.toString(tokenId)).length - 5, bytes(HelperFunctions.toString(tokenId)).length)) - 1;
+    uint256 collectibleId = HelperFunctions.safeParseInt(HelperFunctions.substring(HelperFunctions.toString(tokenId), bytes(HelperFunctions.toString(tokenId)).length - 8, bytes(HelperFunctions.toString(tokenId)).length - 5)) - 1;
     uint256 cID = ((tokenId - ((collectibleId + 1) * 100000)) - (edition + 1)) / 100000000 - 1;
     Fee[] memory _fees = ds.collection[cID].secondaryFees[collectibleId];
     address payable[] memory result = new address payable[](_fees.length);
@@ -476,8 +504,8 @@ library LibPackStorage {
   function getFeeBps(uint256 tokenId) public view returns (uint[] memory) {
     Storage storage ds = packStorage();
 
-    uint256 edition = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 5, bytes(toString(tokenId)).length)) - 1;
-    uint256 collectibleId = safeParseInt(substring(toString(tokenId), bytes(toString(tokenId)).length - 8, bytes(toString(tokenId)).length - 5)) - 1;
+    uint256 edition = HelperFunctions.safeParseInt(HelperFunctions.substring(HelperFunctions.toString(tokenId), bytes(HelperFunctions.toString(tokenId)).length - 5, bytes(HelperFunctions.toString(tokenId)).length)) - 1;
+    uint256 collectibleId = HelperFunctions.safeParseInt(HelperFunctions.substring(HelperFunctions.toString(tokenId), bytes(HelperFunctions.toString(tokenId)).length - 8, bytes(HelperFunctions.toString(tokenId)).length - 5)) - 1;
     uint256 cID = ((tokenId - ((collectibleId + 1) * 100000)) - (edition + 1)) / 100000000 - 1;
     Fee[] memory _fees = ds.collection[cID].secondaryFees[collectibleId];
     uint[] memory result = new uint[](_fees.length);
@@ -494,63 +522,5 @@ library LibPackStorage {
 
     if (rec.length == 0) return (address(this), 0);
     return (rec[0], getFeeBps(tokenId)[0] * value / 10000);
-  }
-
-  function toString(uint256 value) internal pure returns (string memory) {
-    if (value == 0) {
-        return "0";
-    }
-    uint256 temp = value;
-    uint256 digits;
-    while (temp != 0) {
-        digits++;
-        temp /= 10;
-    }
-    bytes memory buffer = new bytes(digits);
-    uint256 index = digits - 1;
-    temp = value;
-    while (temp != 0) {
-        buffer[index--] = bytes1(uint8(48 + temp % 10));
-        temp /= 10;
-    }
-    return string(buffer);
-  }
-
-  function safeParseInt(string memory _a) internal pure returns (uint _parsedInt) {
-    return safeParseInt(_a, 0);
-  }
-
-  function safeParseInt(string memory _a, uint _b) internal pure returns (uint _parsedInt) {
-    bytes memory bresult = bytes(_a);
-    uint mint = 0;
-    bool decimals = false;
-    for (uint i = 0; i < bresult.length; i++) {
-      if ((uint(uint8(bresult[i])) >= 48) && (uint(uint8(bresult[i])) <= 57)) {
-        if (decimals) {
-            if (_b == 0) break;
-            else _b--;
-        }
-        mint *= 10;
-        mint += uint(uint8(bresult[i])) - 48;
-      } else if (uint(uint8(bresult[i])) == 46) {
-        require(!decimals, 'More than one decimal encountered in string!');
-        decimals = true;
-      } else {
-        revert("Non-numeral character encountered in string!");
-      }
-    }
-    if (_b > 0) {
-      mint *= 10 ** _b;
-    }
-    return mint;
-  }
-
-  function substring(string memory str, uint startIndex, uint endIndex) internal pure returns (string memory) {
-    bytes memory strBytes = bytes(str);
-    bytes memory result = new bytes(endIndex-startIndex);
-    for(uint i = startIndex; i < endIndex; i++) {
-        result[i-startIndex] = strBytes[i];
-    }
-    return string(result);
   }
 }

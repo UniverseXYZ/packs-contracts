@@ -17,11 +17,10 @@ describe("Packs Test", async function() {
   const nullAddress = '0x0000000000000000000000000000000000000000';
   const mintPassAddress = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
   const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
-  const mintPassOnePerWallet = false;
   const mintPassOnly = true;
   const mintPassFree = false;
   const mintPassBurn = true;
-  const mintPassParams = [mintPassOnePerWallet, mintPassOnly, mintPassFree, mintPassBurn]
+  const mintPassParams = [mintPassOnly, mintPassFree, mintPassBurn]
   const saleStartTime = Math.round((new Date()).getTime() / 1000) + mintPassDuration;
   const metadata = mock.data;
   const metadataKeys = mock.metadataKeys;
@@ -190,6 +189,14 @@ describe("Packs Test", async function() {
     expect(bps[1].toNumber()).to.equal(feeSplit2);
   });
 
+  it("should return collection info", async function() {
+    const info = await packsInstance.getCollectionInfo(0);
+    const json = JSON.parse(info);
+    // const json = base64toJSON(info);
+    console.log('yooo wtf', json);
+    expect(json.saleStart).to.equal(saleStartTime.toString());
+  })
+
   // SECOND COLLECTION
   const licenseURI2 = 'https://arweave.net/license';
   const editioned2 = true;
@@ -197,11 +204,10 @@ describe("Packs Test", async function() {
   const bulkBuyLimit2 = 50;
   const nullAddress2 = '0x0000000000000000000000000000000000000000';
   const mintPassAddress2 = '0x164cb8bf056ffb41e4819cbb669bd89476d81279';
-  const mintPassOnePerWallet2 = false;
   const mintPassOnly2 = true;
   const mintPassFree2 = false;
   const mintPassBurn2 = false;
-  const mintPassParams2 = [mintPassOnePerWallet2, mintPassOnly2, mintPassFree2, mintPassBurn2]
+  const mintPassParams2 = [mintPassOnly2, mintPassFree2, mintPassBurn2]
   const mintPassDuration2 = 600; // 600 = 10 minutes, 3600 = 1 hour
   const saleStartTime2 = saleStartTime + mintPassDuration;
 

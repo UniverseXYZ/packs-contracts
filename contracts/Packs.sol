@@ -116,9 +116,9 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     return LibPackStorage.mintPassClaimed(cID, tokenId);
   }
 
-  function tokensClaimable(uint256 cID, address minter) public override view returns (uint256[] memory) {
-    return LibPackStorage.tokensClaimable(cID, minter);
-  }
+  // function tokensClaimable(uint256 cID, address minter) public override view returns (uint256[] memory) {
+  //   return LibPackStorage.tokensClaimable(cID, minter);
+  // }
 
   function remainingTokens(uint256 cID) public override view returns (uint256) {
     return LibPackStorage.remainingTokens(cID);
@@ -132,10 +132,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     LibPackStorage.addVersion(cID, collectibleId, asset);
   }
 
-  // function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) public override onlyDAO {
-  //   LibPackStorage.updateVersion(cID, collectibleId, versionNumber);
-  // }
-
   function addNewLicense(uint256 cID, string memory _license) public override onlyDAO {
     LibPackStorage.addNewLicense(cID, _license);
   }
@@ -146,6 +142,10 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
 
   function getCollectionCount() public override view returns (uint256) {
     return LibPackStorage.packStorage().collectionCount;
+  }
+
+  function getCollectionInfo(uint256 cID) public override view returns (string memory) {
+    return LibPackStorage.getCollectionInfo(cID);
   }
 
   function tokenURI(uint256 tokenId) public view virtual override(ERC721, IPacks) returns (string memory) {
