@@ -116,10 +116,6 @@ contract Packs is IPacks, ERC721, ReentrancyGuard {
     return LibPackStorage.mintPassClaimed(cID, tokenId);
   }
 
-  // function tokensClaimable(uint256 cID, address minter) public override view returns (uint256[] memory) {
-  //   return LibPackStorage.tokensClaimable(cID, minter);
-  // }
-
   function remainingTokens(uint256 cID) public override view returns (uint256) {
     return LibPackStorage.remainingTokens(cID);
   }

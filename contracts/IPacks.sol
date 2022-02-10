@@ -42,11 +42,6 @@ interface IPacks is IERC721Enumerable {
   /// @param _fees Array of different percentage payout splits on secondary sales
   function bulkAddCollectible(uint256 cID, string[][] memory _coreData, uint16[] memory _editions, string[][] memory _assets, LibPackStorage.MetadataStore[][] memory _metadataValues, LibPackStorage.Fee[][] memory _fees) external;
   
-  /// @notice Checks if owner of an NFT in free mint required ERC721 collection address
-  /// @param cID Collection ID
-  /// @param minter Address of user
-  // function checkMintPass(uint256 cID, address minter) external view returns (uint256);
-
   /// @notice Mints an NFT with random token ID
   /// @param cID Collection ID
   /// @param mintPassTokenId Provide token ID to use as mint pass if appicable
@@ -61,11 +56,6 @@ interface IPacks is IERC721Enumerable {
   /// @param cID Collection ID
   /// @param tokenId NFT tokenID
   function mintPassClaimed(uint256 cID, uint256 tokenId) external view returns (bool);
-
-  // /// @notice Returns enumerable list of tokens that can be used to claim for mint pass
-  // /// @param cID Collection ID
-  // /// @param minter address of holder
-  // function tokensClaimable(uint256 cID, address minter) external view returns (uint256[] memory);
 
   /// @notice Returns remaining NFTs available to purchase
   /// @param cID Collection ID
@@ -83,12 +73,6 @@ interface IPacks is IERC721Enumerable {
   /// @param collectibleId Collectible index (value 1 is index 0)
   /// @param asset Asset hash without baseURI included
   function addVersion(uint256 cID, uint256 collectibleId, string memory asset) external;
-
-  // /// @notice Updates asset version of collectible
-  // /// @param cID Collection ID
-  // /// @param collectibleId Collectible index (value 1 is index 0)
-  // /// @param versionNumber New version number to set collectible's asset to
-  // function updateVersion(uint256 cID, uint256 collectibleId, uint256 versionNumber) external;
 
   /// @notice Adds new license URL for collection, auto increments license version number
   /// @param cID Collection ID

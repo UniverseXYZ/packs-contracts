@@ -272,53 +272,6 @@ library LibPackStorage {
     emit LogAddCollectible(cID, _coreData[0]);
   }
 
-  // function tokensClaimable(uint256 cID, address minter) public view returns (uint256[] memory) {
-  //   Storage storage ds = packStorage();
-
-  //   uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
-  //   bool done = false;
-  //   uint256 counter = 0;
-  //   uint256 index = 0;
-  //   uint256[] memory claimable = new uint256[](count);
-  //   while (!done && count > 0) {
-  //     uint256 tokenID = ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter);
-  //     if (ds.collection[cID].mintPassClaims[tokenID] != true) {
-  //       claimable[index] = tokenID;
-  //       index++;
-  //     }
-
-  //     if (counter == count - 1) done = true;
-  //     else counter++;
-  //   }
-
-  //   return claimable;
-  // }
-
-  // function checkTokensForMintPass(uint256 cID, uint256 mintPassTokenId, address minter) private returns (bool) {
-  //   Storage storage ds = packStorage();
-  //   uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
-  //   bool done = false;
-  //   uint256 counter = 0;
-  //   bool canClaim = false;
-  //   bool supportsEnumerable = ds.collection[cID].mintPassContract.supportsInterface(0x780e9d63);
-  //   while (!done && count > 0) {
-  //     uint256 tokenID = supportsEnumerable ? ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter) : mintPassTokenId;
-  //     if (ds.collection[cID].mintPassClaims[tokenID] != true) {
-  //       ds.collection[cID].mintPassClaims[tokenID] = true;
-  //       done = true;
-  //       canClaim = true;
-  //       if (ds.collection[cID].mintPassBurn) {
-  //         ds.collection[cID].mintPassContract.safeTransferFrom(msg.sender, address(0xdEaD), tokenID);
-  //       }
-  //     }
-
-  //     if (counter == count - 1 || !supportsEnumerable) done = true;
-  //     else counter++;
-  //   }
-
-  //   return canClaim;
-  // }
-
   function checkTokensForMintPass(uint256 cID, uint256 mintPassTokenId, address minter) private returns (bool) {
     Storage storage ds = packStorage();
     if (ds.collection[cID].mintPassContract.ownerOf(mintPassTokenId) == minter &&

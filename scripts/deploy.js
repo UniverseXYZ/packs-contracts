@@ -17,7 +17,7 @@ async function main() {
   const tokenPrice = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit = 50;
   const nullAddress = '0x0000000000000000000000000000000000000000';
-  const mintPassAddress = '0x638Cf5Caf54e2251436E394f5e46E1Bb8bA4E6F6';
+  const mintPassAddress = '0xCEBCf9C6fE1366eD0d79eEC6e2E44824a4C408ad';
   // const mintPassAddress = nftInstance.address;
   const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
   const mintPassOnly = true;
@@ -25,7 +25,7 @@ async function main() {
   const mintPassBurn = true;
   const mintPassParams = [mintPassOnly, mintPassFree, mintPassBurn]
   // const saleStartTime = Math.round((new Date()).getTime() / 1000);
-  const saleStartTime = 1644019200; // Jan 4th 2022, 7PM EST
+  const saleStartTime = 1644624000; // Jan 11th 2022, 7PM EST
   console.log('sale start time', saleStartTime);
   let metadata = mock.instinct;
   const metadataKeys = mock.metadataKeys;
@@ -103,7 +103,7 @@ async function main() {
   const tokenPrice2 = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit2 = 50;
   const nullAddress2 = '0x0000000000000000000000000000000000000000';
-  const mintPassAddress2 = '0x638Cf5Caf54e2251436E394f5e46E1Bb8bA4E6F6';
+  const mintPassAddress2 = '0xCEBCf9C6fE1366eD0d79eEC6e2E44824a4C408ad';
   const mintPassDuration2 = 60; // 600 = 10 minutes, 3600 = 1 hour
   const mintPassOnly2 = true;
   const mintPassFree2 = true;

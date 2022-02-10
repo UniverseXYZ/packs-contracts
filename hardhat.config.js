@@ -36,7 +36,7 @@ module.exports = {
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ process.env.ALCHEMY_KEY }`,
       },
-      allowUnlimitedContractSize: true
+      allowUnlimitedContractSize: false
     },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${ process.env.ALCHEMY_KEY }`,
