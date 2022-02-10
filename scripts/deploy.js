@@ -3,6 +3,12 @@ const hre = require("hardhat");
 const mock = require('../test/mock-deploy.json');
 
 async function main() {
+  // let ERC721 = await hre.ethers.getContractFactory("ERC721Mock");
+  // const nftInstance = await ERC721.deploy('TICKET', 'TICKET');
+  // await nftInstance.deployed();
+
+  // console.log("ERC721 deployed to:", nftInstance.address);
+
   const collectionName = 'RELICS';
   const collectionSymbol = 'RELICS';
   const baseURI = 'https://arweave.net/';
@@ -11,13 +17,13 @@ async function main() {
   const tokenPrice = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit = 50;
   const nullAddress = '0x0000000000000000000000000000000000000000';
-  const mintPassAddress = '0x56c4476316ac2231a73cdaa8b0ac5331752bfd72';
+  const mintPassAddress = '0x638Cf5Caf54e2251436E394f5e46E1Bb8bA4E6F6';
+  // const mintPassAddress = nftInstance.address;
   const mintPassDuration = 600; // 600 = 10 minutes, 3600 = 1 hour
-  const mintPassOnePerWallet = false;
   const mintPassOnly = true;
   const mintPassFree = true;
   const mintPassBurn = true;
-  const mintPassParams = [mintPassOnePerWallet, mintPassOnly, mintPassFree, mintPassBurn]
+  const mintPassParams = [mintPassOnly, mintPassFree, mintPassBurn]
   // const saleStartTime = Math.round((new Date()).getTime() / 1000);
   const saleStartTime = 1644019200; // Jan 4th 2022, 7PM EST
   console.log('sale start time', saleStartTime);
@@ -97,13 +103,12 @@ async function main() {
   const tokenPrice2 = ethers.utils.parseEther("0.000007");
   const bulkBuyLimit2 = 50;
   const nullAddress2 = '0x0000000000000000000000000000000000000000';
-  const mintPassAddress2 = '0xcebcf9c6fe1366ed0d79eec6e2e44824a4c408ad';
+  const mintPassAddress2 = '0x638Cf5Caf54e2251436E394f5e46E1Bb8bA4E6F6';
   const mintPassDuration2 = 60; // 600 = 10 minutes, 3600 = 1 hour
-  const mintPassOnePerWallet2 = false;
   const mintPassOnly2 = true;
   const mintPassFree2 = true;
   const mintPassBurn2 = true;
-  const mintPassParams2 = [mintPassOnePerWallet2, mintPassOnly2, mintPassFree2, mintPassBurn2]
+  const mintPassParams2 = [mintPassOnly2, mintPassFree2, mintPassBurn2]
   const saleStartTime2 = saleStartTime;
   const args = [
     baseURI,
@@ -154,6 +159,17 @@ async function main() {
   console.log('Uncaged metadata deployed');
 
   await new Promise(resolve => setTimeout(resolve, 20000));
+
+  // try {
+  //   await hre.run("verify:verify", {
+  //     address: nftInstance.address,
+  //     constructorArguments: ['TICKET', 'TICKET'],
+  //   });
+  // } catch (e) {
+  //   console.log('got error', e);
+  // }
+
+  // console.log('ERC721 verified');
 
   try {
     await hre.run("verify:verify", {

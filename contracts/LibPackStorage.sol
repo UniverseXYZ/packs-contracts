@@ -294,36 +294,46 @@ library LibPackStorage {
   //   return claimable;
   // }
 
-  function checkTokensForMintPass(uint256 cID, uint256 mintPassTokenId, address minter, address contractAddress) private returns (bool) {
+  // function checkTokensForMintPass(uint256 cID, uint256 mintPassTokenId, address minter) private returns (bool) {
+  //   Storage storage ds = packStorage();
+  //   uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
+  //   bool done = false;
+  //   uint256 counter = 0;
+  //   bool canClaim = false;
+  //   bool supportsEnumerable = ds.collection[cID].mintPassContract.supportsInterface(0x780e9d63);
+  //   while (!done && count > 0) {
+  //     uint256 tokenID = supportsEnumerable ? ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter) : mintPassTokenId;
+  //     if (ds.collection[cID].mintPassClaims[tokenID] != true) {
+  //       ds.collection[cID].mintPassClaims[tokenID] = true;
+  //       done = true;
+  //       canClaim = true;
+  //       if (ds.collection[cID].mintPassBurn) {
+  //         ds.collection[cID].mintPassContract.safeTransferFrom(msg.sender, address(0xdEaD), tokenID);
+  //       }
+  //     }
+
+  //     if (counter == count - 1 || !supportsEnumerable) done = true;
+  //     else counter++;
+  //   }
+
+  //   return canClaim;
+  // }
+
+  function checkTokensForMintPass(uint256 cID, uint256 mintPassTokenId, address minter) private returns (bool) {
     Storage storage ds = packStorage();
-    uint256 count = ds.collection[cID].mintPassContract.balanceOf(minter);
-    bool done = false;
-    uint256 counter = 0;
-    bool canClaim = false;
-    bool supportsEnumerable = ds.collection[cID].mintPassContract.supportsInterface(0x780e9d63);
-    while (!done && count > 0) {
-      uint256 tokenID = supportsEnumerable ? ds.collection[cID].mintPassContract.tokenOfOwnerByIndex(minter, counter) : mintPassTokenId;
-      if (ds.collection[cID].mintPassClaims[tokenID] != true) {
-        ds.collection[cID].mintPassClaims[tokenID] = true;
-        done = true;
-        canClaim = true;
-        if (ds.collection[cID].mintPassBurn) {
-          ds.collection[cID].mintPassContract.safeTransferFrom(msg.sender, address(0xdEaD), tokenID);
-        }
-      }
-
-      if (counter == count - 1 || !supportsEnumerable) done = true;
-      else counter++;
-    }
-
-    return canClaim;
+    if (ds.collection[cID].mintPassContract.ownerOf(mintPassTokenId) == minter &&
+        ds.collection[cID].mintPassClaims[mintPassTokenId] != true) {
+      ds.collection[cID].mintPassClaims[mintPassTokenId] = true;
+      if (ds.collection[cID].mintPassBurn) ds.collection[cID].mintPassContract.safeTransferFrom(msg.sender, address(0xdEaD), mintPassTokenId);
+      return true;
+    } else return false;
   }
 
-  function checkMintPass(address relics, uint256 cID, uint256 mintPassTokenId, address user, address contractAddress) external relicSafety(relics) returns (bool) {
+  function checkMintPass(address relics, uint256 cID, uint256 mintPassTokenId, address users) external relicSafety(relics) returns (bool) {
     Storage storage ds = packStorage();
 
     bool canMintPass = false;
-    if (ds.collection[cID].mintPass && checkTokensForMintPass(cID, mintPassTokenId, user, contractAddress)) canMintPass = true;
+    if (ds.collection[cID].mintPass && checkTokensForMintPass(cID, mintPassTokenId, users)) canMintPass = true;
 
     if (ds.collection[cID].mintPassOnly) {
       require(canMintPass, "Mint pass only");
@@ -408,24 +418,24 @@ library LibPackStorage {
     }
 
     return string(
-              abi.encodePacked(
-                '{"weiPrice": "',
-                HelperFunctions.toString(ds.collection[cID].tokenPrice),
-                '", "saleStart": "',
-                HelperFunctions.toString(ds.collection[cID].saleStartTime),
-                '", "mintPass": "',
-                ds.collection[cID].mintPass ? 'true' : 'false',
-                '", "passAddress": "',
-                HelperFunctions.addressToString(ds.collection[cID].mintPassAddress),
-                '", "passDuration": "',
-                HelperFunctions.toString(ds.collection[cID].mintPassDuration),
-                '", "passOnly": "',
-                ds.collection[cID].mintPassOnly ? 'true' : 'false',
-                '", "passBurn": "',
-                ds.collection[cID].mintPassBurn ? 'true' : 'false',
-                '", "metadata": [',
-                  encodedMetadata,
-                '] }'
+      abi.encodePacked(
+        '{"weiPrice": "',
+        HelperFunctions.toString(ds.collection[cID].tokenPrice),
+        '", "saleStart": "',
+        HelperFunctions.toString(ds.collection[cID].saleStartTime),
+        '", "mintPass": "',
+        ds.collection[cID].mintPass ? 'true' : 'false',
+        '", "passAddress": "',
+        HelperFunctions.addressToString(ds.collection[cID].mintPassAddress),
+        '", "passDuration": "',
+        HelperFunctions.toString(ds.collection[cID].mintPassDuration),
+        '", "passOnly": "',
+        ds.collection[cID].mintPassOnly ? 'true' : 'false',
+        '", "passBurn": "',
+        ds.collection[cID].mintPassBurn ? 'true' : 'false',
+        '", "metadata": [',
+          encodedMetadata,
+        '] }'
       )
     );
   }

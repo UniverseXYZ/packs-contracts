@@ -22,11 +22,13 @@ task("accounts", "Prints the list of accounts", async () => {
  * @type import('hardhat/config').HardhatUserConfig
  */
 module.exports = {
-  solidity: "0.7.3",
-  settings: {
-    optimizer: {
-      enabled: true,
-      runs: 200,
+  solidity: {
+    version: "0.7.3",
+    settings: {
+      optimizer: {
+        enabled: false,
+        runs: 200,
+      },
     },
   },
   networks: {
@@ -34,13 +36,15 @@ module.exports = {
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${ process.env.ALCHEMY_KEY }`,
       },
+      allowUnlimitedContractSize: true
     },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${ process.env.ALCHEMY_KEY }`,
       accounts: [`0x${ process.env.MM_PRIVATE_KEY }`],
     },
     rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${ process.env.ALCHEMY_RINKEBY }`,
+      url: `https://rinkeby.infura.io/v3/${ process.env.INFURA_KEY }`,
+      // url: `https://eth-rinkeby.alchemyapi.io/v2/${ process.env.ALCHEMY_RINKEBY }`,
       accounts: [`0x${ process.env.MM_PRIVATE_KEY }`],
     },
   },
